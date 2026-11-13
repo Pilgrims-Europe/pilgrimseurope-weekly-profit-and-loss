@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="snowflake-source" content="cortex-agent-authored" />
+<title>{{TITLE}} – questionnaire</title>
+<!--
+  Pilgrim's Europe questionnaire template. See .cortex/skills/pilgrims-reporting/SKILL.md.
+  Edit only the QUESTIONNAIRE object in the script near the end of this file, plus <title> and the metadata block.
+  The page and the .md export are built from that object.
+-->
+<script type="application/json" id="snowflake-report-metadata">
+{
+  "generated": "{{YYYY-MM-DD}}",
+  "intent": "{{ONE_LINE_PURPOSE}}",
+  "dataSources": [],
+  "sections": [
+    { "id": "{{SECTION_ID}}", "title": "{{SECTION_TITLE}}", "dataSources": [], "producerNotes": "{{WHERE_OPTION_VALUES_CAME_FROM}}" }
+  ]
+}
+</script>
+<style>
+  :root {
+    color-scheme: light dark;
+    --brand: light-dark(#00406E, #7FB3E0);
+    --brand-navy: #1A2B37;
+    --red: #E11F20;
+    --red-dark: #CB1011;
+    --yellow: #FF9D00;
+    --text: light-dark(#374151, #E5E7EB);
+    --muted: light-dark(#6B7280, #9CA3AF);
+    --line: light-dark(#E5E7EB, #374151);
+    --page: light-dark(#F9FAFB, #111827);
+    --card: light-dark(#FFFFFF, #1F2937);
+    --field: light-dark(#FFFFFF, #111827);
+    --tint-brand: light-dark(#EEF4FA, #16324A);
+    --tint-yellow: light-dark(#FFF7E6, #3A2A0A);
+    --tint-red: light-dark(#FDECEC, #3A1A1A);
+    --head: 'Fjalla One', 'Arial Narrow', 'Segoe UI', sans-serif;
+    --body: Montserrat, 'Segoe UI', -apple-system, system-ui, sans-serif;
+    --serif: moret, Georgia, 'Times New Roman', serif;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--page); color: var(--text); font-family: var(--body); font-size: 15px; line-height: 1.6; }
+  .hero { background: var(--brand-navy); color: #fff; border-bottom: 6px solid var(--red); }
+  .wrap { max-width: 880px; width: 100%; margin: 0 auto; padding: clamp(16px, 4vw, 32px); }
+  .eyebrow { font-family: var(--head); letter-spacing: .08em; text-transform: uppercase; color: var(--yellow); font-size: 14px; margin: 0 0 6px; }
+  h1 { font-family: var(--serif); font-weight: 400; font-size: clamp(28px, 5vw, 42px); line-height: 1.15; margin: 0 0 14px; }
+  .meta { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px 24px; margin: 0; font-size: 14px; }
+  .meta dt { font-family: var(--head); text-transform: uppercase; letter-spacing: .06em; color: #9CC5EA; font-size: 12px; }
+  .meta dd { margin: 0; }
+  h2 { font-family: var(--head); font-weight: 400; color: var(--brand); font-size: 26px; line-height: 1.2; margin: 40px 0 12px; }
+  h3 { font-family: var(--head); font-weight: 400; color: var(--brand); font-size: 20px; line-height: 1.3; margin: 0 0 8px; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 1.25rem; padding: clamp(16px, 3vw, 24px); margin: 0 0 18px; }
+  .card > :last-child { margin-bottom: 0; }
+  .q { border-left: 6px solid var(--brand); }
+  .qnum { display: inline-block; min-width: 30px; height: 30px; line-height: 30px; text-align: center; border-radius: 9999px; background: var(--red); color: #fff; font-family: var(--head); margin-right: 8px; }
+  .why { font-style: italic; color: var(--muted); margin: 6px 0 12px; }
+  .opts { display: grid; gap: 8px; margin: 12px 0; }
+  .opts label { display: flex; gap: 10px; align-items: flex-start; padding: 10px 14px; border: 1px solid var(--line); border-radius: .5rem; cursor: pointer; background: var(--field); }
+  .opts label:has(input:checked) { border-color: var(--brand); box-shadow: 0 0 0 1px var(--brand); }
+  .opts input { margin-top: 5px; accent-color: var(--brand); }
+  .fld { display: block; margin: 12px 0 0; }
+  .fld span { display: block; font-weight: 700; font-size: 13px; color: var(--muted); margin-bottom: 4px; }
+  textarea, input[type=text] { width: 100%; font: inherit; color: var(--text); background: var(--field); border: 1px solid light-dark(#D1D5DB, #4B5563); border-radius: .5rem; padding: 10px 12px; }
+  textarea { min-height: 80px; resize: vertical; }
+  textarea:focus, input[type=text]:focus { outline: 2px solid var(--brand); outline-offset: 1px; }
+  .table-wrap { overflow-x: auto; margin: 12px 0; border: 1px solid var(--line); border-radius: .5rem; }
+  table { border-collapse: collapse; width: 100%; font-size: 13px; }
+  th, td { padding: 7px 10px; border-bottom: 1px solid var(--line); text-align: left; white-space: nowrap; }
+  th { background: var(--brand); color: #fff; font-family: var(--head); font-weight: 400; letter-spacing: .03em; }
+  td.n, th.n { text-align: right; font-variant-numeric: tabular-nums; }
+  tr.grp td { background: var(--tint-brand); font-weight: 700; color: var(--brand); }
+  tr:has(input:checked) td { background: var(--tint-red); }
+  td input { accent-color: var(--red); width: 18px; height: 18px; }
+  .callout { border-radius: .5rem; padding: 10px 14px; margin: 10px 0; border-left: 4px solid var(--brand); background: var(--tint-brand); }
+  .callout.warn { border-color: var(--yellow); background: var(--tint-yellow); }
+  ol.steps { margin: 6px 0 0; padding-left: 20px; }
+  .bar { position: sticky; bottom: 0; background: var(--card); border-top: 4px solid var(--red); box-shadow: 0 -4px 16px rgba(0,0,0,.08); }
+  .bar-in { max-width: 880px; margin: 0 auto; padding: 12px clamp(16px, 4vw, 32px); display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+  .btn { font-family: var(--head); letter-spacing: .05em; text-transform: uppercase; font-size: 14px; border: 2px solid var(--red); background: var(--red); color: #fff; border-radius: 9999px; padding: 9px 20px; cursor: pointer; }
+  .btn:hover { background: var(--red-dark); border-color: var(--red-dark); }
+  .btn.alt { background: transparent; color: var(--brand); border-color: var(--brand); }
+  .btn.alt:hover { background: var(--brand); color: #fff; }
+  .btn:focus-visible { outline: 3px solid var(--yellow); outline-offset: 2px; }
+  .status { font-size: 13px; color: var(--muted); flex: 1 1 200px; }
+  @media print { .bar { display: none; } }
+</style>
+</head>
+<body>
+
+<header class="hero"><div class="wrap" id="hero"></div></header>
+<main class="wrap" id="main"></main>
+
+<div class="bar">
+  <div class="bar-in">
+    <button type="button" class="btn" id="dl">Download answers (.md)</button>
+    <button type="button" class="btn alt" id="cp">Copy answers</button>
+    <button type="button" class="btn alt" id="clr">Clear</button>
+    <span class="status" id="status" role="status" aria-live="polite"></span>
+  </div>
+</div>
+
+<script>
+/* ================== EDIT THIS OBJECT ONLY ==================
+   Question types:
+     "choice" - radio buttons. options: ["...", "..."]. Add "Don't know" as the last option.
+     "text"   - free text only.
+     "ticks"  - tick-box table. columns: [{ key, label, num? }], rows: [{ group?, values... }].
+                tickLabel = column title for the tick box. The first column is the item name.
+   Every question gets a "Comments" box. Set whoKnows: false to hide "If you don't know, who does?".
+   Text rules: /wait-what (STE, max 20 words a sentence, one idea a question, glossary terms, no invented facts).
+*/
+var QUESTIONNAIRE = {
+  slug: '{{slug}}',
+  eyebrow: '{{PROJECT}} · Discovery questionnaire',
+  title: '{{TITLE}}',
+  from: '{{FROM}}',
+  to: '{{TO}}',
+  deadline: 'Unknown',
+  purpose: '{{Why this exists and the decision that depends on it.}}',
+  use: '{{Where the answers go and what happens next.}}',
+  context: ['{{One short paragraph for a reader who was not in the session.}}'],
+  glossary: [{ term: '{{TERM}}', text: '{{Definition from GLOSSARY.md}}' }],
+  effort: 'about {{N}} minutes',
+  sections: [
+    {
+      id: '{{section-id}}', title: '{{Theme}}',
+      questions: [
+        { type: 'choice', title: '{{One-idea question?}}', context: '{{Optional context.}}', why: '{{Optional: why this matters.}}',
+          options: ['{{Option A}}', '{{Option B}}', "Don't know"] },
+        { type: 'ticks', title: '{{Which items are X?}}', context: '{{Tick each item that is X.}}', why: '',
+          note: '{{Period and units of the numbers.}}', tickLabel: 'X?',
+          columns: [{ key: 'name', label: 'Item' }, { key: 'v1', label: '{{Measure}}', num: true }],
+          rows: [{ group: '{{Group 1}}', name: '{{Item}}', v1: 0 }],
+          extraField: 'Items you are not sure about' },
+        { type: 'text', title: '{{Open question?}}', context: '', why: '' }
+      ]
+    }
+  ],
+  anythingElse: true
+};
+/* ================== END OF EDITABLE PART ================== */
+
+(function (Q) {
+  var el = function (tag, attrs, text) {
+    var e = document.createElement(tag);
+    Object.keys(attrs || {}).forEach(function (k) { if (k === 'class') e.className = attrs[k]; else e.setAttribute(k, attrs[k]); });
+    if (text != null) e.textContent = text;
+    return e;
+  };
+  var fmt = function (v) { return typeof v === 'number' ? v.toLocaleString('en-GB') : (v == null ? '' : String(v)); };
+
+  // Header
+  var hero = document.getElementById('hero');
+  hero.appendChild(el('p', { class: 'eyebrow' }, Q.eyebrow));
+  hero.appendChild(el('h1', {}, Q.title));
+  var dl = el('dl', { class: 'meta' });
+  [['From', Q.from], ['To', Q.to], ['Deadline', Q.deadline || 'Unknown']].forEach(function (m) {
+    var d = el('div'); d.appendChild(el('dt', {}, m[0])); d.appendChild(el('dd', {}, m[1])); dl.appendChild(d);
+  });
+  hero.appendChild(dl);
+
+  // Intro
+  var main = document.getElementById('main');
+  var intro = el('div', { class: 'card' });
+  var p1 = el('p'); p1.appendChild(el('strong', {}, 'Purpose: ')); p1.appendChild(document.createTextNode(Q.purpose)); intro.appendChild(p1);
+  var p2 = el('p'); p2.appendChild(el('strong', {}, 'How your answers will be used: ')); p2.appendChild(document.createTextNode(Q.use)); intro.appendChild(p2);
+  main.appendChild(intro);
+
+  main.appendChild(el('h2', { id: 'context' }, 'Context'));
+  var ctx = el('div', { class: 'card' });
+  Q.context.forEach(function (t) { ctx.appendChild(el('p', {}, t)); });
+  (Q.glossary || []).forEach(function (g) {
+    var c = el('div', { class: 'callout' }); c.appendChild(el('strong', {}, g.term)); c.appendChild(document.createTextNode(', from the project glossary: ' + g.text)); ctx.appendChild(c);
+  });
+  main.appendChild(ctx);
+
+  main.appendChild(el('h2', { id: 'how-to-answer' }, 'How to answer'));
+  var how = el('div', { class: 'card' });
+  var ol = el('ol', { class: 'steps' });
+  ['Type your name below.', 'Answer each question. "Don\'t know" is a useful answer.', 'If you do not know an answer, write the name of a person who knows.',
+   'Click Download answers (.md) and send the file to ' + Q.from + ' by email or Teams. Or click Copy answers and paste them into a message.']
+    .forEach(function (s) { ol.appendChild(el('li', {}, s)); });
+  how.appendChild(ol);
+  how.appendChild(el('p', {}, 'Time: ' + Q.effort + '. Partial answers are useful.'));
+  var who = el('label', { class: 'fld' }); who.appendChild(el('span', {}, 'Your name'));
+  var whoIn = el('input', { type: 'text', id: 'who', 'data-save': 'who', autocomplete: 'name' }); who.appendChild(whoIn);
+  how.appendChild(who);
+  main.appendChild(how);
+
+  // Questions
+  var n = 0;
+  var addField = function (box, label, key) {
+    var l = el('label', { class: 'fld' }); l.appendChild(el('span', {}, label));
+    var input = label.indexOf('who does') > -1 ? el('input', { type: 'text' }) : el('textarea');
+    input.dataset.save = key; input.dataset.field = label; l.appendChild(input); box.appendChild(l);
+  };
+  var sections = Q.sections.slice();
+  if (Q.anythingElse) sections.push({ id: 'anything-else', title: 'Anything else?', questions: [{ type: 'text', title: 'Anything else?', plain: true, whoKnows: false,
+    context: 'Is there something that we did not ask, but should know?' }] });
+  sections.forEach(function (s) {
+    main.appendChild(el('h2', { id: s.id }, s.title));
+    s.questions.forEach(function (q) {
+      n += 1; q._n = n;
+      var box = el('section', { class: 'card q', 'data-n': n });
+      q._box = box;
+      if (!q.plain) { var h = el('h3'); h.appendChild(el('span', { class: 'qnum' }, String(n))); h.appendChild(document.createTextNode(q.title)); box.appendChild(h); }
+      if (q.context) box.appendChild(el('p', {}, q.context));
+      if (q.why) box.appendChild(el('p', { class: 'why' }, 'Why this matters: ' + q.why));
+      if (q.type === 'choice') {
+        var opts = el('div', { class: 'opts', role: 'radiogroup', 'aria-label': 'Question ' + n });
+        q.options.forEach(function (o) {
+          var l = el('label'); var r = el('input', { type: 'radio', name: 'q' + n, value: o }); l.appendChild(r); l.appendChild(document.createTextNode(' ' + o)); opts.appendChild(l);
+        });
+        box.appendChild(opts);
+      }
+      if (q.type === 'ticks') {
+        if (q.note) box.appendChild(el('div', { class: 'callout warn' }, q.note));
+        var wrap = el('div', { class: 'table-wrap' }); var t = el('table'); var thead = el('thead'); var hr = el('tr');
+        hr.appendChild(el('th', {}, q.tickLabel || 'Yes?'));
+        q.columns.forEach(function (c) { hr.appendChild(el('th', c.num ? { class: 'n' } : {}, c.label)); });
+        thead.appendChild(hr); t.appendChild(thead);
+        var tb = el('tbody'); var last = null;
+        q.rows.forEach(function (r, i) {
+          if (r.group && r.group !== last) { last = r.group; var g = el('tr', { class: 'grp' }); var gt = el('td', { colspan: q.columns.length + 1 }, r.group); g.appendChild(gt); tb.appendChild(g); }
+          var tr = el('tr'); var td0 = el('td');
+          var cb = el('input', { type: 'checkbox', id: 'q' + n + 'r' + i, 'aria-label': (q.tickLabel || 'Yes') + ' ' + r[q.columns[0].key] });
+          cb.dataset.tick = 'q' + n; cb.dataset.row = i; td0.appendChild(cb); tr.appendChild(td0);
+          q.columns.forEach(function (c, j) {
+            var td = el('td', c.num ? { class: 'n' } : {});
+            if (j === 0) { var lab = el('label', { for: cb.id }, fmt(r[c.key])); td.appendChild(lab); } else td.textContent = fmt(r[c.key]);
+            tr.appendChild(td);
+          });
+          tb.appendChild(tr);
+        });
+        t.appendChild(tb); wrap.appendChild(t); box.appendChild(wrap);
+        if (q.extraField) addField(box, q.extraField, 'q' + n + ':extra');
+      }
+      addField(box, q.plain ? 'Your answer' : 'Comments', 'q' + n + ':comments');
+      if (q.whoKnows !== false) addField(box, "If you don't know, who does?", 'q' + n + ':who');
+      main.appendChild(box);
+    });
+  });
+
+  // Autosave: works in a normal browser; skipped where storage is blocked (Snowflake sandbox).
+  var KEY = 'pe-questionnaire-' + Q.slug;
+  var store = null;
+  try { store = window.localStorage; store.setItem(KEY + ':t', '1'); store.removeItem(KEY + ':t'); } catch (e) { store = null; }
+  function save() {
+    if (!store) return;
+    var d = {};
+    document.querySelectorAll('[data-save]').forEach(function (e) { d[e.dataset.save] = e.value; });
+    document.querySelectorAll('input[type=radio]:checked').forEach(function (e) { d['r:' + e.name] = e.value; });
+    d.ticks = Array.prototype.map.call(document.querySelectorAll('input[data-tick]:checked'), function (e) { return e.id; });
+    try { store.setItem(KEY, JSON.stringify(d)); } catch (e) {}
+  }
+  (function load() {
+    if (!store) return;
+    var d; try { d = JSON.parse(store.getItem(KEY) || 'null'); } catch (e) { d = null; }
+    if (!d) return;
+    document.querySelectorAll('[data-save]').forEach(function (e) { if (d[e.dataset.save] != null) e.value = d[e.dataset.save]; });
+    document.querySelectorAll('input[type=radio]').forEach(function (e) { if (d['r:' + e.name] === e.value) e.checked = true; });
+    (d.ticks || []).forEach(function (id) { var e = document.getElementById(id); if (e) e.checked = true; });
+  })();
+  document.addEventListener('input', save);
+  document.addEventListener('change', save);
+
+  // Markdown export, in the to-questionnaire template shape.
+  var quote = function (t) { t = (t || '').trim(); return t ? t.split(/\r?\n/).map(function (l) { return '> ' + l; }).join('\n') : '> (no answer)'; };
+  var val = function (key) { var e = document.querySelector('[data-save="' + key + '"]'); return e ? e.value : ''; };
+  function buildMarkdown() {
+    var name = whoIn.value.trim() || 'Unknown';
+    var out = ['# ' + Q.title + ': answers', '', '**From:** ' + name + ', **To:** ' + Q.from + ', **Date:** ' + new Date().toISOString().slice(0, 10), '', Q.purpose];
+    sections.forEach(function (s) {
+      out.push('', '## ' + s.title);
+      s.questions.forEach(function (q) {
+        if (!q.plain) out.push('', '### ' + q._n + '. ' + q.title);
+        if (q.type === 'choice') {
+          var r = q._box.querySelector('input[type=radio]:checked');
+          out.push('', '**Answer:**', quote(r ? r.value : ''));
+        }
+        if (q.type === 'ticks') {
+          var ticked = Array.prototype.filter.call(q._box.querySelectorAll('input[data-tick]'), function (e) { return e.checked; });
+          out.push('', '**' + (q.tickLabel || 'Ticked') + ' (' + ticked.length + ' of ' + q.rows.length + '):**', '');
+          if (ticked.length) {
+            var gcol = q.rows.some(function (r) { return r.group; });
+            out.push('| ' + q.columns[0].label + (gcol ? ' | Group' : '') + ' |', '| --- |' + (gcol ? ' --- |' : ''));
+            ticked.forEach(function (e) {
+              var r = q.rows[+e.dataset.row];
+              out.push('| ' + String(r[q.columns[0].key]).replace(/\|/g, '\\|') + (gcol ? ' | ' + (r.group || '') : '') + ' |');
+            });
+          } else out.push('> (none ticked)');
+          if (q.extraField) out.push('', '**' + q.extraField + ':**', quote(val('q' + q._n + ':extra')));
+        }
+        out.push('', '**' + (q.plain ? 'Answer' : 'Comments') + ':**', quote(val('q' + q._n + ':comments')));
+        if (q.whoKnows !== false) out.push('', "**Who knows:**", quote(val('q' + q._n + ':who')));
+      });
+    });
+    out.push('');
+    return out.join('\n');
+  }
+
+  var status = document.getElementById('status');
+  document.getElementById('dl').addEventListener('click', function () {
+    var nm = (whoIn.value.trim() || 'unknown').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+    var blob = new Blob([buildMarkdown()], { type: 'text/markdown;charset=utf-8' });
+    var a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = Q.slug + '-answers-' + (nm || 'unknown') + '.md';
+    document.body.appendChild(a); a.click(); a.remove(); setTimeout(function () { URL.revokeObjectURL(a.href); }, 1000);
+    status.textContent = 'File downloaded. Attach it to an email or a Teams message to ' + Q.from + '.';
+  });
+  document.getElementById('cp').addEventListener('click', function () {
+    var declined = function () { status.textContent = 'Answers were not copied. Use Download answers (.md) instead.'; };
+    status.textContent = 'Copying…';
+    try { navigator.clipboard.writeText(buildMarkdown()).then(function () { status.textContent = 'Answers copied. Paste them into an email or a Teams message.'; }, declined); }
+    catch (e) { declined(); }
+  });
+  document.getElementById('clr').addEventListener('click', function () {
+    if (!window.confirm('Clear all answers? You cannot undo this.')) return;
+    document.querySelectorAll('textarea, input[type=text]').forEach(function (e) { e.value = ''; });
+    document.querySelectorAll('input[type=radio], input[type=checkbox]').forEach(function (e) { e.checked = false; });
+    save(); status.textContent = 'All answers cleared.';
+  });
+})(QUESTIONNAIRE);
+</script>
+</body>
+</html>

@@ -9,6 +9,16 @@ Before you write text to Git or GitHub (issue, comment, wayfinder map, commit me
 5. Read it again as a reader who was not in this session. If it is not clear on one read, write it again.
 6. Do not add facts to make text clearer. If something is unknown (an owner, a date, a definition), write "Unknown" or ask.
 
+## Reporting
+
+All reports use one house style, from pilgrimseurope.com. This includes HTML reports, questionnaires, dashboards and Streamlit apps. Before you make or change a report, read `.cortex/skills/pilgrims-reporting/SKILL.md`. Start from a template in that folder.
+
+- HTML report: `templates/report.html`
+- Questionnaire (also for `/to-questionnaire`): `templates/questionnaire.html`. Output HTML, not `.md`.
+- Streamlit: `templates/streamlit/pe_theme.py` and `templates/streamlit/config.toml`
+
+Apply the `/wait-what` rules above to all report text.
+
 ## Agent skills
 
 ### Issue tracker
