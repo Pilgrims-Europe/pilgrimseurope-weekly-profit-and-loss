@@ -126,6 +126,27 @@ cd pilgrimseurope-weekly-profit-and-loss
 
 The first time you connect, a browser window asks you to sign in to GitHub. Sign in with your GitHub account.
 
+Then turn on the project check. It stops a commit that has any of these problems:
+
+- A notebook with outputs. Outputs can hold finance figures.
+- A Python syntax error in a `.py` file or a notebook code cell.
+- Python code that fails `ruff` (lint or format).
+
+Run these inside the repo folder:
+
+```powershell
+pip install ruff
+git config core.hooksPath .githooks
+```
+
+If a commit is blocked, read the message and fix the problem. These commands fix the common ones:
+
+```powershell
+python scripts/notebook_outputs.py clear "docs/Project Notebook.ipynb"
+ruff check --fix .
+ruff format .
+```
+
 ### Every time you start a ticket
 
 **1. Get the latest files.**
@@ -180,7 +201,11 @@ git push -u origin emma/2-kill-data
 ├── README.md        ← you are here
 ├── GLOSSARY.md      ← exact meaning of project words
 ├── AGENTS.md        ← rules for the AI agents
-└── docs/agents/     ← how agents use GitHub issues
+├── docs/agents/     ← how agents use GitHub issues
+├── docs/Project Notebook.ipynb  ← working log for the research tickets
+├── scripts/         ← helper scripts (notebook output check, Python syntax check)
+├── ruff.toml        ← ruff settings (Python lint and format)
+└── .githooks/       ← pre-commit check
 ```
 
 When you add work, use these folders. Make the folder if it does not exist.
