@@ -1,0 +1,9 @@
+# Pilgrim's Europe Streamlit theme. Copy to .streamlit/config.toml in the app folder.
+# Colours from pilgrimseurope.com. See .cortex/skills/pilgrims-reporting/SKILL.md.
+[theme]
+base = "light"
+primaryColor = "#E11F20"
+backgroundColor = "#F9FAFB"
+secondaryBackgroundColor = "#FFFFFF"
+textColor = "#374151"
+font = "sans serif"

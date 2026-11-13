@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="snowflake-source" content="cortex-agent-authored" />
+<title>Kill rules for the weekly P&amp;L – questionnaire</title>
+<script type="application/json" id="snowflake-report-metadata">
+{
+  "generated": "2026-11-13",
+  "intent": "Questionnaire to Gui (project sponsor) for the open kill rules from ticket #2. Answers unblock ticket #10.",
+  "dataSources": [
+    { "type": "file", "path": "research/kill-data.md (branch research/kill-data)" }
+  ],
+  "sections": [
+    { "id": "poultry-rejects", "title": "Poultry rejects",
+      "dataSources": [{ "type": "query", "sql": "SELECT c.CONDEMNATIONNO, c.CONDEMNATIONNAME, c.CALCULATIONCATEGORY, SUM(IFF(p.PLANTNO = 'S11', d.HEAD, 0)) AS ANWICK_HEAD, SUM(IFF(p.PLANTNO = 'S10', d.HEAD, 0)) AS ASHBOURNE_HEAD, SUM(IFF(p.PLANTNO = 'S01', d.HEAD, 0)) AS DUNGANNON_HEAD, SUM(d.HEAD) AS TOTAL_HEAD FROM PROD_RAW.MTECH.PMTSCONDEMNTRANSDETAILS d JOIN PROD_RAW.MTECH.PMTSCONDEMNTRANS t ON t.IRN = d.PMTSCONDEMNTRANSIRN JOIN PROD_RAW.MTECH.PMTSCONDEMNATIONS c ON c.IRN = d.PMTSCONDEMNATIONSIRN JOIN PROD_RAW.MTECH.PROTEINFACILITYPLANTS p ON p.IRN = t.PROTEINFACILITYPLANTSIRN WHERE p.PLANTNO IN ('S01', 'S10', 'S11') AND t.VOIDFLAG = FALSE AND t.XDATE >= '2026-09-14' AND t.XDATE < '2026-11-09' GROUP BY 1, 2, 3 HAVING SUM(d.HEAD) > 0 ORDER BY c.CALCULATIONCATEGORY, TOTAL_HEAD DESC" }],
+      "producerNotes": "Code table values are inlined from this query (8 weeks, 2026-09-14 to 2026-11-08, void lots excluded)." },
+    { "id": "pork-kill", "title": "Pork kill",
+      "dataSources": [{ "type": "file", "path": "research/kill-data.md (Hellenic section, totals since 2025-01-01)" }],
+      "producerNotes": "Delivered and Killed Qty totals copied from the research note." },
+    { "id": "birds-delivered", "title": "Birds delivered",
+      "dataSources": [
+        { "type": "query", "sql": "SELECT p.PLANTNAME, p.PLANTNO, COUNT(*) AS LOADS, SUM(r.FARMHDCOUNT) AS FARM_HEAD, SUM(r.PLANTHDCOUNT) AS PLANT_HEAD, COUNT_IF(r.FARMHDCOUNT <> r.PLANTHDCOUNT) AS LOADS_DIFFERENT, SUM(r.DOA) AS DOA FROM PROD_RAW.MTECH.PMTSPROCRECVTRANS r JOIN PROD_RAW.MTECH.PROTEINFACILITYPLANTS p ON p.IRN = r.PROTEINFACILITYPLANTSIRN WHERE p.PLANTNO IN ('S01', 'S10', 'S11') AND r.VOIDFLAG = FALSE AND r.XDATE >= '2026-09-14' AND r.XDATE < '2026-11-09' GROUP BY 1, 2 ORDER BY 1" },
+        { "type": "query", "sql": "SELECT p.PLANTNAME, YEAR(r.XDATE) AS YR, COUNT(*) AS LOADS, COUNT_IF(r.FARMHDCOUNT <> r.PLANTHDCOUNT) AS LOADS_DIFFERENT, SUM(r.PLANTHDCOUNT) - SUM(r.FARMHDCOUNT) AS PLANT_MINUS_FARM, MAX(IFF(r.FARMHDCOUNT <> r.PLANTHDCOUNT, r.XDATE, NULL))::DATE AS LAST_DIFF FROM PROD_RAW.MTECH.PMTSPROCRECVTRANS r JOIN PROD_RAW.MTECH.PROTEINFACILITYPLANTS p ON p.IRN = r.PROTEINFACILITYPLANTSIRN WHERE p.PLANTNO IN ('S01', 'S10', 'S11') AND r.VOIDFLAG = FALSE GROUP BY 1, 2 HAVING LOADS_DIFFERENT > 0 ORDER BY 1, 2" }
+      ],
+      "producerNotes": "Birds delivered totals and the 2018 Dungannon difference come from these queries." }
+  ]
+}
+</script>
+<style>
+  :root {
+    color-scheme: light dark;
+    --brand: light-dark(#00406E, #7FB3E0);
+    --brand-light: light-dark(#025895, #9CC5EA);
+    --brand-navy: #1A2B37;
+    --red: #E11F20;
+    --red-dark: #CB1011;
+    --yellow: #FF9D00;
+    --green: light-dark(#5B6C43, #A3B88A);
+    --text: light-dark(#374151, #E5E7EB);
+    --muted: light-dark(#6B7280, #9CA3AF);
+    --line: light-dark(#E5E7EB, #374151);
+    --page: light-dark(#F9FAFB, #111827);
+    --card: light-dark(#FFFFFF, #1F2937);
+    --field: light-dark(#FFFFFF, #111827);
+    --head: 'Fjalla One', 'Arial Narrow', 'Segoe UI', sans-serif;
+    --body: Montserrat, 'Segoe UI', -apple-system, system-ui, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--page); color: var(--text); font-family: var(--body); font-size: 15px; line-height: 1.6; }
+  img, svg { max-width: 100%; height: auto; }
+  .hero { background: var(--brand-navy); color: #fff; border-bottom: 6px solid var(--red); }
+  .hero-in, main { max-width: 880px; width: 100%; margin: 0 auto; padding: clamp(16px, 4vw, 32px); }
+  .eyebrow { font-family: var(--head); letter-spacing: .08em; text-transform: uppercase; color: var(--yellow); font-size: 14px; margin: 0 0 6px; }
+  h1 { font-family: moret, Georgia, 'Times New Roman', serif; font-weight: 400; font-size: clamp(28px, 5vw, 42px); line-height: 1.15; margin: 0 0 14px; }
+  .meta { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px 24px; margin: 0; font-size: 14px; }
+  .meta dt { font-family: var(--head); text-transform: uppercase; letter-spacing: .06em; color: #9CC5EA; font-size: 12px; }
+  .meta dd { margin: 0; }
+  h2 { font-family: var(--head); font-weight: 400; color: var(--brand); font-size: 26px; line-height: 1.2; margin: 40px 0 12px; }
+  h3 { font-family: var(--head); font-weight: 400; color: var(--brand); font-size: 20px; line-height: 1.3; margin: 0 0 8px; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 1.25rem; padding: clamp(16px, 3vw, 24px); margin: 0 0 18px; }
+  .q { border-left: 6px solid var(--brand); }
+  .qnum { display: inline-block; min-width: 30px; height: 30px; line-height: 30px; text-align: center; border-radius: 9999px; background: var(--red); color: #fff; font-family: var(--head); margin-right: 8px; }
+  .why { font-style: italic; color: var(--muted); margin: 6px 0 12px; }
+  .ctx { margin: 0 0 10px; }
+  .opts { display: grid; gap: 8px; margin: 12px 0; }
+  .opts label { display: flex; gap: 10px; align-items: flex-start; padding: 10px 14px; border: 1px solid var(--line); border-radius: .5rem; cursor: pointer; background: var(--field); }
+  .opts label:has(input:checked) { border-color: var(--brand); box-shadow: 0 0 0 1px var(--brand); }
+  .opts input { margin-top: 5px; accent-color: var(--brand); }
+  .fld { display: block; margin: 12px 0 0; }
+  .fld span { display: block; font-weight: 700; font-size: 13px; color: var(--muted); margin-bottom: 4px; }
+  textarea, input[type=text] { width: 100%; font: inherit; color: var(--text); background: var(--field); border: 1px solid light-dark(#D1D5DB, #4B5563); border-radius: .5rem; padding: 10px 12px; }
+  textarea { min-height: 80px; resize: vertical; }
+  textarea:focus, input[type=text]:focus { outline: 2px solid var(--brand); outline-offset: 1px; }
+  .table-wrap { overflow-x: auto; margin: 12px 0; border: 1px solid var(--line); border-radius: .5rem; }
+  table { border-collapse: collapse; width: 100%; font-size: 13px; }
+  th, td { padding: 7px 10px; border-bottom: 1px solid var(--line); text-align: left; white-space: nowrap; }
+  th { background: var(--brand); color: #fff; font-family: var(--head); font-weight: 400; letter-spacing: .03em; position: sticky; top: 0; }
+  td.n, th.n { text-align: right; font-variant-numeric: tabular-nums; }
+  tr.cat td { background: light-dark(#EEF4FA, #16324A); font-weight: 700; color: var(--brand); }
+  tr:has(input:checked) td { background: light-dark(#FDECEC, #3A1A1A); }
+  td input { accent-color: var(--red); width: 18px; height: 18px; }
+  .note { background: light-dark(#FFF7E6, #3A2A0A); border-left: 4px solid var(--yellow); border-radius: .5rem; padding: 10px 14px; margin: 10px 0; }
+  .glossary { background: light-dark(#EEF4FA, #16324A); border-left: 4px solid var(--brand); border-radius: .5rem; padding: 10px 14px; margin: 10px 0; }
+  .bar { position: sticky; bottom: 0; background: var(--card); border-top: 4px solid var(--red); box-shadow: 0 -4px 16px rgba(0,0,0,.08); }
+  .bar-in { max-width: 880px; margin: 0 auto; padding: 12px clamp(16px, 4vw, 32px); display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+  .btn { font-family: var(--head); letter-spacing: .05em; text-transform: uppercase; font-size: 14px; border: 2px solid var(--red); background: var(--red); color: #fff; border-radius: 9999px; padding: 9px 20px; cursor: pointer; }
+  .btn:hover { background: var(--red-dark); border-color: var(--red-dark); }
+  .btn.alt { background: transparent; color: var(--brand); border-color: var(--brand); }
+  .btn.alt:hover { background: var(--brand); color: #fff; }
+  .btn:focus-visible { outline: 3px solid var(--yellow); outline-offset: 2px; }
+  .status { font-size: 13px; color: var(--muted); flex: 1 1 200px; }
+  ol.steps { margin: 6px 0 0; padding-left: 20px; }
+  @media print { .bar { display: none; } }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="hero-in">
+    <p class="eyebrow">Weekly P&amp;L · Discovery questionnaire</p>
+    <h1>Kill rules for the weekly P&amp;L</h1>
+    <dl class="meta">
+      <div><dt>From</dt><dd>Chris McCann</dd></div>
+      <div><dt>To</dt><dd>Guilherme De Marchi (Gui)</dd></div>
+      <div><dt>Deadline</dt><dd>Unknown</dd></div>
+    </dl>
+  </div>
+</header>
+
+<main>
+  <div class="card">
+    <p><strong>Purpose:</strong> The weekly P&amp;L needs kill for each site and week. Some kill rules are not known. Your answers set these rules for the weekly kill table (ticket #10).</p>
+    <p style="margin:0"><strong>How your answers will be used:</strong> Chris adds them to the project glossary and to ticket #2. The team then builds the weekly kill table.</p>
+  </div>
+
+  <h2 id="context">Context</h2>
+  <div class="card">
+    <p class="ctx">Ticket #2 found the kill data in Snowflake. Poultry kill data comes from Mtech, for Anwick, Ashbourne and Dungannon. Pork kill data comes from Hellenic, for Spalding and Westerleigh. The data is there, but four business rules are not known.</p>
+    <div class="glossary"><strong>Kill (poultry)</strong>, from the project glossary: birds delivered, less dead on arrival, less rejects. This is the net number of birds onto the line.</div>
+  </div>
+
+  <h2 id="how-to-answer">How to answer</h2>
+  <div class="card">
+    <ol class="steps">
+      <li>Type your name below.</li>
+      <li>Answer each question. "Don't know" is a useful answer.</li>
+      <li>If you do not know an answer, write the name of a person who knows.</li>
+      <li>Click <strong>Download answers (.md)</strong> and send the file to Chris by email or Teams. Or click <strong>Copy answers</strong> and paste them into a message.</li>
+    </ol>
+    <p style="margin:10px 0 0">Time: about 15 minutes. Partial answers are useful.</p>
+    <label class="fld"><span>Your name</span><input type="text" id="who" data-save="who" autocomplete="name" /></label>
+  </div>
+
+  <!-- ===================== POULTRY REJECTS ===================== -->
+  <h2 id="poultry-rejects">Poultry rejects</h2>
+
+  <section class="card q" data-q="1" data-title="Do part rejects reduce kill?">
+    <h3><span class="qnum">1</span>Do part rejects reduce kill?</h3>
+    <p class="ctx">Some condemnation codes remove only part of a bird. An example is Croppings. The rest of the bird stays on the line.</p>
+    <p class="why">Why this matters: in the last 8 weeks, Croppings was 3.8 million head at the pilot sites. That is about 10% of birds delivered. If it counts, kill is about 10% lower.</p>
+    <div class="opts" role="radiogroup" aria-label="Question 1">
+      <label><input type="radio" name="q1" value="Yes. A part reject counts as a full reject." /> Yes. A part reject counts as a full reject.</label>
+      <label><input type="radio" name="q1" value="No. Only whole-bird rejects reduce kill." /> No. Only whole-bird rejects reduce kill.</label>
+      <label><input type="radio" name="q1" value="Don't know" /> Don't know</label>
+    </div>
+    <label class="fld"><span>Comments</span><textarea data-field="Comments"></textarea></label>
+    <label class="fld"><span>If you don't know, who does?</span><input type="text" data-field="Who knows" /></label>
+  </section>
+
+  <section class="card q" data-q="2" data-title="Which condemnation codes are rejects?" data-kind="codes">
+    <h3><span class="qnum">2</span>Which condemnation codes are rejects?</h3>
+    <p class="ctx">The table shows each Mtech condemnation code that was used at the pilot sites in the last 8 weeks. Tick each code that is a reject. Leave the box empty if the code is not a reject.</p>
+    <p class="why">Why this matters: kill uses the sum of the ticked codes. The sum of all codes is too high, because some codes are part rejects.</p>
+    <div class="note">Period: 2026-09-14 to 2026-11-08. Values are head (number of birds). Birds delivered in this period: Anwick 16,272,819. Ashbourne 5,240,400. Dungannon 17,007,432.</div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Reject?</th><th>Code</th><th class="n">Anwick</th><th class="n">Ashbourne</th><th class="n">Dungannon</th><th class="n">Total</th></tr></thead>
+        <tbody id="codes"></tbody>
+      </table>
+    </div>
+    <label class="fld"><span>Codes you are not sure about</span><textarea data-field="Not sure about"></textarea></label>
+    <label class="fld"><span>Comments</span><textarea data-field="Comments"></textarea></label>
+    <label class="fld"><span>If you don't know, who does?</span><input type="text" data-field="Who knows" /></label>
+  </section>
+
+  <section class="card q" data-q="3" data-title="What do category 1 and category 2 mean?">
+    <h3><span class="qnum">3</span>What do category 1 and category 2 mean?</h3>
+    <p class="ctx">Mtech gives each condemnation code a category: 1 or 2. Mtech does not say what they mean. Category 1 codes look like bird health conditions, for example Cellulitis. Category 2 codes look like factory damage, for example Machine Damage.</p>
+    <p class="why">Why this matters: if one category is the rejects, the kill table can use the category. Then new codes go in the correct group.</p>
+    <div class="opts" role="radiogroup" aria-label="Question 3">
+      <label><input type="radio" name="q3" value="Yes. Category 1 is bird health. Category 2 is factory damage." /> Yes. Category 1 is bird health. Category 2 is factory damage.</label>
+      <label><input type="radio" name="q3" value="No. They mean something different (see comments)." /> No. They mean something different. Write the meaning below.</label>
+      <label><input type="radio" name="q3" value="Don't know" /> Don't know</label>
+    </div>
+    <label class="fld"><span>Comments</span><textarea data-field="Comments"></textarea></label>
+    <label class="fld"><span>If you don't know, who does?</span><input type="text" data-field="Who knows" /></label>
+  </section>
+
+  <!-- ===================== PORK KILL ===================== -->
+  <h2 id="pork-kill">Pork kill</h2>
+
+  <section class="card q" data-q="4" data-title="Which value is kill for a pork site?">
+    <h3><span class="qnum">4</span>Which value is kill for a pork site?</h3>
+    <p class="ctx">The glossary defines kill for poultry only. Hellenic has a "Killed Qty" field for each booking. It also has pigs delivered, dead on arrival, dead in pen and casualty. A separate table has whole pigs condemned.</p>
+    <p class="why">Why this matters: the two methods give different numbers. Since 2025-01-01, Westerleigh had 1,809,392 pigs delivered and a Killed Qty of 1,804,400. Spalding had 2,333,923 delivered and 2,333,613 killed.</p>
+    <div class="opts" role="radiogroup" aria-label="Question 4">
+      <label><input type="radio" name="q4" value="Killed Qty from Hellenic" /> "Killed Qty" from Hellenic</label>
+      <label><input type="radio" name="q4" value="Pigs delivered, less dead on arrival, dead in pen, casualty and whole pigs condemned" /> Pigs delivered, less dead on arrival, less dead in pen, less casualty, less whole pigs condemned</label>
+      <label><input type="radio" name="q4" value="Other (see comments)" /> Other. Write the rule below.</label>
+      <label><input type="radio" name="q4" value="Don't know" /> Don't know</label>
+    </div>
+    <label class="fld"><span>Comments</span><textarea data-field="Comments"></textarea></label>
+    <label class="fld"><span>If you don't know, who does?</span><input type="text" data-field="Who knows" /></label>
+  </section>
+
+  <!-- ===================== BIRDS DELIVERED ===================== -->
+  <h2 id="birds-delivered">Birds delivered</h2>
+
+  <section class="card q" data-q="5" data-title="Which head count is birds delivered: farm or plant?">
+    <h3><span class="qnum">5</span>Which head count is birds delivered: farm or plant?</h3>
+    <p class="ctx">Mtech has two head counts for each load. One is the farm head count. The other is the plant head count. Since 2019, the two counts are the same at all three pilot sites. They were different at Dungannon in 2018 only.</p>
+    <p class="why">Why this matters: the risk is low now. But we must use the correct count if the two counts are different again.</p>
+    <div class="opts" role="radiogroup" aria-label="Question 5">
+      <label><input type="radio" name="q5" value="Farm head count" /> Farm head count</label>
+      <label><input type="radio" name="q5" value="Plant head count" /> Plant head count</label>
+      <label><input type="radio" name="q5" value="Don't know" /> Don't know</label>
+    </div>
+    <label class="fld"><span>Comments</span><textarea data-field="Comments"></textarea></label>
+    <label class="fld"><span>If you don't know, who does?</span><input type="text" data-field="Who knows" /></label>
+  </section>
+
+  <!-- ===================== ANYTHING ELSE ===================== -->
+  <h2 id="anything-else">Anything else?</h2>
+  <section class="card q" data-q="6" data-title="Anything else?">
+    <p class="ctx">Is there something about kill that we did not ask, but should know?</p>
+    <label class="fld"><span>Your answer</span><textarea data-field="Answer"></textarea></label>
+  </section>
+</main>
+
+<div class="bar">
+  <div class="bar-in">
+    <button type="button" class="btn" id="dl">Download answers (.md)</button>
+    <button type="button" class="btn alt" id="cp">Copy answers</button>
+    <button type="button" class="btn alt" id="clr">Clear</button>
+    <span class="status" id="status" role="status" aria-live="polite"></span>
+  </div>
+</div>
+
+<script>
+(function () {
+  // Condemnation codes, pilot sites, 2026-09-14 to 2026-11-08 (see metadata query).
+  var CODES = [
+    [1,'Croppings',1680471,625936,1532309],[1,'Asc / OED',27577,18486,14467],[1,'Runts',59217,318,0],
+    [1,'AB Colour Fever',23024,9342,20343],[1,'Wet Cellulitis',44238,7524,0],[1,'Cellulitis',0,0,36660],
+    [1,'Perhepatitis',9509,5021,19180],[1,'Les Joint',22410,4066,0],[1,'DOS',0,0,17941],
+    [1,'Other Jaund',1606,15950,0],[1,'OtherEV',0,0,17509],[1,'OtherDF',0,0,16554],
+    [1,'Wooden Breast/White Muscle/Trapezius',15358,0,0],[1,'DermEV',0,0,12660],[1,'Necrosis',0,0,3685],
+    [1,'Tum/Nud',2066,1264,0],[1,'Dermatitis',624,761,1526],[1,'Hepatitis',1147,1512,0],
+    [1,'Emac',505,402,558],[1,'Dry Cell',1410,0,0],[1,'Bruises',422,908,0],
+    [1,'Breast Blist',0,0,102],[1,'Fract',1,83,0],[1,'Peritonis',31,0,0],
+    [1,'Pericarditis',15,10,0],[1,'Resp Dies',19,0,0],
+    [2,'Offal Only',12,53860,0],[2,'Parsons Nose Discolouration',0,0,40849],[2,'Broken Limb',33128,0,0],
+    [2,'Br Light',29914,0,0],[2,'Fact Other: Others',7476,15224,0],[2,'Br Dark',17723,0,0],
+    [2,'UnCut',11596,3586,0],[2,'Machine Damage',8315,1607,4014],[2,'Overscald',6201,2312,4713],
+    [2,'Contamination',559,2776,4435],[2,'Fact Other: Chiller Floor Birds',279,28,6562],
+    [2,'Blood Free Flowing',0,0,2210],[2,'Fact Other: Crystal',593,2,0],[2,'Poor Bleed',14,0,0]
+  ];
+  var fmt = function (n) { return n.toLocaleString('en-GB'); };
+  var tbody = document.getElementById('codes');
+  var lastCat = 0;
+  CODES.forEach(function (c, i) {
+    if (c[0] !== lastCat) {
+      lastCat = c[0];
+      var h = document.createElement('tr'); h.className = 'cat';
+      var td = document.createElement('td'); td.colSpan = 6; td.textContent = 'Category ' + c[0];
+      h.appendChild(td); tbody.appendChild(h);
+    }
+    var tr = document.createElement('tr');
+    var cb = document.createElement('input');
+    cb.type = 'checkbox'; cb.dataset.code = c[1]; cb.dataset.cat = c[0]; cb.id = 'code' + i;
+    cb.setAttribute('aria-label', 'Reject: ' + c[1]);
+    var cells = [cb, c[1], fmt(c[2]), fmt(c[3]), fmt(c[4]), fmt(c[2] + c[3] + c[4])];
+    cells.forEach(function (v, j) {
+      var td = document.createElement('td');
+      if (j >= 2) td.className = 'n';
+      if (j === 0) td.appendChild(v);
+      else if (j === 1) { var l = document.createElement('label'); l.htmlFor = cb.id; l.textContent = v; td.appendChild(l); }
+      else td.textContent = v;
+      tr.appendChild(td);
+    });
+    tbody.appendChild(tr);
+  });
+
+  // Give every input a stable key, for autosave.
+  document.querySelectorAll('section.q').forEach(function (s) {
+    s.querySelectorAll('[data-field]').forEach(function (el) { el.dataset.save = 'q' + s.dataset.q + ':' + el.dataset.field; });
+  });
+
+  // Autosave works when the file is opened in a normal browser. It is skipped where storage is blocked.
+  var KEY = 'pe-questionnaire-kill-rules';
+  var store = null;
+  try { store = window.localStorage; store.setItem(KEY + ':t', '1'); store.removeItem(KEY + ':t'); } catch (e) { store = null; }
+  function save() {
+    if (!store) return;
+    var data = {};
+    document.querySelectorAll('[data-save]').forEach(function (el) { data[el.dataset.save] = el.value; });
+    document.querySelectorAll('input[type=radio]:checked').forEach(function (el) { data['r:' + el.name] = el.value; });
+    data.codes = Array.prototype.map.call(document.querySelectorAll('#codes input:checked'), function (el) { return el.dataset.code; });
+    try { store.setItem(KEY, JSON.stringify(data)); } catch (e) {}
+  }
+  function load() {
+    if (!store) return;
+    var data; try { data = JSON.parse(store.getItem(KEY) || 'null'); } catch (e) { data = null; }
+    if (!data) return;
+    document.querySelectorAll('[data-save]').forEach(function (el) { if (data[el.dataset.save] != null) el.value = data[el.dataset.save]; });
+    document.querySelectorAll('input[type=radio]').forEach(function (el) { if (data['r:' + el.name] === el.value) el.checked = true; });
+    (data.codes || []).forEach(function (code) {
+      document.querySelectorAll('#codes input').forEach(function (el) { if (el.dataset.code === code) el.checked = true; });
+    });
+  }
+  load();
+  document.addEventListener('input', save);
+  document.addEventListener('change', save);
+
+  function quote(text) {
+    var t = (text || '').trim();
+    return t ? t.split(/\r?\n/).map(function (l) { return '> ' + l; }).join('\n') : '> (no answer)';
+  }
+
+  function buildMarkdown() {
+    var name = document.getElementById('who').value.trim() || 'Unknown';
+    var today = new Date().toISOString().slice(0, 10);
+    var out = [];
+    out.push('# Kill rules for the weekly P&L: answers');
+    out.push('');
+    out.push('**From:** ' + name + ', **To:** Chris McCann, **Date:** ' + today);
+    out.push('');
+    out.push('These are answers to the kill rules questionnaire. They set the rules for the weekly kill table (ticket #10).');
+    var heads = { '1': 'Poultry rejects', '4': 'Pork kill', '5': 'Birds delivered', '6': 'Anything else?' };
+    document.querySelectorAll('section.q').forEach(function (s) {
+      var q = s.dataset.q;
+      if (heads[q]) { out.push(''); out.push('## ' + heads[q]); }
+      if (q !== '6') { out.push(''); out.push('### ' + q + '. ' + s.dataset.title); }
+      var radio = s.querySelector('input[type=radio]:checked');
+      if (s.querySelector('input[type=radio]')) { out.push(''); out.push('**Answer:**'); out.push(quote(radio ? radio.value : '')); }
+      if (s.dataset.kind === 'codes') {
+        var ticked = Array.prototype.filter.call(s.querySelectorAll('#codes input'), function (el) { return el.checked; });
+        out.push('');
+        out.push('**Codes that are rejects (' + ticked.length + ' of ' + CODES.length + '):**');
+        out.push('');
+        if (ticked.length) {
+          out.push('| Code | Category |');
+          out.push('| --- | --- |');
+          ticked.forEach(function (el) { out.push('| ' + el.dataset.code.replace(/\|/g, '\\|') + ' | ' + el.dataset.cat + ' |'); });
+        } else {
+          out.push('> (no codes ticked)');
+        }
+      }
+      s.querySelectorAll('[data-field]').forEach(function (el) {
+        out.push('');
+        out.push('**' + el.dataset.field + ':**');
+        out.push(quote(el.value));
+      });
+    });
+    out.push('');
+    return out.join('\n');
+  }
+
+  var status = document.getElementById('status');
+  document.getElementById('dl').addEventListener('click', function () {
+    var name = (document.getElementById('who').value.trim() || 'unknown').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+    var blob = new Blob([buildMarkdown()], { type: 'text/markdown;charset=utf-8' });
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'kill-rules-answers-' + (name || 'unknown') + '.md';
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function () { URL.revokeObjectURL(a.href); }, 1000);
+    status.textContent = 'File downloaded. Attach it to an email or a Teams message to Chris.';
+  });
+  document.getElementById('cp').addEventListener('click', function () {
+    var declined = function () { status.textContent = 'Answers were not copied. Use Download answers (.md) instead.'; };
+    status.textContent = 'Copying…';
+    try {
+      navigator.clipboard.writeText(buildMarkdown()).then(function () {
+        status.textContent = 'Answers copied. Paste them into an email or a Teams message to Chris.';
+      }, declined);
+    } catch (e) { declined(); }
+  });
+  document.getElementById('clr').addEventListener('click', function () {
+    if (!window.confirm('Clear all answers? You cannot undo this.')) return;
+    document.querySelectorAll('textarea, input[type=text]').forEach(function (el) { el.value = ''; });
+    document.querySelectorAll('input[type=radio], input[type=checkbox]').forEach(function (el) { el.checked = false; });
+    save();
+    status.textContent = 'All answers cleared.';
+  });
+})();
+</script>
+</body>
+</html>
