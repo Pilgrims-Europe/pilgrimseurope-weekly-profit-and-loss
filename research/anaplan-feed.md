@@ -4,7 +4,12 @@ Ticket: #7. Today, site finance uploads the weekly P&L to Anaplan by hand. This 
 
 ## Short answer
 
-Anaplan already reads data from our Snowflake account. A user `ANAPLAN_SECURE` connects every day with key-pair authentication. It reads `V_ANAPLAN_*` views in `PROD_ANALYTICS.FINANCE_MT`. The simplest path is to add one more view for the weekly P&L. Abhishek and Simon then add an extract and an import on the Anaplan side.
+Anaplan already reads data from our Snowflake account. A user `ANAPLAN_SECURE` connects every day with key-pair authentication. It reads `V_ANAPLAN_*` views in `PROD_ANALYTICS.FINANCE_MT`. The simplest path is to add one more view for the weekly P&L. Finance Systems then add an extract and an import on the Anaplan side.
+
+Finance Systems contacts:
+
+- Abhishek Mazumdar, FP&A Analyst - Finance Systems, Finance
+- Simon Thompson, Head of Finance Systems, Finance
 
 ## What is already in place (checked in Snowflake, read-only)
 

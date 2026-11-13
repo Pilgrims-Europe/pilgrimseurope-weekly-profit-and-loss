@@ -18,7 +18,7 @@ The pilot sites Redruth and Bromborough are in company code 125. The table has m
 | `PROD_RAW.SAP."system-local.bw.bw2hana.0/COSTCENTER_REPORTING"` | Cost centre master, with profit centre and company code. | 5,000 | 2026-11-12 | `INFORMATION_SCHEMA.TABLES` |
 | `PROD_RAW.SAP."system-local.bw.bw2hana.0/PROFIT_CTR_REPORTING"` | Profit centre master, with names. | 16,934 | 2026-11-12 | `INFORMATION_SCHEMA.TABLES` |
 | `PROD_RAW.SAP."system-local.bw.bw2hana.0/VEN_COMPC_REPORTING"` | Supplier per company code. It has no supplier name column. | 25,808 | 2026-11-12 | `INFORMATION_SCHEMA.COLUMNS` |
-| `PROD_RAW.SAP."jbs_bw4_hana.edw.scm.mmic/C_GOODSMOVEMENTDOCUMENTS"` | Goods movements (MM). It has supplier, PO, material, batch and movement type. Posting dates 2024-12-30 to 2026-11-27. | 125,021,852 | 2026-11-12 | `INFORMATION_SCHEMA` |
+| `PROD_RAW.SAP."jbs_bw4_hana.edw.scm.mmic/C_GOODSMOVEMENTDOCUMENTS"` | Goods movements (MM). It has supplier, PO, material, batch and movement type. Posting dates 2024-12-30 to 2026-11-27, all plants. The pilot plants end on 2026-11-12. One row at plant AG03 has 2026-11-27. | 125,021,852 | 2026-11-12 | `INFORMATION_SCHEMA` |
 
 Views that already read the GL line item table:
 
@@ -167,7 +167,7 @@ By document type (accounts `00052*` and the POV and PO variance accounts above):
 
 ## Open questions
 
-For Aswani (BW):
+For Aswani Nune (SAP BW Developer, Information Technology):
 
 1. Is the BW query `C_ACTUALPLANGL` at ACDOCA line grain, or does BW sum some lines?
 2. Can BW add the line item number (DOCLN), posting key, assignment and reference to the query?
@@ -176,7 +176,7 @@ For Aswani (BW):
 5. What is in `PROD_RAW.SAP.C_ACTUALPLANGL_Additional` (23.8 million rows, same columns)?
 6. Do back-postings to weeks older than W6 reach Snowflake?
 
-For Tracy Conall (SAP):
+For Tracy Conall (SAP; job title Unknown):
 
 1. Which ledger (0L or 1L) does site finance use in FAGLL03H?
 2. Which GL accounts are PPV, stock variances and consumables for Redruth and Bromborough?
@@ -184,7 +184,7 @@ For Tracy Conall (SAP):
 
 ## Sources
 
-All Snowflake checks ran read-only on account `PILGRIMS_EUROPE_PROD`, role `ENGINEER_ROLE`, on 2026-11-12.
+All Snowflake checks ran read-only on account `JBSUSA-PILGRIMS_EUROPE_PROD`, role `ENGINEER_ROLE`, on 2026-11-12.
 
 1. `SHOW TABLES` and `PROD_RAW.INFORMATION_SCHEMA.TABLES` and `COLUMNS`, schema `PROD_RAW.SAP`.
 2. `GET_DDL` of `PROD_STAGING.FINANCE_PL.GL_DETAIL_STG`, `GL_DETAIL_BWLIVE_STG`, `PROD_ANALYTICS.FINANCE_PL_INT.INT_GL_POSTINGS` and `FINANCE_STORE.BSR.IC_SRC_ACDOCA`.

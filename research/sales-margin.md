@@ -50,7 +50,7 @@ For company 125, January to 11 November 2026, the split adds up to about 99% of 
 | Labour | 66.3 |
 | `CC_COST006` | 10.9 |
 
-The split per kg for the top materials at Redruth and Bromborough (week of 19 October 2026) is the same as the released cost estimate in `FACT_PRODUCT_COST_RELEASED` (costing variant Z125, version 01):
+This check uses the top materials at Redruth and Bromborough, in the week of 19 October 2026. The COPA split per kg is the same as the released cost estimate in `FACT_PRODUCT_COST_RELEASED`. The estimate uses costing variant Z125, version 01:
 
 | Plant | Material | COPA meat £/kg | Estimate meat £/kg | COPA packaging £/kg | Estimate packaging £/kg | COPA labour £/kg | Estimate direct labour £/kg |
 | --- | --- | --- | --- | --- | --- | --- | --- |

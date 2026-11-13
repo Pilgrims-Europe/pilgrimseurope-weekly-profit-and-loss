@@ -53,12 +53,19 @@ Coverage:
 | PF68 Carrickmacross | 5,320,314 | 2024-12-30 | 2026-11-12 | 27 | 9,177 |
 | WM41 Carrickmacross | 260,694 | 2024-12-30 | 2026-11-12 | 17 | 1 |
 
+Other plants have some later posting dates. On 2026-11-13, plant AG03 had one row with posting date 2026-11-27. Unknown: why.
+
 The table has no data before fiscal period 2025001.
 
 Main movement types since 2026-01-01:
 
-- PF68: 261 (issue to an order, 1.95 million rows, all with an order) and 101 (receipt, 77,212 rows with an order).
-- 2504 and 2506: 201 (issue to a cost centre), Z61 (receipt with a cost centre), 601 (delivery), 641 (stock transfer), 101 (receipt). Only 32 rows at 2504 and 91 rows at 2506 have an order.
+- PF68:
+  - 261 (issue to an order): 1.95 million rows. All rows have an order.
+  - 101 (receipt): 77,212 rows have an order.
+- 2504 and 2506:
+  - 201 (issue to a cost centre) and Z61 (receipt with a cost centre).
+  - 601 (delivery), 641 (stock transfer) and 101 (receipt).
+  - Only 32 rows at 2504 and 91 rows at 2506 have an order.
 - At 2504 and 2506, the 101 rows since 2026-10-01 all have a purchase order. These are goods received from suppliers.
 
 Unknown: what Z61, Z62, Z71 and Z72 mean. They are custom movement types.
