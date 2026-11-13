@@ -19,6 +19,16 @@ All reports use one house style, from pilgrimseurope.com. This includes HTML rep
 
 Apply the `/wait-what` rules above to all report text.
 
+## Notebooks
+
+`docs/Project Notebook.ipynb` is the working log for research tickets. Rules:
+
+- Never commit notebook outputs. Run `python scripts/notebook_outputs.py clear <file>` before you commit.
+- Check Python syntax with `python scripts/check_python.py <file>`. This covers `.py` files and notebook code cells. The pre-commit hook runs it.
+- Python code must pass `ruff check` and `ruff format --check` (settings in `ruff.toml`). The hook runs both.
+- Put reusable SQL in `sql/` and reusable Python in `scripts/`. The notebook calls them.
+- Do not write reports in the notebook. Use the house style in "Reporting".
+
 ## Agent skills
 
 ### Issue tracker

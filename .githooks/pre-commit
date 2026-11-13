@@ -1,0 +1,25 @@
+#!/bin/sh
+# Pre-commit checks:
+# 1. Block notebook outputs (they can hold finance figures).
+# 2. Block Python syntax errors in .py files and notebook code cells.
+# 3. Run ruff (lint and format check) on staged .py and .ipynb files.
+status=0
+
+nbs=$(git diff --cached --name-only --diff-filter=ACM | grep '\.ipynb$')
+if [ -n "$nbs" ]; then
+  echo "$nbs" | tr '\n' '\0' | xargs -0 python scripts/notebook_outputs.py check || status=1
+fi
+
+py=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\.(py|ipynb)$')
+if [ -n "$py" ]; then
+  echo "$py" | tr '\n' '\0' | xargs -0 python scripts/check_python.py || status=1
+  if command -v ruff >/dev/null 2>&1; then
+    echo "$py" | tr '\n' '\0' | xargs -0 ruff check || status=1
+    echo "$py" | tr '\n' '\0' | xargs -0 ruff format --check || status=1
+  else
+    echo "ruff is not installed. Run: pip install ruff"
+    status=1
+  fi
+fi
+
+exit $status
