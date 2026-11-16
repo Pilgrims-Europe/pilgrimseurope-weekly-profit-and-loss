@@ -1,2 +1,13 @@
 __pycache__/
 *.pyc
+
+# Weekly P&L app (Next.js)
+app/node_modules/
+app/.next/
+app/output/
+app/.env*
+app/*.tsbuildinfo
+app/snowflake.log
+
+# Cortex Code local plans
+.snowflake/
