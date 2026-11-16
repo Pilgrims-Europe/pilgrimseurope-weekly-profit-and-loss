@@ -31,6 +31,10 @@ const nextConfig = {
   // snowflake-sdk uses dynamic requires and optional native addons. Keep it and the
   // SAR SDK external so the standalone server loads them from node_modules.
   serverExternalPackages: ["@snowflake/sar-sdk", "snowflake-sdk"],
+  // `next upgrade` takes security releases only.
+  experimental: {
+    agentUpgrade: "security",
+  },
 }
 
 export default nextConfig
