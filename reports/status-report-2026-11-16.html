@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="snowflake-source" content="cortex-agent-authored" />
+<title>Weekly P&amp;L Status Report 2026-11-16</title>
+<script type="application/json" id="snowflake-report-metadata">
+{
+  "generated": "2026-11-16",
+  "intent": "Status of the Weekly P&L v1 project at the end of 2026-11-16: what is done, in progress, to do, and which decisions are open.",
+  "dataSources": [
+    { "type": "other", "sql": "gh issue list --state all (Pilgrims-Europe/pilgrimseurope-weekly-profit-and-loss): 9 closed, 6 open on 2026-11-16, after #3, #8, #11 and #18 closed and #20 to #22 opened" },
+    { "type": "other", "sql": "gh pr list --state all: 7 merged (#12 to #17, #19), 0 open on 2026-11-16" },
+    { "type": "other", "sql": "git log main to 3dfe7b9; reports/anaplan-line-tags.html; research/kill-data.md (Decisions 2026-11-16); reports/kill-reconciliation-week-45.html; to-questionnaire-gl-line-items.md" }
+  ],
+  "sections": [
+    { "id": "summary", "title": "Summary", "dataSources": [], "producerNotes": "Refresh with gh issue list, gh pr list and git log." },
+    { "id": "completed", "title": "Completed", "dataSources": [], "producerNotes": "Closed issues, merged PRs and commits to main." },
+    { "id": "in-progress", "title": "In progress", "dataSources": [], "producerNotes": "Open issues with recent activity." },
+    { "id": "to-do", "title": "To do", "dataSources": [], "producerNotes": "Open issues, with blockers from the map #1." },
+    { "id": "issues", "title": "Issues and solutions", "dataSources": [], "producerNotes": "From research/kill-data.md Gaps." },
+    { "id": "decisions", "title": "Decisions needed", "dataSources": [], "producerNotes": "From research/kill-data.md Open questions and the GL questionnaire." }
+  ]
+}
+</script>
+<style>
+  :root {
+    color-scheme: light dark;
+    --brand: light-dark(#00406E, #7FB3E0);
+    --brand-light: light-dark(#025895, #9CC5EA);
+    --brand-navy: #1A2B37;
+    --red: #E11F20;
+    --red-dark: #CB1011;
+    --yellow: #FF9D00;
+    --green: light-dark(#5B6C43, #A3B88A);
+    --text: light-dark(#374151, #E5E7EB);
+    --muted: light-dark(#6B7280, #9CA3AF);
+    --line: light-dark(#E5E7EB, #374151);
+    --page: light-dark(#F9FAFB, #111827);
+    --card: light-dark(#FFFFFF, #1F2937);
+    --tint-brand: light-dark(#EEF4FA, #16324A);
+    --tint-yellow: light-dark(#FFF7E6, #3A2A0A);
+    --tint-green: light-dark(#EFF3EA, #1F2A16);
+    --tint-red: light-dark(#FDECEC, #3A1A1A);
+    --head: 'Fjalla One', 'Arial Narrow', 'Segoe UI', sans-serif;
+    --body: Montserrat, 'Segoe UI', -apple-system, system-ui, sans-serif;
+    --serif: moret, Georgia, 'Times New Roman', serif;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--page); color: var(--text); font-family: var(--body); font-size: 15px; line-height: 1.6; }
+  a { color: var(--brand); }
+  .hero { background: var(--brand-navy); color: #fff; border-bottom: 6px solid var(--red); }
+  .wrap { max-width: 880px; width: 100%; margin: 0 auto; padding: clamp(16px, 4vw, 32px); }
+  .eyebrow { font-family: var(--head); letter-spacing: .08em; text-transform: uppercase; color: var(--yellow); font-size: 14px; margin: 0 0 6px; }
+  h1 { font-family: var(--serif); font-weight: 400; font-size: clamp(28px, 5vw, 42px); line-height: 1.15; margin: 0 0 14px; }
+  .lede { margin: 0 0 16px; color: #E5E7EB; max-width: 65ch; }
+  .meta { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px 24px; margin: 0; font-size: 14px; }
+  .meta dt { font-family: var(--head); text-transform: uppercase; letter-spacing: .06em; color: #9CC5EA; font-size: 12px; }
+  .meta dd { margin: 0; }
+  .meta a { color: #9CC5EA; }
+  h2 { font-family: var(--head); font-weight: 400; color: var(--brand); font-size: 26px; line-height: 1.2; margin: 40px 0 12px; }
+  h3 { font-family: var(--head); font-weight: 400; color: var(--brand); font-size: 20px; line-height: 1.3; margin: 0 0 8px; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 1.25rem; padding: clamp(16px, 3vw, 24px); margin: 0 0 18px; }
+  .card.accent { border-left: 6px solid var(--brand); }
+  .card > :last-child { margin-bottom: 0; }
+  .kpi-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 14px; margin: 0 0 18px; }
+  .kpi { background: var(--card); border: 1px solid var(--line); border-top: 4px solid var(--brand); border-radius: 1.25rem; padding: 16px 18px; }
+  .kpi .label { font-family: var(--head); text-transform: uppercase; letter-spacing: .06em; font-size: 12px; color: var(--muted); }
+  .kpi .value { font-family: var(--head); font-size: 30px; line-height: 1.2; color: var(--brand); font-variant-numeric: tabular-nums; }
+  .kpi .delta { font-size: 13px; font-weight: 700; color: var(--muted); }
+  .callout { border-radius: .5rem; padding: 10px 14px; margin: 10px 0; border-left: 4px solid var(--brand); background: var(--tint-brand); }
+  .callout.warn { border-color: var(--yellow); background: var(--tint-yellow); }
+  .callout.good { border-color: var(--green); background: var(--tint-green); }
+  .badge { display: inline-block; font-family: var(--head); letter-spacing: .04em; font-size: 12px; padding: 2px 10px; border-radius: 9999px; background: var(--tint-brand); color: var(--brand); white-space: nowrap; }
+  .badge.good { background: var(--tint-green); color: var(--green); }
+  .badge.warn { background: var(--tint-yellow); color: light-dark(#976611, #FFC966); }
+  .badge.bad { background: var(--tint-red); color: var(--red); }
+  .table-wrap { overflow-x: auto; margin: 12px 0; border: 1px solid var(--line); border-radius: .5rem; }
+  table { border-collapse: collapse; width: 100%; font-size: 13px; }
+  th, td { padding: 7px 10px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
+  th { background: var(--brand); color: #fff; font-family: var(--head); font-weight: 400; letter-spacing: .03em; white-space: nowrap; }
+  td.n { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  table:not(.decisions) td:first-child, table.decisions td:last-child { white-space: nowrap; }
+  .bar { position: sticky; bottom: 0; background: var(--card); border-top: 4px solid var(--red); box-shadow: 0 -4px 16px rgba(0,0,0,.08); }
+  .bar-in { max-width: 880px; margin: 0 auto; padding: 12px clamp(16px, 4vw, 32px); display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+  .btn { font-family: var(--head); letter-spacing: .05em; text-transform: uppercase; font-size: 14px; border: 2px solid var(--red); background: var(--red); color: #fff; border-radius: 9999px; padding: 9px 20px; cursor: pointer; }
+  .btn:hover { background: var(--red-dark); border-color: var(--red-dark); }
+  .btn.alt { background: transparent; color: var(--brand); border-color: var(--brand); }
+  .btn.alt:hover { background: var(--brand); color: #fff; }
+  .btn:focus-visible { outline: 3px solid var(--yellow); outline-offset: 2px; }
+  .status { font-size: 13px; color: var(--muted); flex: 1 1 200px; }
+  footer.src { color: var(--muted); font-size: 12px; margin-top: 32px; }
+  @media print { .bar { display: none; } .hero { -webkit-print-color-adjust: exact; print-color-adjust: exact; } }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <p class="eyebrow">Weekly P&amp;L v1 · Status report</p>
+    <h1>Weekly P&amp;L: project status</h1>
+    <p class="lede">This project moves the weekly P&amp;L into Snowflake, so site finance spends less time building it. This report shows where the work stands at the end of 2026-11-16.</p>
+    <dl class="meta">
+      <div><dt>Author</dt><dd>Chris McCann</dd></div>
+      <div><dt>Project map</dt><dd><a href="https://github.com/Pilgrims-Europe/pilgrimseurope-weekly-profit-and-loss/issues/1">#1 Weekly P&amp;L v1</a></dd></div>
+      <div><dt>Data as at</dt><dd>2026-11-16, commit 3dfe7b9</dd></div>
+    </dl>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <h2 id="summary">Summary</h2>
+  <div class="kpi-row">
+    <div class="kpi"><div class="label">Tickets closed</div><div class="value">9</div><div class="delta">+4 today (<a href="https://github.com/Pilgrims-Europe/pilgrimseurope-weekly-profit-and-loss/issues/3">#3</a>, <a href="https://github.com/Pilgrims-Europe/pilgrimseurope-weekly-profit-and-loss/issues/8">#8</a>, <a href="https://github.com/Pilgrims-Europe/pilgrimseurope-weekly-profit-and-loss/issues/11">#11</a>, <a href="https://github.com/Pilgrims-Europe/pilgrimseurope-weekly-profit-and-loss/issues/18">#18</a>)</div></div>
+    <div class="kpi"><div class="label">Tickets open</div><div class="value">6</div><div class="delta">Including the map <a href="https://github.com/Pilgrims-Europe/pilgrimseurope-weekly-profit-and-loss/issues/1">#1</a></div></div>
+    <div class="kpi"><div class="label">Kill decisions made</div><div class="value">11</div><div class="delta">On 2026-11-16</div></div>
+    <div class="kpi"><div class="label">Open questions</div><div class="value">12</div><div class="delta">6 kill, 3 GL, 3 line tags</div></div>
+  </div>
+  <div class="card accent">
+    <h3>Where we are</h3>
+    <p>The kill rules for pork and poultry are now decided. Gui confirmed that pork kill is <code>"Killed Qty"</code> on the Hellenic booking. Poultry kill is delivered, less DOA, less all condemnation codes, from Mtech only. All sites use the Dungannon rule.</p>
+    <p>Emma compared the week 45 site figures with Mtech. The sites do not use one rule today. Peter wrote a questionnaire for Gui on GL line items.</p>
+    <p>The team closed <a href="https://github.com/Pilgrims-Europe/pilgrimseurope-weekly-profit-and-loss/issues/3">#3</a> and <a href="https://github.com/Pilgrims-Europe/pilgrimseurope-weekly-profit-and-loss/issues/18">#18</a>. Their open checks are now on <a href="https://github.com/Pilgrims-Europe/pilgrimseurope-weekly-profit-and-loss/issues/10">#10</a>. Gui's files are in SharePoint (<a href="https://github.com/Pilgrims-Europe/pilgrimseurope-weekly-profit-and-loss/issues/8">#8</a>). No open ticket has a blocker now.</p>
+    <p>Each Anaplan template line now has a source and a RAG for Redruth and Bromborough (<a href="https://github.com/Pilgrims-Europe/pilgrimseurope-weekly-profit-and-loss/issues/11">#11</a>). 9 lines are Green, 39 are Amber and 13 are Red. The 21 subtotals have no RAG.</p>
+    <p>The next steps are the weekly kill table (<a href="https://github.com/Pilgrims-Europe/pilgrimseurope-weekly-profit-and-loss/issues/10">#10</a>), the 7 Green GL variance lines, and three questions for Gui (<a href="https://github.com/Pilgrims-Europe/pilgrimseurope-weekly-profit-and-loss/issues/20">#20</a>, <a href="https://github.com/Pilgrims-Europe/pilgrimseurope-weekly-profit-and-loss/issues/21">#21</a>, <a href="https://github.com/Pilgrims-Europe/pilgrimseurope-weekly-profit-and-loss/issues/22">#22</a>).</p>
+    <div class="callout warn"><strong>Main risk:</strong> The pork kill figure is not final on the kill day. On 2026-11-16, 18 of 19 Westerleigh bookings for 2026-11-13 still showed a <code>"Killed Qty"</code> of 0.</div>
+  </div>
+
+  <h2 id="completed">Completed</h2>
+  <div class="card">
+    <h3>Today (2026-11-16)</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Item</th><th>What</th><th>Who</th></tr></thead>
+        <tbody>
+          <tr><td><a href="https://github.com/Pilgrims-Europe/pilgrimseurope-weekly-profit-and-loss/blob/main/research/kill-data.md#decisions-2026-11-16">Kill decisions</a></td><td>11 kill rules for pork and poultry are recorded in <code>research/kill-data.md</code>.</td><td>Chris, Gui</td></tr>
+          <tr><td><a href="https://github.com/Pilgrims-Europe/pilgrimseurope-weekly-profit-and-loss/blob/main/reports/kill-reconciliation-week-45.html">Week 45 kill report</a></td><td>Each site figure is compared with the Mtech view. Dungannon takes DOA off. Anwick, Ashbourne and Ballymena do not.</td><td>Emma</td></tr>
+          <tr><td><a href="https://github.com/Pilgrims-Europe/pilgrimseurope-weekly-profit-and-loss/blob/main/research/kill-data.md#pig-kill-by-pig-type">Pig kill by pig type</a></td><td>A Snowflake query gives pig kill by pig type for Spalding and Westerleigh. DEV and PROD agree.</td><td>Chris</td></tr>
+          <tr><td>Pork condemnation fields</td><td>The probable field for a TC'd pig's responsibility is found. It is not confirmed.</td><td>Chris</td></tr>
+          <tr><td><a href="https://github.com/Pilgrims-Europe/pilgrimseurope-weekly-profit-and-loss/blob/main/to-questionnaire-gl-line-items.md">GL questionnaire</a></td><td>Three questions for Gui. GL line item, Ledger and Fiscal week are added to <code>GLOSSARY.md</code>.</td><td>Peter</td></tr>
+          <tr><td><a href="https://github.com/Pilgrims-Europe/pilgrimseurope-weekly-profit-and-loss/issues/3">#3</a></td><td>Closed. Pork kill is <code>"Killed Qty"</code> in head. Poultry kill takes off all condemnation codes.</td><td>Gui, Chris</td></tr>
+          <tr><td><a href="https://github.com/Pilgrims-Europe/pilgrimseurope-weekly-profit-and-loss/issues/8">#8</a></td><td>Closed. Gui's files are in the <a href="https://pilgrimsfoodgroup.sharepoint.com/:f:/r/sites/T_PSSL_BIDataAnalytics/Shared%20Documents/Documentation/Weekly%20Profit%20and%20Loss?d=wc678b72a7b904a5db51671ea45aa9dc6&amp;csf=1&amp;web=1&amp;e=FzH5ss">Weekly Profit and Loss SharePoint folder</a>.</td><td>Jason</td></tr>
+          <tr><td><a href="https://github.com/Pilgrims-Europe/pilgrimseurope-weekly-profit-and-loss/issues/18">#18</a></td><td>Closed. All sites use the Dungannon rule.</td><td>Chris</td></tr>
+          <tr><td><a href="https://github.com/Pilgrims-Europe/pilgrimseurope-weekly-profit-and-loss/issues/11">#11</a></td><td>Closed. <a href="https://github.com/Pilgrims-Europe/pilgrimseurope-weekly-profit-and-loss/blob/main/reports/anaplan-line-tags.html">Line tags report</a>: 9 Green, 39 Amber, 13 Red, 21 subtotals. Build kill, PPV and STK lines first.</td><td>Chris</td></tr>
+          <tr><td><a href="https://github.com/Pilgrims-Europe/pilgrimseurope-weekly-profit-and-loss/issues/1">#1</a></td><td>The map has the new kill decisions, the line tags and three new tickets.</td><td>Chris</td></tr>
+          <tr><td><a href="https://github.com/Pilgrims-Europe/pilgrimseurope-weekly-profit-and-loss/pull/17">PR #17</a>, <a href="https://github.com/Pilgrims-Europe/pilgrimseurope-weekly-profit-and-loss/pull/19">PR #19</a></td><td>Mtech, Anaplan and the kill definitions are in the glossary. The line tags report is on main.</td><td>Chris</td></tr>
+          <tr><td><a href="https://github.com/Pilgrims-Europe/pilgrimseurope-weekly-profit-and-loss/pull/15">PR #15</a>, <a href="https://github.com/Pilgrims-Europe/pilgrimseurope-weekly-profit-and-loss/pull/16">PR #16</a></td><td>The project notebook is removed. The kickoff transcript is added.</td><td>Chris</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <h3>Earlier</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Ticket</th><th>Question</th><th>Finding</th></tr></thead>
+        <tbody>
+          <tr><td><a href="https://github.com/Pilgrims-Europe/pilgrimseurope-weekly-profit-and-loss/issues/2">#2</a></td><td>Which kill data is in Snowflake?</td><td>Poultry kill is in Mtech. Pork kill is in Hellenic. Arolink and Innova have no kill data.</td></tr>
+          <tr><td><a href="https://github.com/Pilgrims-Europe/pilgrimseurope-weekly-profit-and-loss/issues/4">#4</a></td><td>Which GL line item data is in Snowflake?</td><td>One BW table holds GL lines from fiscal 2025, loaded every day. It has no line item number.</td></tr>
+          <tr><td><a href="https://github.com/Pilgrims-Europe/pilgrimseurope-weekly-profit-and-loss/issues/5">#5</a></td><td>Which stock movement and BOM data is in Snowflake?</td><td>Goods movements load every day. Stock balances are by period, not by week. No BOM is in a PROD schema.</td></tr>
+          <tr><td><a href="https://github.com/Pilgrims-Europe/pilgrimseurope-weekly-profit-and-loss/issues/6">#6</a></td><td>Which sales and standard margin data is in Snowflake?</td><td>COPA sales are in <code>FACT_COPAPEUS4</code>. Standard freight is Unknown.</td></tr>
+          <tr><td><a href="https://github.com/Pilgrims-Europe/pilgrimseurope-weekly-profit-and-loss/issues/7">#7</a></td><td>How can Snowflake data load into Anaplan?</td><td>Add one weekly P&amp;L view to <code>PROD_ANALYTICS.FINANCE_MT</code>, next to the <code>V_ANAPLAN_*</code> views.</td></tr>
+          <tr><td><a href="https://github.com/Pilgrims-Europe/pilgrimseurope-weekly-profit-and-loss/pull/12">PR #12</a>–<a href="https://github.com/Pilgrims-Europe/pilgrimseurope-weekly-profit-and-loss/pull/14">#14</a></td><td>Project set-up</td><td>Reporting skill and templates, research notes, and commit checks.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <h2 id="in-progress">In progress</h2>
+  <div class="card">
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Ticket</th><th>What</th><th>Owner</th><th>Status</th></tr></thead>
+        <tbody>
+          <tr><td><a href="https://github.com/Pilgrims-Europe/pilgrimseurope-weekly-profit-and-loss/issues/10">#10</a></td><td>Build and check the weekly kill table</td><td>Emma</td><td>Week 45 review done. No blocker. Five checks are open on the ticket.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <h2 id="to-do">To do</h2>
+  <div class="card">
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Ticket</th><th>What</th><th>Owner</th><th>Blocked by</th></tr></thead>
+        <tbody>
+          <tr><td><a href="https://github.com/Pilgrims-Europe/pilgrimseurope-weekly-profit-and-loss/issues/9">#9</a></td><td>Prototype the site entry screen in Streamlit</td><td>Jason</td><td><span class="badge good">None</span></td></tr>
+          <tr><td><a href="https://github.com/Pilgrims-Europe/pilgrimseurope-weekly-profit-and-loss/issues/20">#20</a></td><td>Which intercompany rule does the weekly P&amp;L use? (8 Amber lines)</td><td>Unknown</td><td><span class="badge good">None</span></td></tr>
+          <tr><td><a href="https://github.com/Pilgrims-Europe/pilgrimseurope-weekly-profit-and-loss/issues/21">#21</a></td><td>Which field is standard freight? (4 Amber lines)</td><td>Unknown</td><td><span class="badge good">None</span></td></tr>
+          <tr><td><a href="https://github.com/Pilgrims-Europe/pilgrimseurope-weekly-profit-and-loss/issues/22">#22</a></td><td>Which GL accounts are in Consumables, OCI and Traded Good? (4 Amber lines)</td><td>Unknown</td><td><span class="badge good">None</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p><strong>Not yet specified in the map (<a href="https://github.com/Pilgrims-Europe/pilgrimseurope-weekly-profit-and-loss/issues/1">#1</a>):</strong> production variance calculations, the STO line, freight for PFM and Moy Park, the overheads run rate period, manual net revenue adjustments, stock revaluation, site-specific P&amp;L layouts, and management charges.</p>
+  </div>
+
+  <h2 id="issues">Issues and solutions</h2>
+  <div class="card">
+    <div class="callout warn"><strong>Sites do not use one kill rule.</strong> In week 45, Dungannon took DOA off. Anwick, Ashbourne and Ballymena reported birds delivered. <strong>Solution:</strong> All sites use the Dungannon rule. Gui tells the sites.</div>
+    <div class="callout warn"><strong>Anwick left out Sunday 8 Nov.</strong> This was 113,004 birds in week 45. <strong>Solution:</strong> Include late loads. The gap was a manual entry issue.</div>
+    <div class="callout warn"><strong>"All codes" takes off more birds than rejects.</strong> The Mtech condemnation codes include part rejects, for example cropping. <strong>Solution:</strong> Use all codes, and let the reader expand each figure to every code.</div>
+    <div class="callout warn"><strong>Pork kill is not final on the kill day.</strong> When it becomes final is Unknown. The owner is Unknown.</div>
+    <div class="callout warn"><strong>One extra pig row.</strong> For Westerleigh 2026-11-13, Snowflake has 3,345 rows. The "Pig Purchase Analysis" report shows 3,344 pigs over scale. The cause is not found.</div>
+    <div class="callout"><strong>Mtech and Anaplan numbers may differ.</strong> Mtech holds production transactions. Anaplan holds planned transactions. A difference is not an error.</div>
+  </div>
+
+  <h2 id="decisions">Decisions needed</h2>
+  <div class="table-wrap">
+    <table class="decisions">
+      <thead><tr><th>Decision or check</th><th>Owner</th><th>Ticket</th></tr></thead>
+      <tbody>
+        <tr><td>Is <code>"Killed Qty"</code> pigs over scale, or pigs over scale less TC'd pigs?</td><td>Chris, when 2026-11-13 is final</td><td><a href="https://github.com/Pilgrims-Europe/pilgrimseurope-weekly-profit-and-loss/issues/10">#10</a></td></tr>
+        <tr><td>When is <code>"Killed Qty"</code> final after the kill day?</td><td>Unknown</td><td><a href="https://github.com/Pilgrims-Europe/pilgrimseurope-weekly-profit-and-loss/issues/10">#10</a></td></tr>
+        <tr><td>Confirm the field for a TC'd pig's responsibility. Compare with the report for Westerleigh 2026-09-16 or Spalding 2026-10-27.</td><td>Unknown</td><td><a href="https://github.com/Pilgrims-Europe/pilgrimseurope-weekly-profit-and-loss/issues/10">#10</a></td></tr>
+        <tr><td>Anwick: kill date or plant weigh-in time? Check another week.</td><td>Emma</td><td><a href="https://github.com/Pilgrims-Europe/pilgrimseurope-weekly-profit-and-loss/issues/10">#10</a></td></tr>
+        <tr><td>How often does Mtech load into Snowflake?</td><td>Unknown</td><td><a href="https://github.com/Pilgrims-Europe/pilgrimseurope-weekly-profit-and-loss/issues/10">#10</a></td></tr>
+        <tr><td>Does the pig type query agree with the "Ledger Balances and PPV" PDF for one week?</td><td>Chris Kitchen or Ian Chapman</td><td><a href="https://github.com/Pilgrims-Europe/pilgrimseurope-weekly-profit-and-loss/issues/2">#2</a></td></tr>
+        <tr><td>Which GL accounts are PPV, stock variances and consumables for Redruth and Bromborough?</td><td>Gui</td><td><a href="https://github.com/Pilgrims-Europe/pilgrimseurope-weekly-profit-and-loss/issues/4">#4</a></td></tr>
+        <tr><td>Can site finance work without line item number, posting key, assignment and reference?</td><td>Gui</td><td><a href="https://github.com/Pilgrims-Europe/pilgrimseurope-weekly-profit-and-loss/issues/4">#4</a></td></tr>
+        <tr><td>Does the weekly P&amp;L need PPV by supplier?</td><td>Gui</td><td><a href="https://github.com/Pilgrims-Europe/pilgrimseurope-weekly-profit-and-loss/issues/4">#4</a></td></tr>
+        <tr><td>Which intercompany rule: the SAP flag or the payer account group?</td><td>Gui</td><td><a href="https://github.com/Pilgrims-Europe/pilgrimseurope-weekly-profit-and-loss/issues/20">#20</a></td></tr>
+        <tr><td>Which field is standard freight: ZUF2 or inland freight?</td><td>Gui</td><td><a href="https://github.com/Pilgrims-Europe/pilgrimseurope-weekly-profit-and-loss/issues/21">#21</a></td></tr>
+        <tr><td>Which GL accounts are in Consumables, OCI and Traded Good?</td><td>Gui</td><td><a href="https://github.com/Pilgrims-Europe/pilgrimseurope-weekly-profit-and-loss/issues/22">#22</a></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <footer class="src">Pilgrim's Europe · Weekly P&amp;L · Generated 2026-11-16 from GitHub issues, pull requests and <code>main</code> at commit 3dfe7b9.</footer>
+</main>
+
+<div class="bar">
+  <div class="bar-in">
+    <button type="button" class="btn" id="dl">Download as .md</button>
+    <button type="button" class="btn alt" id="cp">Copy</button>
+    <span class="status" id="status" role="status" aria-live="polite"></span>
+  </div>
+</div>
+
+<script>
+(function () {
+  // Text of an element, with links kept as Markdown links.
+  function md(node) {
+    var c = node.cloneNode(true);
+    c.querySelectorAll('a').forEach(function (a) { a.replaceWith('[' + a.textContent.trim() + '](' + a.href + ')'); });
+    return c.textContent.trim().replace(/\s+/g, ' ');
+  }
+  function buildMarkdown() {
+    var out = [];
+    out.push('# ' + document.querySelector('h1').textContent.trim());
+    out.push('');
+    out.push(document.querySelector('.lede').textContent.trim());
+    document.querySelectorAll('main h2').forEach(function (h) {
+      out.push(''); out.push('## ' + h.textContent.trim());
+      var el = h.nextElementSibling;
+      while (el && el.tagName !== 'H2' && el.tagName !== 'FOOTER') {
+        el.querySelectorAll('.kpi').forEach(function (k) {
+          out.push('- **' + k.querySelector('.label').textContent.trim() + ':** ' + k.querySelector('.value').textContent.trim() +
+            ' (' + k.querySelector('.delta').textContent.trim() + ')');
+        });
+        el.querySelectorAll('h3, p, .callout').forEach(function (p) {
+          if (p.closest('.kpi')) return;
+          out.push(''); out.push((p.tagName === 'H3' ? '### ' : '') + md(p));
+        });
+        el.querySelectorAll('table').forEach(function (t) {
+          out.push('');
+          t.querySelectorAll('tr').forEach(function (tr, i) {
+            var cells = Array.prototype.map.call(tr.children, function (c) { return md(c).replace(/\|/g, '\\|'); });
+            out.push('| ' + cells.join(' | ') + ' |');
+            if (i === 0) out.push('|' + cells.map(function () { return ' --- '; }).join('|') + '|');
+          });
+        });
+        el = el.nextElementSibling;
+      }
+    });
+    out.push('');
+    return out.join('\n');
+  }
+  var status = document.getElementById('status');
+  document.getElementById('dl').addEventListener('click', function () {
+    var blob = new Blob([buildMarkdown()], { type: 'text/markdown;charset=utf-8' });
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob); a.download = 'weekly-pl-status-report-2026-11-16.md';
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function () { URL.revokeObjectURL(a.href); }, 1000);
+    status.textContent = 'File downloaded. Attach it to an email or a Teams message.';
+  });
+  document.getElementById('cp').addEventListener('click', function () {
+    var declined = function () { status.textContent = 'Not copied. Use Download as .md instead.'; };
+    status.textContent = 'Copying…';
+    try { navigator.clipboard.writeText(buildMarkdown()).then(function () { status.textContent = 'Copied. Paste it into an email or a Teams message.'; }, declined); }
+    catch (e) { declined(); }
+  });
+})();
+</script>
+</body>
+</html>
