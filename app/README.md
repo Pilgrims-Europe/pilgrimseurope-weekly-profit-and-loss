@@ -28,6 +28,23 @@ Amber lines use a default rule. The rule shows next to each line in the app and 
 
 The views read 557 M GL rows and take about 20 seconds. So the procedure `WPL_REFRESH` copies them into the `WPL_T_*` tables. The task `WPL_REFRESH_TASK` runs it each day at 11:00 UTC, after the 10:15 UTC GL and goods movement loads.
 
+## Access
+
+The app runs with owner's rights. A user needs only `USAGE` on the app, not grants on the tables.
+
+| Role | Privilege | Who |
+| --- | --- | --- |
+| `ENGINEER_ROLE` | OWNERSHIP | Owner role. Chris, Luke, Jason, Emma, Peter, Simon and Abhishek have this role. |
+| `MODELLER_FINANCE` | USAGE | Gui. Granted 2026-11-16. Gui is the only user of this role. |
+
+Aswani and Tracy Conall have no Snowflake user that was found. To give a person access, grant `USAGE` to a role that the person has:
+
+```sql
+GRANT USAGE ON APPLICATION SERVICE DEV_ANALYTICS.FINANCE_PL_WEEKLY.WEEKLY_PL TO ROLE <role>;
+```
+
+The user must use that role in the session that opens the app.
+
 ## Logo
 
 The header uses `public/pilgrims-logo.png` when that file is there. Until then it shows a text wordmark. Use the same file as the Travel Expense Dashboard.
