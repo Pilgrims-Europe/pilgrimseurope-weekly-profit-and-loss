@@ -1,0 +1,1360 @@
+Because a few of the other things that we're doing are...
+kind of starting to leak into this. So we've been, we've had like an ongoing conversation back and forth today around Successfactors data, so head count data. And then what's coming into that is looking at the contract labour as well, because Vanessa needs that for that. And then we were having
+
+Guilherme De Marchi  0:18
+Yeah.
+
+Peter Nwora  0:21
+It's about a cigar.
+
+Luke Harrison  0:26
+Obviously, we're having back and forth conversations about sales, getting sales cleaned up, that goes into this project as well. So there's lots and lots of little bits and pieces that by doing that for other projects, we're kind of doing that for this, or by doing it for this project, we do it for the other projects as well. Because it's all kind of core data that we're talking about.
+
+Peter Nwora  0:27
+Box.
+Well...
+Yeah, yeah.
+There's a lot of places where some of these gentlemen's clubs, where they still have a smoke there.
+
+Guilherme De Marchi  0:42
+Yeah, I...
+It is all linked. So remember, look, I think we had a chance a couple of months ago to talk to the Brazilian team. They developed that Qlik fancy style. So everything that goes at the end of the month for the PNL, right, should have any link to.
+
+Peter Nwora  0:51
+Thank you.
+
+Luke Harrison  0:53
+Yeah.
+
+Peter Nwora  1:03
+Open her.
+
+Guilherme De Marchi  1:03
+Auxiliary data. So you're talking about volume, right? Kim volume, right? P&L. OK, this is a sales data. The sales data should be breakdown by customer, by material, by delivery date, and everything else. Talking about sales deduction, right, which is the override or discounts is a commercial finance. They will have another dashboard to see that.
+
+Peter Nwora  1:08
+Scotch.
+The.
+
+Luke Harrison  1:13
+I.
+
+Guilherme De Marchi  1:24
+Talking about Costings, they're gonna talk about with me because the standard cost is in here, then let's talk about standard contribution overheads. I need a new dashboard for overhead, so it's all linked the P&L Monthly and P&L Weekly.
+
+Luke Harrison  1:36
+Yeah.
+
+Guilherme De Marchi  1:42
+They should target to the same.
+process, layout, and everything, right? But we all know we spend three months travelling across all sites, right? Luke went with me, a couple of them, Jason went in Dungannon with me. So because the way the sites do the weekly PNL is so diverse, they have different systems and so on.
+
+Luke Harrison  1:49
+Yeah.
+
+Guilherme De Marchi  2:06
+That's the project here, how we can, how we can centralise and automate as much as we can to avoid the site spending time every week because it's a weekly P&L, then every week they need to go in France, just in there for Hannah.
+She had a book like that.
+
+Luke Harrison  2:28
+Yeah.
+
+Guilherme De Marchi  2:28
+110 steps she had to go. Click here, transaction XYZ, download from here, copy and paste in this tab, go there, da da da da, spending a lot of time. So this project, it's really, in my opinion, one that will save time.
+
+Luke Harrison  2:44
+Yeah.
+
+Guilherme De Marchi  2:44
+for all the site finance teams. They should be spending time looking, analysing, getting action plan in place, chasing the guys, why OPEX is not delivering the yield, why the maintenance guy are spending too much and so on not building. So we are aligned on what we need to do.
+
+Peter Nwora  2:46
+Six.
+Yeah, we got that.
+My, for important.
+No.
+No.
+
+Luke Harrison  3:02
+The.
+
+Peter Nwora  3:03
+Yeah.
+
+Luke Harrison  3:06
+Yeah, do you want to do you want to walk them through what the processes they're doing at the moment, just so the guys can actually see what the pain is doing?
+
+Guilherme De Marchi  3:06
+Ahh.
+
+Peter Nwora  3:06
+And a lot.
+
+Guilherme De Marchi  3:07
+But the, the...
+
+Peter Nwora  3:11
+Now.
+You said the video we bring.
+
+Guilherme De Marchi  3:13
+Yeah.
+Yeah, no, of course. So I think this slide here will summarise most of the data that is coming through.
+
+Peter Nwora  3:15
+In our Boyd.
+Straight.
+Even prepared to you not, and so yeah, not shame, yeah, so I didn't think it was right, thank you.
+
+Luke Harrison  3:25
+Yeah.
+
+Guilherme De Marchi  3:25
+on a weekly basis. So I will not start opening all the spreadsheets we have because you're going to look and see, okay, what I do with that is such diverse names, but at the end it's a P&L, right? So basically what the sites do on a weekly basis, this was the list of transactions from Sap.
+
+Luke Harrison  3:28
+Because.
+
+Peter Nwora  3:35
+The.
+So, I, if you have a time to read.
+Sure.
+
+Guilherme De Marchi  3:45
+that we were able to identify that all of them use. Okay, some of them use different layouts because Sap is also built like that. They normally put the names. So if you go into the PPV, for example, you're going to generate Fagalo 3H, they have a setup group of accounts.
+
+Peter Nwora  3:46
+I got home.
+Big.
+
+Guilherme De Marchi  4:05
+Then you have PPV Redruth, PPV Bromborough, PPV Spalding, PPV. This is all different layouts with the same information downloaded from Sap. OK, so basically I'm not so worried about the format, the template. I'm worried about how the flow of the information. OK, so basically on the on the.
+PNL line item extract, which is an accounting extract on a more detailed level as possible. They use the Fagalo 3H transaction. Okay.
+Behind that transaction, probably Chris, you guys know better than me, but is the, it is what feeds into the PNL, the monthly PNL, okay?
+
+Luke Harrison  4:46
+Yeah.
+Yeah, so, so we don't we don't see it as a cycle of 3H, but from what we're getting on the BW side of things, we know that we're getting GL line items, so it's going to be us mapping that, but there's this is just a there's a distinction between what SAP calls things, then what they they call when they hit BW, and then ultimately.
+
+Guilherme De Marchi  5:00
+Yeah.
+
+Luke Harrison  5:10
+what they're called when we get them from a Qlik perspective. But we can figure all of that out because we've got Aswani from a BW standpoint, and then we've got the SAP guys, so the likes of Tracy Conall, who we could use to kind of help us translate it back to SAP.
+
+Guilherme De Marchi  5:14
+Correct.
+Yeah.
+Correct. And then on that front, myself and Peter, we spent some time looking into that. And Peter already brought some Qlik Dash as a test. It was a draught that we were trying to do. So this is just an example. Peter has the detail behind. This is an extract from the Faglo 3H.
+
+Luke Harrison  5:32
+Yeah.
+
+Guilherme De Marchi  5:47
+We just apply a mapping behind. So let's say engineering cost there, account number 5511420, contract service, support and tech, then you get the list of the supplier. And if you open even further, you can get the PO number for that.
+and also the material code for that. So Peter was working on that, but I know that now we're going to move to his Snowflake. So it was an exercise to see the data behind. But Faglo 3H is one that the sites use a lot. For inventory, they use MB 51, ZL 20, ZR 63G.
+
+Luke Harrison  6:07
+Yeah.
+
+Guilherme De Marchi  6:28
+ZVAR. Why they use the inventory? First of all, to see the movements because they normally download what am I opening stock, what is my goods receipt and what is my closing stock. The difference between that or is consumption or is production. So they
+They used the inventory reports with the opening and close first to cheque. One thing is important is the weekly P&L is not just build a P&L and report to Gui, Kim and Ben and Eduardo here in the central office. They used the weekly P&L.
+as a tool to cheque things they need to deliver on their job description, which is a site finance. They need to guarantee the stock is correct. They need to guarantee the financials are correct. So stock movement is 1 important they use. And of course, POs, receipts and vendors, they use all these transactions.
+Sales. Sales is a mix of things. You got the guys from PUK using Copa. They do not use Qlik at all. And you get the guys from PFM and Moy Park using Qlik. Okay. And you have other sites that not even use either Qlik or Copa. They use
+Sap transactions, VFO 5, which is just a list of billing documents, okay, to cheque the sales. On the cost side, they use all these transactions, right? The important one is that ZPP 56, which is an extract of the BOM,
+because they need to do, I'm going to show how the layout of the weekly PNL is structured into Anna plan at the moment, right? But they need to calculate the production variances, right? And to calculate production variance, they need to go into a packaging, ingredients, meat level. So they normally get the bomb.
+right? They apply the standards that is on the bone and compare against the actual. So basically saying, how much was my consumption of carrot, right? I had 10,000 pounds consumption of carrot in that week, for example.
+If I apply the bomb.
+How should be my standard consumption of that carrot into that week? Ah, should be 8,000 pounds. Okay, the difference between the 10 that I use it and the 8 that is my standard is 2, the 1,000 pounds as ingredients variance in that case. So they do it for ingredients.
+packaging and meat. So basically is this, I'm gonna go, we can go as the project goes on, but the plan with Luke was, okay, you have different system, different Sap transactions, different ways of working.
+Let's push all this data to Snowflake. Let's organise this data there, right? Look, model. And then we can use to build the PNL.
+
+Luke Harrison  9:33
+Yeah.
+
+Guilherme De Marchi  9:39
+Okay, and if we want, we can replicate that dashboards and the way of working into Qlik.
+Okay, and Anoh plan will be just...
+final two of reporting. Okay, so let me just open here.
+The Anna plan piece. I don't know how familiar the teams are with Anna plan. OK, but let me just give more visual to what we are.
+
+Luke Harrison  10:01
+Yeah.
+We, we, we can use, we can use, and the plan side of things, got Abhishek and Simon there. I think what I want from this, I want to make sure that the all of the logic is built within Snowflake, managed within Snowflake. I think we've got click on this to give the guys an easy way of getting to the data for validation.
+because we're not really looking to do their jobs entirely for them. So we could automate everything and just push it to Anaplan, but there isn't a massive amount of value there because we still need the site finance to know their sites, to know their data, to provide commentary. So we may use Qlik as a means of them getting to the background data to analyse, to ask questions,
+
+Guilherme De Marchi  10:27
+Yeah.
+Correct.
+All right.
+Kate.
+
+Luke Harrison  10:50
+to point out any kind of issues that they have. But I want the guts of it in Snowflake because we know we can depend on Snowflake. We know that with Snowflake, we've got speed and we know where they can leverage more in terms of technology, in particular AI, in the Snowflake side of things.
+
+Guilherme De Marchi  10:53
+Yeah.
+Yeah.
+Okay, so...
+How these things works, okay? All the 30 sites that we have, they have a site finance with a team. In a weekly basis, the final output is this. They go into here, okay? Imagine here, Dungannon, they're gonna upload a week. So each week they build into Excel and all the...
+all the data crunch that is behind. And they come here week 45. They will upload into an app plan. The number of kill, okay, is just a Kpi. They can upload the sales volume, okay, splitting by what is edible and non-edible, okay. The production tonnage has a Kpi.
+
+Guilherme De Marchi  0:07
+Okay, then extend their net sales revenue.
+material cost, right, and the standard contribution, okay, freight as well. This is all coming from Qlik, okay, in Dungannon, and it's coming from Copa if it is a PUK site, okay, but so far, all good is easy. Then we go into the STO, okay, if they transfer goods between sites.
+Then they go into transactions from Sap, stock Movement Reports, and...
+stock from here to there, right? Splitting, then each site has a way of doing, but it's a stock material movement report from Copa, most of them, and they download this data and stick here, okay? Net sales, material, and they have a standard contribution. Here is where the things got a little bit complicated.
+Okay, so you see here production material yield. This is to get into this number, then each site will have a way of doing. Okay, but it's not complex because it should be in a standard way of calculating that. You have your standard yield, you have your actual yield,
+The difference to that is a variance, right? The same for substitution, packaging, yield, and so on. They have the production variances here. Then the PPV, PPV is straightforward, is just a download from FAGLO3H. Stock variances, this here is also coming from some
+list of GL accounts. They normally post manual adjustments into the stock. This is all stock adjustments, okay, stock variances. It can come as well from the stock revaluation impact that we do once a month, right? So our team here centrally, we release the cost.
+And based on the position they have on stock, it can get an effect, an impact. But that impact is never on that week for the month end. It is from the first day of the coming month. So they split that cost into here. So this is all most related to stock revaluation. So we can also
+change the name of that or create a new line into the P&L to make sure that we have a clear understanding what is it. Okay, then they have other income, other cost and income. Sometimes they sell spare parts on any other things on sites. They can have other income.
+Then, freight distribution varies, only variances, and all the overheads. OK, I think overheads we are all we are more familiar because we have this overheads report from from, but the sites they don't close every week. We know that our financials are not, we don't have our month end every week, of course.
+So what the sites do, they forecast the overheads. And in the end of the month, they will compare about what they forecast as a weekly cost and what has been the final, final number. So basically what I'm saying here is the weekly P&L is not an ECTO. We call ECTO, but it's not an ECTO.
+Right, it is actual on sales, it is actual on variances, but is a forecast of the overheads. OK, so based on that, just to show you guys how this flows, let me just open a file that I...
+
+Chris McCann  3:31
+Yeah.
+
+Luke Harrison  3:42
+On the, so what I was thinking on the all verts piece, because it's a forecast, what we could actually do on that is build them an interface. So build them an actual interface of a UI that we post in what their average run rate has looked like, and then they can go in and they can modify
+that with some commentary against it.
+
+Guilherme De Marchi  4:02
+exactly how the budget works on Anaplan. When they are submitting the weekly, the budget, Anaplan will give them like an average cost year to date per week for that GL line. And they can choose if they're going to use exactly the average or if they're going to put that average plus 1% or 2% based on any assumptions we can have.
+
+Luke Harrison  4:05
+Yeah.
+
+Guilherme De Marchi  4:26
+Okay, but basically here, I think, look, I don't know if you shared this already with the team. So we went, we have all the data from the sites, where is it, here, right, with the help from Ricoh, right, they were able to document for us.
+each of the sites we investigated, where the information came from, okay, and how they worked with some notes and all the logic behind, okay? So for example, Redruth, where they got the production tonnage, they have analysis for office, sales they got from Fagalo 3, these guys use
+Sap, these guys use Copa, these guys use Qlik and so on. So we can go with more detail. I think this is not the reason of the meeting today, right? But we have the detail behind. And based on that, we are suggesting how we're going to deliver this project. Okay. So basically, you have the first section of the weekly P&L, which is the Kpi, right?
+So, Q data, I was exploring with Jason. Can you give me from Snowflake the Q data? It should be straightforward, right? Because Q pig come from Atlantic, Q chicken come from Innova, and the lamb come from HCS. Let's not worry about lamb now. Okay, but let's just pig and chicken.
+So the idea is get the source, push into Snowflake, let's use that data to consolidate here as a Kpi. When we're talking about standard margin, okay, this is done. It is working. We just need to collect the same.
+Qlik reporting sales data and organising this way here by site. And we can create new dashboards to help the guys to navigate on that revenue. The material cost packaging and labour is the cog split is already there. So our team here, central costing team, we are releasing the cost every month.
+This data is flowing to Copa and Copa is flowing to Qlik and Qlik is going to consolidate into a Snowflake. I don't know technically how this is going to work, but it is the data from Qlik that we need. We need to bring it here. How we're going to do it, but it is.
+Then here on the STO, we don't have any reporting Qlik at the moment, since I'm aware that consolidates the intercompany sales from Qlik plus the material movements from Analysis for Office, which is basically the STO
+report. So we need to have somewhere from Redruth to Bodmin, for example, same company code, the volume they transfer. Okay, plus if Redruth is selling something, let's say to Moy Park, Company 84, then is a sales intercompany. This is on Qlik.
+because it's a sales. But if it is a stock transfer, STO, it is not on Qlik, and then the guys needs to go there on Sap, download the report, or run the analysis for Office, put into an Excel and so on. So we are also complicating the way we're doing, but the information is there. The same logic for.
+splitting the meat packaging and labour, standard cost, standard freight. That is 1 look that we didn't explore.
+In a detail that I would like to explore, but there is a Sap shipment costing.
+in PUK that the guys use. So the standard freight that is coming from the Qlik dash here, it is okay. But in the PFM and Moy Park,
+
+Luke Harrison  8:14
+Yeah.
+Mm.
+
+Guilherme De Marchi  8:35
+right? They account that in a central supply chain and they recharge, let's say recharge in the end of the month for the sites. So it is that project that I know IT was exploring to replicate the same Sap shipping Costings from PUK to other sites and they are holding for a new solution.
+
+Luke Harrison  8:43
+FF.
+Yeah.
+
+Guilherme De Marchi  8:57
+So on this one, it's going to be a mix of, okay, PUK we can use, but then on the PFM and Moy Park, we should allow supply chain finance manual entry for now.
+
+Luke Harrison  9:10
+Yeah, we can do that.
+
+Guilherme De Marchi  9:11
+to the weekly P&L and then they do not need to send to the sites and ask the sites to copy and paste and then uploading to an app plan. It should be like directly there and just in a state to saying completed, supply chain finance completed the allocation for the weekly P&L.
+
+Luke Harrison  9:14
+Is.
+I know what do they do? So, are they are they just raise it? Is it like a recharge, like an intercompany thing they're doing in the moment?
+
+Guilherme De Marchi  9:35
+Yeah, it's kind of a central team. So you have a PO hub. They raise each POs for the hauliers and so on. When the invoice come, they account everything centrally. And in the end of the month, every week, actually,
+
+Luke Harrison  9:36
+Okay.
+Yeah.
+Yeah.
+
+Guilherme De Marchi  9:54
+the supply chain file and say, okay, this bill for this freight is from Dungannon to Ballymena, or is from Ballymena to the customer. Oh, this is a Ballymena one. So they split the cost and they send an Excel sheet.
+
+Luke Harrison  10:09
+Mm.
+
+Guilherme De Marchi  10:11
+Weekly to the sites, then the sites receive and include here mainly. And then in the end of the month, they do a journal into the accounts to clear the central cost centre and recharge the sites. It's completely different than the way the PUK works.
+
+Luke Harrison  10:21
+Yeah.
+
+Guilherme De Marchi  10:31
+PUK work, they have that central team in there in Kingsling. They maintain the freight rates. Every time you raise a freight, then Sap creates an accrue. When the invoice come, they cheque if it is matching. If it is matching, each site, they have their own freight.
+
+Luke Harrison  10:31
+Answer that.
+
+Guilherme De Marchi  10:51
+Let's say, base it on that.
+
+Luke Harrison  10:53
+Again, again, we could do on that, we could do on that one, the similar to what we do with the overheads, where we calculate a run rate and then we give them a means of going in and adjusting that run rate.
+
+Guilherme De Marchi  11:01
+Yeah.
+Yeah, this piece here is where we're going to spend most of the time, but basically it's not complicated. I'm selecting here Redruth and Bromborough for us to explore. Packaging youth, for example, in Carrickmacross is really good. I can show you guys. Labour should be straightforward and it should come from
+
+Luke Harrison  11:06
+And.
+
+Guilherme De Marchi  11:27
+as well, as Luke was mentioning, is the labour efficiency is not something complicated. It is based on what I produced, okay, how much was my standard labour? That amount, okay? How much I had in the end of the month?
+
+Chris McCann  11:46
+Yes.
+
+Guilherme De Marchi  11:48
+internal labour from payroll plus the agency cost. The difference between both, it is a variance, labour variance. They stick into here. The only thing it is if we do the labour variance, not including the agency, then we are not calculating correctly. So we need to build
+an input file and everything. Look, we already spoke to Gustavo. The flow from the agency needs to come to us in a standard way that we can consolidate the full labour.
+
+Luke Harrison  12:13
+Yeah.
+So, this was this was in the, you know, the listing in the manual files that Ben was sharing that Vanessa is using. So, it's a mix of real labour and then which we can't we know we can get that from Successfactors, but the agency labour at the moment comes from sums you can get from the system, some is coming, yeah.
+
+Guilherme De Marchi  12:22
+Labour picture.
+Yeah.
+Yeah.
+Yeah.
+
+Luke Harrison  12:40
+Something's coming via e-mail, but Gustavo consolidates that every week. So what we might do to begin with is while we work on those integrations, actually use Gustavo's sheet to begin with, ingest that in depending on timing. Take from there. Yeah, we've chased them to do it by the way, Key.
+
+Guilherme De Marchi  12:41
+Yeah.
+Yeah.
+Yeah.
+
+Chris McCann  12:52
+All right.
+
+Guilherme De Marchi  12:55
+Yeah.
+Yeah, correct. And one thing that is important, guys, is you see labour efficiency here. We can do, we can do, we can change this layout if we want. We can put a line, say,
+Pilgrim, Europe.
+Payroll, let's say, okay.
+Right, then we can put the agency.
+Something like that. Agency cost. OK, let's say this is 100, this is 100. And then we go here. Standard cost is minus 160. OK, the sum of this will be 40K, 40K will be a labour.
+various. Okay, so we can make it more easy for anyone who wants to understand this to see here, because it is this. You see, you have two elements of labour. One is the payroll, another is the agency. Both of them was a cost of 200 K for that week. Okay.
+How much I'm recovering into the production based on the labour standard cost? 160. Okay, so I have a difference of 40. The explanation on the investigation of why this is happening, this is not, it will not be sitting here, right? Because then the site will, the site finance with the team, they will.
+They manage this on a weekly basis, so they know what's going on. Sometimes is an overtime, it is, you know, we had more agents that we should, we didn't produce because we had downtime, we have absence and any explanation, yield as well.
+We just need to say to the team is, how much was my consumption of packaging?
+Okay, let's say same example was 100 and my recovery from...
+Production, my standard is saying was 110. It's OK. So, in this case, I produce my usage of packaging was less compared to my recovery. So, then it's a positive impact or a negative impact. It depends. OK. So, what I'm saying here on the on the on the variances.
+The model that Redruth use and Bromborough use is really good and simple, okay? And of course, this is the beginning of this project. If we get a number in a concept in, then we can work out in getting better views, better way of looking, better breakdown, but for now, the...
+concept is what's really important. Okay, then we go to this PPV stock variance that already spoke. This should be straightforward from Faglo 3H and all the overheads. I'm calling here a manual input apart from consumables because consumables is from stock.
+
+Luke Harrison  15:53
+Yeah.
+
+Guilherme De Marchi  16:01
+It should come from Fagalo 3H as well, but we should allow each site a template. They go, they feed.
+Also what Luke was suggesting, we can populate with the average, okay, year to date, if they want to use the average of the last three weeks or average, sorry, the average of the last three months or the last six months, because you have inflation coming from the numbers as well, but it should be a number there.
+for them to, as a reference, if they want to override that number and put another number, they can do it because they manage this all the time. And then you have your result.
+I dropped them.
+So, it seems simple.
+But the work we need to do, right, to push all this data to stabilise.
+But I'm more comfortable now because without visiting this site, we should not even see what's going on, right? So I have a folder here I can share with you guys and then we can, you know, project management behind that. But I have a file that today have all the video recordings.
+from the sections. So we spent two days in each site, so a lot of content can be used as well. I know you guys can make magic on the AI on that stuff. But I have also the documents, the spreadsheets for each site.
+I, I, I each site sent to me the the the final, you know, PNL for that week with all the supporting documents, so we can navigate in into each one, but what I'm more concerned is we should not just choose one and replicate, we we should build the concept of creating the weekly PNL.
+Okay, so then we can replicate to other sites. Yeah, so that's the plan.
+
+Luke Harrison  18:02
+So just been in the chat there as well. So I know that we put EI credit limits on everybody at the moment, we'll be raising that for the purpose of this. So this is our number one priority at the moment. And I think if you actually look at the backlog of other things that we're working on, there's a hell of a lot in here that helps other things as well.
+So I know factually a number of projects that are in the pipeline, things that we're looking at, actually things that we've looked at, the P&L project, we've looked at a lot of the work that Rita has been doing on clarity actually feeds into this. This is kind of a central finance part of information.
+So I want as much of it done in Snowflake and I actually want us to spend on the AI credits. I want this to be a good example of where we're using AI within the data team.
+You're on mute, Gui.
+
+Guilherme De Marchi  19:02
+Sorry, guys. So let me just share quickly here the one example, okay, of one thing that could be used in the same way for all sites to cheque their stock and calculate their production variance. Okay, this model is from Carrickmacross. This is a really good one.
+
+Luke Harrison  19:03
+Right.
+
+Guilherme De Marchi  19:21
+Okay, so what they do, you see here, this is the groups, we look up everywhere. Okay, so expect we look ups everywhere on this, but you have this code, right? They have this opening stock. Okay, this code here. This is the opening stock. You see it's coming from another file stock report.
+That stock report was downloaded from Sap. They have then the goods received. The goods received is coming from another report from Sap. Okay? They didn't have any movement and they have their closing stock. Okay? So in a simple calculation, right, in a very simple calculation, if I have my opening stock,
+I got 2000 more, right? I didn't have any movement. OK, less my closing stock is my consumption, correct? Is my consumption of goods, correct? If I close with that, where is the difference? Is my closing stock, is my consumption. OK, if this is my closing stock.
+Then they go and apply the boom in another spreadsheet. Okay. So basically saying my usage was this and I should have used this. So I had a variance of 42 kilogrammes on that chicken. Okay. So the ecto yield was 99.93 and my standard yield is 99.
+The difference of that is 236 pounds. So this is a way that the sites can cheque opening and closing stock, goods received, right, yield and variances into one single way. This is for meat, ingredients,
+packaging, okay, separate by what is trays, inner, and so on. They can make graphic as an explain. So when they come here to the summary, you see, look how ugly these spreadsheets are. But it is saying on meat what happened, okay, by group. So they can have their actual, they can compare to the budget, the consumption, and the impact, you see?
+3K here, nothing here, 4K here. So if the site has identified a problem, they can correct with the stock controllers, they can correct the boom because the costing is not right, the standard cost is not making sense, the impact is lower. So it's just one example of things that is a good practise.
+can be automated and use it for other sites. One important thing I would like to mention, there is some initiatives on the OPEX as well, okay, to calculate the variance, yield impact. Sometimes, okay, they will be similar, but.
+OPEX works more on targets, okay? Targets, theoretical gaps. For the P&L is more standard cost and actual cost. So the variances is what we're going to close the books in the end of the month.
+because the weekly PNL, it's an estimated result for that week. If they close more or less to that estimated result, they need to explain, okay, in the month end. So decide to use this as a managing tool, and it's not so obvious.
+Packs driven, so we need just to make sure not to create true.
+We're probably going to create 2 numbers, but they're going to target the different things. Okay, we need to have this understanding because, oh, my yield we have from OPEX, the gap from yield is not gap. This is difference to the standard, is the stock movement and the recovery from the financials on a weekly basis is not.
+Target, OK.
+I think is that for me? I spoke too much today. Luke, help me here.
+
+Luke Harrison  23:11
+That was good. That wasn't that was that was wasn't a huge amount of talking from you, Gui. You like to talk.
+
+Guilherme De Marchi  23:17
+Yeah, Peter knows.
+
+Luke Harrison  23:19
+So I think I think in terms of delivery, so I think we talked about the Snowflake aspect. I think you'll have obviously a lot of access to Gui. I don't know if there's anyone else you want to put on this in your area. Well, but you're pretty hands on. You want to see the data as it comes in, don't you? So, I mean, he's pretty technical. He's in Snowflake as well.
+
+Guilherme De Marchi  23:34
+Yeah.
+
+Luke Harrison  23:39
+Um...
+But yeah, a lot of this we've got, and we're not looking for it to be absolutely perfect, but we want to see it start to move quickly. The quicker we can get it moving, the quicker we can get feedback from people.
+So I want that quick delivery, quick feedback, no expectation on it being 100% perfect to begin with. So I think Chris, from like your perspective, we're not, this isn't going to be like delivering for Kim where Kim wants, needs it to be 100% perfect before we do anything with it. We want it to be stable. We want it to work. We want to get the numbers out and get feedback on those numbers.
+
+Chris McCann  24:10
+Mhm.
+
+Guilherme De Marchi  24:14
+Hmm.
+
+Luke Harrison  24:16
+We'll get to perfection. Well, we'll get as close to perfection as we possibly can with this, because there's a lot of process to account for in here, but it's about getting it moving and getting that forward and progress on it.
+
+Chris McCann  24:16
+Mhm.
+Mhm.
+Mhm.
+
+Guilherme De Marchi  24:30
+How do I see this look is you have a very quick win, which is getting the queue, getting the standard margin from click. Boom. This is done. It's just implement there, okay? And you can create a manual entry for the sites to upload.
+
+Luke Harrison  24:40
+Yeah.
+Yeah.
+
+Guilherme De Marchi  24:49
+in the weekly basis, the production varies and the overheads. Okay, job done. Then we go, yield, then we build a yield, yeah, and then you ask them to stop uploading because then you have the yield ready, then you go to the package and then, then, and then we can we can move faster on this.
+
+Luke Harrison  24:52
+Yeah.
+Well, and in terms of the kill, in terms of the kill game, we...
+Just, I mean, just as giving the sites a slightly better interface to fill in their run rates and the missing data, then going into Anaplan will be a win as well, because going into Anaplan is a complex process. It's not the most intuitive system. It's incredibly powerful.
+But it's a bit sluggish. So yeah, we can do that. But in terms of like, the kill's a good example of it. Like we've actually got everything in Snowflake already for the kill. So we've got Hellenic data going into there, which gives us pork. We've got access to HDS, which would give us Lamb, although
+You know that's...
+not as much of A concern kind of going forward with the changes there. And then we got Mtech and Innova. So we already have kill there. We've got killer exposing other reports, but we're not exposing it to the finance community. So again, it's a place where we can kind of bring all of this together.
+So I think there's a lot of the work that we've been doing in the background, in particular over the last year already, all we're going to be doing is, with a lot of it, is actually just bringing that to the forefront and showing it to a wider audience of people.
+
+Jason Taylor  26:22
+What do you think, Luke? Do we take the first example? Obviously, take both your points, put them together, and do we look at doing an example then by taking one kill measure first of all, like kill cheque a measure, or do you mean do you want us to do all the kill measures as an initial proof? Okay.
+
+Guilherme De Marchi  26:23
+Yeah.
+
+Luke Harrison  26:38
+All the, yeah, all the kill measures in there, but like I, we could we could give you weekly kill today from the data we're getting from, we've got live data essentially coming in from Arolink.
+
+Jason Taylor  26:41
+And then you.
+
+Luke Harrison  26:50
+And I know that from the Innova data that we're getting, we can get killed from there. I believe we can get some degree of kill from the Mtech data as well. So it's all there already. We're already bringing it in.
+
+Guilherme De Marchi  27:03
+Anoh, and also.
+
+Luke Harrison  27:03
+And then Chris that helps you push it back in from an Anaplan standpoint as well and a P&L because we're not using it in the monthly at the moment.
+
+Jason Taylor  27:09
+Yes.
+
+Guilherme De Marchi  27:11
+And as we go, we can ask the sites also to engage them to test. Okay, so if for example, we're talking about queue, you have two sites that queue, right? In 3 sites, Anwick, Ashbourne and Duggan. We get the queue done on a weekly. Guys, can you cheque? They upload on a weekly basis.
+
+Luke Harrison  27:15
+Yeah.
+Okay.
+Yeah.
+
+Guilherme De Marchi  27:29
+Right, can you cheque? Because they go then on auto link, they download or Atlantic or and so on, they download and they have this number. We were in Spalding, right, Luke, myself and you and Ian was populating the queue with us recording and Luke was asking in Snowflake, please give me the queue and the numbers were matched. So that number should be there.
+
+Luke Harrison  27:48
+Mm.
+
+Guilherme De Marchi  27:50
+We need to think of this project, we need to think like that. Imagine you guys are sitting as a site finance and your guys building the weekly P&L, okay? When you're building, lots of questions start to ask, oh, why my volume is up or down? Why my price is up or down? Why my discount is up or down? Why my standard costs? So my margin is moving.
+
+Luke Harrison  27:59
+Yeah.
+OK.
+
+Guilherme De Marchi  28:10
+Okay, so if we just build, this was the important feedback we got from them. If you just collect all the data and you get a P&L job done, it's not enough because the guys will have to navigate through the customer to the materials, the group categories.
+
+Luke Harrison  28:44
+Yeah.
+
+Guilherme De Marchi  28:44
+The queue.
+The volume, the revenue, the standard margins. If we start from that.
+25% of the work is done. Then we go to the variance, then we go to the overheads, and that's it.
+
+Luke Harrison  29:01
+Yeah, think about building, like we could build out the template already as even taking like a native Snowflake app. So build out the template, what it looks like in Anna plan, build that out, populate that with what we know at the moment, keep populating that, and then give it a means for people to fill in the rest. And then so think about it in terms of what the interface is going to look like.
+some of it is going to be pre-populated data, some of it is going to be calculated with the option to comment. But we know that we could, you could take a screenshot of what they're doing in NanoPlan now and have that built in Snowflake in seconds.
+So just think about the power of the tooling.
+
+Guilherme De Marchi  29:40
+Yeah, so I can share the file. If you guys could push this Carrickmacross way of doing the stock controls, production, and variances. This should be amazing because it will fit for Carrickmacross and its killing grant all sides.
+Ah, probably is not the way Bromborough do it, but if they do, it should be better because they are not looking into that. They're doing it in a more simple way, but it could be doing even better. You know what I mean? So we are replicating a good practise. And let's build, send to them.
+Ask the feedback if we need to adapt anything, we could adapt.
+Mmm, don't feel too much confidence, Luke.
+
+Chris McCann  30:27
+Okay, so...
+
+Luke Harrison  30:31
+That'll be alright.
+
+Guilherme De Marchi  30:31
+No, yeah, let's see, let's see, let's see now.
+
+Chris McCann  30:31
+S.
+So.
+
+Luke Harrison  30:34
+When we're building stuff as well, just make sure that, so Chris, say you want to take the lead on building the interface, make sure that you're doing that live with Emma, Peter, Jason on the call as well, because I want everything to be shared. Because I think with the Snowflake side of things as well, like we've got kind of varying skills. Some people have done more of it, you've done
+
+Chris McCann  30:45
+Uh huh.
+Uh-huh.
+
+Luke Harrison  30:53
+a hell of a lot more on the getting the data in from kind of API data sources and that side of things like far more. The other guys, Chris, you've done more on kind of like building the Snowflake pipelines. Chris, you've done, so Pete, you've done a lot more working with Gui. You kind of know how he likes to see things and what that delivery looks like. So just make sure you're sharing that amongst each other.
+
+Chris McCann  31:14
+Mhm.
+
+Luke Harrison  31:15
+Because this is a really good way of kind of build our collective skill levels by sharing how and how we do things. And I'm more than happy to share, like what I did with, say, for example, the kill data reverse engineering that from the Hellenic stuff. But I mean, it's a good opportunity for us to experiment a little bit here.
+
+Jason Taylor  31:23
+Yes.
+
+Luke Harrison  31:34
+Do things in a clever way, but fast.
+
+Chris McCann  31:38
+Do we have a clear picture of the data gap? So the gap of the data that we don't have versus what we do have.
+
+Luke Harrison  31:49
+So the majority of it is the majority of system is system based. So we know that with the overheads, we don't have a clear picture of those from month end. And being as we're doing this on a weekly basis, that's all going to be manual entry.
+The Labour numbers from a...
+kind of external contractor standpoint, that is a big gap because there's three sources for that at the moment. One we could get.
+via API potentially. Another one has a site that we could build a bot to log into, but the site's broken at the moment. The other ones are just being emailed over on an ad hoc basis. So for that one, I'd suggest using what Gustavo is doing, which actually Ben's already dealing with as part of the
+the projects do with Vanessa. So you could almost shuffle that to the side and say, oh, we're looking at a bit of a solution for that now. So we won't use that, we'll just make sure that what Ben's using is compatible with what we're doing. But otherwise, gap-wise, this should all be SAP data. And actually, if we
+expose the SAP data and the sites are like, oh, I'm not quite sure about that. I do it a different way. Actually, that's a really good way of kind of highlighting to the site to be a lot easier if they did more of it in SAP or they cleaned it up in SAP and everything. So it shuffles them from making a lot of these kind of
+ad hoc manual changes to just doing it in SAP in the 1st place. And what we're going to do is we're going to save them time, because what they're doing at the moment is they'll download the data from SAP, they'll make a few manual changes, but then they'll reflect that in SAP at month end anyways. So the time we save them can help them in the process of getting an SAP. So it should kind of become a
+
+Chris McCann  33:32
+Mhm.
+
+Luke Harrison  33:41
+Almost the self-healing process.
+I mean, they want this. When there was a survey around on what's the biggest pain point for all the site finance when Eduardo first came in, they went pulling together the weeklies.
+So they've said this is their biggest headache. It's in their best interest to do it. It's for a lot of them, it's one or two people taking one or two days a week. And it's painful. And a lot of it isn't that the process is like in a lot of cases, we saw them doing something and
+
+Chris McCann  34:02
+Mhm.
+
+Guilherme De Marchi  34:08
+Yeah.
+
+Luke Harrison  34:17
+we're able to suggest on the spot, oh, why don't you get it from Qlik or why don't you run this BW query? And they're like, oh, I didn't know about that. So a lot of it is actually just, yeah, we're just crap at change in Pilgrims Europe. We say this is what we want as an end product, but we don't tell people how to get it. So they figure out their own way of doing it.
+
+Guilherme De Marchi  34:24
+Nobody told me, yeah, nobody.
+Correct.
+Yeah, and also for a financial concept point of view, they were uploading in different lines. Okay, so this should be the first step and it was highlighted by Ricoh. Say, why the guys from France are including the freight?
+
+Luke Harrison  34:54
+Yeah.
+
+Guilherme De Marchi  34:54
+total freight into the freight variance line because nobody explained to them how to calculate the freight variance line. You know what I mean? And then on the overheads, we created a split of overheads, new category group, but they just stick into everything into the utilities because nobody asked them. So, you know what I mean? That is, there is a, is this.
+
+Luke Harrison  35:08
+Yeah.
+
+Guilherme De Marchi  35:15
+Lack of.
+complete understanding as well, because at the end they just need revenue, contribution, overheads, and habit, you know what I mean, for reporting point of view. So each site, they keep they keep the layout behind with the detail.
+
+Luke Harrison  35:28
+Mm.
+And this is why perfect.
+Yeah.
+
+Guilherme De Marchi  35:37
+But they don't report, so, so we need to we need to break this line as well. Say, "Guys, if you have the detail, let's report the detail. Ah, because it takes too much time to adapt the spreadsheet. They have links everywhere, so why they gonna create three, 4, 5, 7 lines to to the chance of a broke the Excel and then they have to rebuild some of the so they never change.
+
+Chris McCann  35:37
+Mm.
+
+Guilherme De Marchi  36:00
+You know.
+
+Luke Harrison  36:01
+But this is why, but this is why I don't get too hung upon perfect in there. So France, for about a year and a half now, have been delivering a single line for their overheads, all in utilities. Like we know we can split that out further. And when we went, oh, could you split it out further? Well, oh yeah, we can do that. But they've been doing it that way. So
+
+Guilherme De Marchi  36:06
+Yeah.
+
+Chris McCann  36:06
+Mm.
+Mm.
+
+Luke Harrison  36:22
+Whatever you deliver is going to be an improvement, and we can keep gradually improving that. So don't get too hung up on, oh, this is a penny out, or we're not sure about this, or we're not doing this like the P&L that we delivered for kind of the monthly one.
+
+Chris McCann  36:40
+Mhm.
+
+Guilherme De Marchi  36:42
+And, and, and look, you know something that is interesting is on on the Qlik, for example, right?
+How many times during Monday and Tuesday morning the site finance goes and download the full data from Qlik?
+Right? Because they need to build this.
+So, you should have you should avoid them to go and have to download something to stick into an Excel, and because it's every site too, not only Qlik or Copilot, so they they use the memory everybody into the same time downloading a year to date.
+
+Luke Harrison  37:03
+Yeah.
+Yeah.
+
+Guilherme De Marchi  37:22
+database for all the sales for the site. Imagine. So using a loss of data as well, because it should be ready, right? It should be ready. Ready in the format they need to analyse and report.
+
+Luke Harrison  37:31
+I mean, that's what it is.
+I mean, that's what a lot of them were doing. A lot of the time cost on this was they were kicking off something running in Analysis for Office, and then that was just locking up their machine for like 45 minutes while it ran.
+
+Guilherme De Marchi  37:46
+I need, yeah, I need to download the *** loads VH, I'm gonna get a coffee, so they put to run 15 minutes later, they come back, oh, it's broken, I need to run again, and then they run again from Sap, so it's hours and hours of saving work if we do this a proper job.
+
+Luke Harrison  37:47
+Prd.
+
+Guilherme De Marchi  38:05
+And of course, they are, they own the process, you know? They know what they're doing. It's not wrong. It is correct, but it's time consuming. So that's the pain that we need to support, right? And...
+
+Chris McCann  38:23
+I, I think, I think from my perspective, um...
+A good place that I would like to start is taking that as...
+that picture you had of the different areas and the different SAP codes that support all the different data sets and figure out what BW view we have and don't have that maps onto that to ensure that we have
+
+Luke Harrison  38:42
+Yeah.
+
+Chris McCann  38:54
+what we need, while the non-SAP routes, so the Innova, the Hellenic, etc., that can be delivered into an app. And I think a third
+a third line of work there is the manual. So actually figure out, deliver the manual report applications for the different data captures. I think those sort of three streams would be a good starting point. And then we can start bringing everything together into an end app.
+
+Luke Harrison  39:29
+Yeah, what I want is HU to be like, we need to kind of keep it moving forward. So what I don't want is there to be a big analysis phase in there. If we know that we can get to kill data now, start going off and working on kill data. If we know we're going to have an interface for them to use, somebody could go off and start designing an interface. So all of these.
+
+Chris McCann  39:35
+Mhm.
+Mhm.
+Mhm.
+Mm-hmm.
+
+Luke Harrison  39:48
+pieces need to be done, but we don't need to do them in series. There are elements that we can do in parallel and then just clean it up as we bring it all together. So think of it as a software project, each person working in a different module or working in a different piece and then gradually together. And I think that's Jason where you can kind of bring a lot, the sense and kind of
+
+Chris McCann  39:56
+Mhm.
+Mhm.
+
+Luke Harrison  40:07
+logic to that, it might even kind of be for yourself to kind of look at what the design would look like and what the interface would look like.
+
+Guilherme De Marchi  40:16
+Look, guys, one thing that I know Peter, Luke knows how I like to work on this is I don't believe if I build a complete blueprint to you guys and say, that's it, and I go and wait one month for do a meeting and cheque how's the progress, it doesn't help.
+
+Luke Harrison  40:16
+Yeah.
+
+Chris McCann  40:30
+Mm.
+
+Guilherme De Marchi  40:37
+So if we can have like a twice a week, weekly meeting, I think Peter delivered how many dashboards for us, PPV, cost release, production volume, and so on on this dynamic. So I like to separate because this is priority for finances, priority for the company.
+
+Luke Harrison  40:45
+Yeah.
+Okay.
+
+Chris McCann  40:51
+Mhm.
+
+Guilherme De Marchi  40:58
+I would like to separate two or three hours a week. We can decide if it is once a week or, you know, for us to touch point and see how I can help.
+because questions will have, Chris, you were going to have questions. So we need to have in a daily contact to see, yeah, let me cheque. Then I go and have my files. If I don't know, I can ask Eloize how the site's doing here. Paulo is here as well. Can call Ron and Felipe. So we go into the detail of things to.
+clarify and build just one because then we avoid having, oh, we build this app, ah, it is not the way I want. I need another source, another way, is not the correct concept. So let's build.
+Test, feedback and move to the next one. Then build, test and feedback. We don't need to build something ready to go to be tested as a whole. Let's go step by step if possible, right?
+
+Jason Taylor  41:58
+Yeah, I think so. You want to follow the suit to how you how you generally tend to work, and that is small, incremental sort of apps have been progressing. You want to see stuff, give feedback, and then we keep delivering. So, I guess that's the style that will that will work with, but I think from from my
+point of view, I think the next step from our side is to let's take the all of the kill and that'll be our first component that we can work through. It makes sense given the existing sources that already exist for each of those. From there, we'll work with the team in terms of sort of
+how you want to tackle that, but I think we've made it clear we're going to source Snowflake, agreed finance measure, then Qlik, and then we can get that validated with Uk and then see if that's going to be a repeatable pattern for the wider usage or the wider measures as well. But at the moment, is there any particular
+Des, you prefer to touch base with the team? You know, do you want as a Tuesday, Thursday better, or do you prefer maybe you could go less time and go Monday, Wednesday, Friday, and then you can have that sort of, but I just think there's no point in having a Monday and Friday both, because you're going to have nothing in between those two. So,
+What's your tech?
+You're on mute again, sorry.
+
+Luke Harrison  43:22
+To.
+
+Guilherme De Marchi  43:23
+Sorry, I think Wednesday and Thursday and Friday, it's better because then we touch point on a Friday. Friday is a day that normally should be less intense for Friday. So if we need to contact the team as well, because Monday and Tuesday are doing the weeklies.
+And then Thursday, they are doing the forecast. And on Friday, they need to report. And so it's very intense. So Friday afternoon or Wednesday afternoon is where we get that window if we need to get them in place for any touchpoint. So we had Peter every Wednesday, right, 3pm, something like that.
+
+Chris McCann  43:59
+Yeah.
+
+Guilherme De Marchi  44:06
+So if you want to use that.
+that window we can use.
+
+Luke Harrison  44:13
+Yeah, I, I, I...
+
+Jason Taylor  44:14
+Yeah.
+
+Guilherme De Marchi  44:14
+Look, but I'm flexible. I can change if you guys want to do on a Monday 7 A.m. We can do 7 A.m. on a Monday, not a problem.
+
+Luke Harrison  44:22
+I don't think anyone wants to do Monday at 7 A.m. What I was also going to suggest was if we get just get a Teams chat going and anything that we're finding, any bits of feedback, just chuck it in there as well for everyone to look at.
+
+Guilherme De Marchi  44:24
+Yeah.
+
+Luke Harrison  44:36
+So just keep it, it's one of those things like keep it coming. If you found something and you quickly want somebody to have a look at it, then drop it in there. You can have a look at it. You can get instant feedback. It doesn't need to be perfect because you've got essentially an entirely technical audience here. It's a big wall of numbers. Gui loves the wall of numbers. So I wouldn't
+
+Chris McCann  44:36
+This is.
+
+Guilherme De Marchi  44:54
+Yeah.
+
+Luke Harrison  44:55
+I wouldn't worry about it, and we can do native into Snowflake as well, so we can just link directly to this source in Snowflake to have a look at.
+
+Guilherme De Marchi  45:04
+Okay, perfect.
+
+Chris McCann  45:06
+OK.
+
+Jason Taylor  45:06
+Luke, do you want to be added to that meeting? I'm just putting it in now. Okay. And is 30 minutes enough for, do you want the hour? I think you said, Gay, there's already an hour.
+
+Luke Harrison  45:08
+Yeah.
+
+Guilherme De Marchi  45:17
+The first, the beginning, let's put one hour and then we can have flat and that, yeah, we need we need to get the flight on, right, get the plane out of the ground and then when we fly a more.
+
+Jason Taylor  45:22
+Yeah, we'll see if.
+Yeah.
+
+Guilherme De Marchi  45:33
+Table should be easy.
+
+Jason Taylor  45:35
+Okay, there might be some turbulence along the way of that flight, but we'll get there.
+
+Guilherme De Marchi  45:40
+It will, yeah. It will, definitely will.
+
+Jason Taylor  45:45
+No problem. Has anyone who hasn't maybe had a chance to speak? Any other questions, whether you guys are happy enough with the steer that's been given?
+
+Emma Cutler  45:54
+I...
+No, everything sounds good. I was just going to add it. I don't currently think, unless I'm aware, that the chicken kill is in Snowflake at the minute. So if not, I'm happy to look at that. I can start work on that and getting that from Mtech. Okay, I can take a look at that.
+
+Luke Harrison  46:04
+Go ahead.
+
+Chris McCann  46:07
+At Mtech, Mtech will be there.
+
+Luke Harrison  46:07
+Go for it.
+Yeah.
+
+Chris McCann  46:11
+Yeah, are we?
+Yeah. Well, yeah, what kill number? Because there's a couple of different kill numbers, and I agree.
+
+Emma Cutler  46:16
+Is up.
+
+Guilherme De Marchi  46:22
+I, I know, yeah, I know the...
+
+Chris McCann  46:23
+Um...
+
+Luke Harrison  46:23
+It would be the one that hits site.
+
+Guilherme De Marchi  46:26
+Yeah, it is the kill I have here. It is the bird, yeah, is birds delivered, last the dead on arrival, last the rejects. So is the total net bird into the line that will pass through the scale and could be converted into a whole chicken or a cut and rejected. So yeah, it's not the Argue.
+
+Chris McCann  46:28
+Tilt a plant.
+
+Luke Harrison  46:30
+Yeah.
+
+Chris McCann  46:39
+Yeah.
+
+Guilherme De Marchi  46:48
+Birds deliver it, because we know you have that, ah, I delivered this, but then that on arrival, so that's the concept is the and and it is on that file, so we can we can clarify as well, Chris. In my opinion, in Brazil, we used to have birds delivered.
+
+Chris McCann  47:02
+It's OK, yeah.
+
+Guilherme De Marchi  47:08
+dead on arrival, Kpi, 0.5% is dead on arrival, rejects, rejects by reason, something happened on the transport or, you know, should have a reason, and then you have the net. So you have everything, you know what I mean? So what we want to have is
+
+Chris McCann  47:24
+Mhm, mhm.
+
+Guilherme De Marchi  47:27
+This possibility, dead on arrival, it's an important Kpi because the logistic Kpi, the guys are stuck in traffic, there's too warm outside, they didn't follow the protocols, why is it have more dead on arrival? We don't touch this point. I know the poultry teams, they touch this, but if we get this available.
+
+Chris McCann  47:31
+Yeah.
+Mhm.
+
+Guilherme De Marchi  47:46
+should avoid any miscommunication between, we don't need to call Ronan and the team to understand that on arrival. It should be a Kpi, you know what I mean? It's easy, an open book for everyone. So these kinds of things we can also explore, but I have the concept for any line. Don't worry about it. One thing that I didn't mention, Luke.
+
+Chris McCann  47:52
+Mhm.
+Yeah.
+Okay.
+
+Guilherme De Marchi  48:04
+and I think it's important. We're gonna have...
+On pork, we have an important number every week, which is the downgrades, okay?
+and downgrade, it's when you have too much pig from one type and you don't have demand for that pig, let's say organic, and you need to downgrade into a red tractor and ODB standard, let's say. So the guys do an Excel, very complicated there to
+Calculate the impact of that should be.
+After, right, we got the P&L in place, it should be a very good improvement if we could automate the way they calculate that Excel, because it's a half a million a week sometimes. It's a very important number. It touches planning, it touches
+
+Luke Harrison  48:53
+Yeah.
+
+Guilherme De Marchi  48:59
+Site finance, they need to explain, so it's a consequence of last demand.
+error and mistakes on planning. So touch points a different area and it's a significant number. So we could develop something good for all of them. You know what I mean? Part of the project because at the end that downgrade number will be included into the P&L.
+
+Luke Harrison  49:07
+Yeah.
+
+Chris McCann  49:07
+Mm.
+
+Luke Harrison  49:21
+Yeah, so a lot of this Emma is in Innova for Spalding Westerleigh. So you see, you know, there's loads of weird things they do with code substitutions which break in over all the time. That's a lot of that is driving this.
+
+Guilherme De Marchi  49:37
+Yeah, you have to, yeah, you have these two elements. One is the pork downgrade, but is which is not a substitution, but then on auto link and Innova, you have the substitution, which substitution is this. I don't have home, I don't have too much trimming. I need to use our whole muscle.
+
+Luke Harrison  49:38
+Uh...
+
+Guilherme De Marchi  49:56
+then you're substituting one from another, then that is a calculation. On the pork downgrade, the guys just start to scan everything as a red tractor pig, standard pig, but they are killing an organic pig. So there is no substitution for a system point of view. It is a calculation. So, okay.
+I packet this amount of red tractor, they convert it back in heads and say, oh, it's too much red tractor pig. So it's a downgrade. So then you have less organic, then they calculate and do an impact. So it's an estimation, it's not truly a number from a system. But
+It is a number that helps to explain. They will not book everything as organic using packaging and stuff and say, okay, now I don't have demand for this organic. Let's transform all this product into a standard and sell. It's time consuming packaging and stuff. So they don't do like that. They just stop. I don't have demand for organic anymore and started to
+pack as an standard. Then you have a natural downgrade and they estimate how much is that. So it's an important spreadsheet, important number that we can have. And also we have in poultry, but just a small impact. You should not worry about this now. The pork is the big one.
+
+Chris McCann  51:14
+Yeah.
+Okay.
+
+Guilherme De Marchi  51:18
+Don't worry, Crates. We're gonna, we're gonna, yeah, we're gonna get there.
+
+Luke Harrison  51:18
+Don't worry about that one just now.
+
+Chris McCann  51:20
+No, no, no, I'm sitting thinking, yeah, kill kill figures are the easy best.
+
+Luke Harrison  51:23
+Not so.
+Yeah, yeah, kill on sales.
+
+Chris McCann  51:26
+Yeah, yeah, for sure. Killer are the easy best.
+
+Guilherme De Marchi  51:26
+Go.
+
+Luke Harrison  51:29
+Details we know.
+
+Guilherme De Marchi  51:29
+Cuban sale.
+
+Chris McCann  51:29
+Fails is the easy bit, yeah, says the easy bit, so yeah.
+
+Guilherme De Marchi  51:31
+Q and sales. Let's get the Q and sales.
+
+Luke Harrison  51:32
+Honestly, honestly, it's maybe worth going down the list between you guys and actually just doing a red, amber, green on the ones. I know where that's from. I know where that's from. I know where that's from. But I actually just go down and validate that. And what I always like to do, which is always a nice kind of confidence builder,
+
+Chris McCann  51:37
+Uh-huh.
+Mhm.
+Mmh.
+
+Luke Harrison  51:53
+The ones that are easy, just take them off right away, just get them done.
+
+Guilherme De Marchi  51:56
+Yeah.
+
+Chris McCann  51:56
+Mhm.
+
+Luke Harrison  51:58
+Um, Kose.
+
+Jason Taylor  51:58
+What's the best sheet? Oh, sorry, like finish with fresh off.
+
+Luke Harrison  52:03
+Take the Anaplan structure at the moment. So take the, and actually I think Gui, you've got a version of the Anaplan structure you've dropped into Excel. I would start with doing a design like that and then just start dropping in the numbers based on the data that we know.
+
+Chris McCann  52:06
+Mhm.
+
+Guilherme De Marchi  52:11
+Yeah, it is.
+Yeah, I have, I can share that one because what has been agreed with Kim, Jason as well is if we need to open groups, we can open to understand, you know what I mean? So let's say for example, if we start for the net revenue, net revenue is terrible because then you don't even cheque for the gross.
+
+Chris McCann  52:18
+Mhm.
+
+Luke Harrison  52:36
+Yeah.
+
+Guilherme De Marchi  52:38
+and the guys do manual overrider. So you click doesn't match to the weekly P&L just because of that. So let's go to the volume and gross, gross revenue. There's no manual adjustment that, okay, it is matched. Then you go to the overrider. Why the overrider is not matching? Why the site funnel is not using the click information?
+
+Luke Harrison  52:41
+1.
+
+Guilherme De Marchi  52:58
+Oh, because I do some tweaks here, I put some adjustments. Why? I don't know, because I want to do, I know something that's going on. Okay, so that is tweaks that sites do on an overrider element as well.
+
+Chris McCann  52:59
+Mm.
+Yeah.
+
+Guilherme De Marchi  53:13
+that doesn't match Qlik. So if we want to get them to do some tweaks, we can also create a manual input. So you keep on the P&L. This is from the system. This is your manual input. And then you close both on an app.
+
+Chris McCann  53:27
+Yeah.
+
+Guilherme De Marchi  53:32
+We should be able to open every time we have a question about, I don't know what there is that number. Then you open to see the GL line item level. Oh, there is something weird here. Then you can explore and talk to the size. So the template for Anna plan.
+It's like a reference, but we can change the light.
+Like here, you see, let me just share one. This is the red roof one.
+It's something that we're going to follow, the output we're going to follow. You see this file I'm going to share, but is this one from Redruth. Okay.
+So all this here, okay, this line here, we don't have on Hana Planned yet, okay? But basically this is saying on packaging here. This was my packaging consumption of the month, of that week, sorry, 72, let me go back, 72K.
+Okay, this is a negative consumption.
+Okay, that is 100K here of inventory gain or loss. And then you have your recovery. Okay, this is the recovery from production on this GL line items. Okay, the difference between this, right, this one.
+And this one and this one is this 2.2k which is in here, which is the packaging new. So we can create something like this. Very simple, right?
+and say, okay, what is this 2K? Ah, this 2K is done by 72 of consumption and 69 of recovery. Okay, close again. Easy, understood. Let's go to labour. Okay. Labour, what we see on Anaplan is this only. We see like this.
+You see this labour here, 4K on labour. What is that number? Then you open here, you say 112K was payroll, 13K was agency cost, the total cost was 125, and the recovery from the production was 129. The difference between this is 4K.
+You see how easy it is to understand. So the template could be...
+
+Luke Harrison  55:42
+Mm-hmm.
+
+Guilherme De Marchi  55:47
+Standard, but we're gonna tweak some some lines there to to help a quick understanding about what's going on.
+
+Chris McCann  55:48
+Mmh.
+Okay, I think, yeah, absolutely. I think
+
+Guilherme De Marchi  55:58
+Kate.
+
+Chris McCann  56:03
+If we put our heads together, go through the spreadsheet, like Luke said, and just go, yeah, I know where that's coming from, I know where that's coming from, where that's coming from, etc. And then...
+Divvy that out and be like, right, okay.
+for Tuesday next week, let's get this, where is it coming from? And then we can just start bringing it all together and then just put some colour on it and make it look nice afterwards.
+
+Guilherme De Marchi  56:29
+Yeah.
+
+Jason Taylor  56:29
+Is your phase one and phase two on that sheet, is that still the case of priorities?
+
+Guilherme De Marchi  56:38
+The phase one, Jason, was just a...
+consolidated from Ricoh because the phase one was well let's map. So we travel, we spend a lot of money travelling, we pay Ricoh, they got the documents, Luke has a couple of the documents. So then we just put one next to each other to compare.
+
+Jason Taylor  56:46
+Okay.
+
+Luke Harrison  56:46
+Yeah.
+
+Jason Taylor  56:48
+Okay, sorry.
+Yes.
+
+Guilherme De Marchi  57:02
+And then we build that phase two, let's say the design. So I went to each line on the P&L, going into the Sap transaction that is related, putting some notes and kind of building the project, how it's going to work for each of the line.
+
+Luke Harrison  57:18
+Yeah, I, I...
+
+Jason Taylor  57:19
+And that's grand, I wasn't sure if it was split between the two.
+
+Luke Harrison  57:22
+No, I think, I think that, yeah, I think when you get into the, I think when you get into the actual data and you start putting it together, there may be a natural phasing where we find gaps in the data or the process, but just now worry about starting to get some of the numbers on the page. Start worrying, because I, like I said, just...
+
+Guilherme De Marchi  57:22
+Phase one is done. Yeah, phase one is done. Yeah.
+
+Jason Taylor  57:39
+Yeah.
+
+Luke Harrison  57:43
+If you focus on the lower hanging fruit, start getting things out and not get hung up on the areas that we have got problems now, we can start releasing things and then we can start looking at where the gaps are, get those out to other people so we can keep moving. But there's lots of individual parts to be getting on with to hopefully not get blocked on this.
+Yeah.
+
+Jason Taylor  58:03
+Yep.
+
+Guilherme De Marchi  58:03
+Yeah.
+
+Jason Taylor  58:05
+And that's why the red amber green will help just to tick off, like we can start these.
+
+Guilherme De Marchi  58:05
+Yeah, and also you...
+
+Luke Harrison  58:09
+Yeah.
+
+Guilherme De Marchi  58:11
+And the low hanging fruit that Luke is mentioning, it will already save time. So for example, queue data, it's so simple, right? Let's say simple. But if we next week we deliver the just a table for the queue per week and by size and share this.
+
+Luke Harrison  58:16
+Yeah.
+
+Guilherme De Marchi  58:29
+Right? The guys can save time because then they don't need to go into auto-link, open, download, do the other work. They have the number ready.
+
+Luke Harrison  58:33
+Yeah.
+Okay.
+Bi.
+Hey, can you bring up one of their working spreadsheets? Just an example for a second.
+
+Guilherme De Marchi  58:43
+Yeah.
+
+Luke Harrison  58:43
+I just wanna, I just want for you guys to see that.
+
+Guilherme De Marchi  58:47
+Back.
+
+Luke Harrison  58:47
+We just opened one of those.
+
+Guilherme De Marchi  58:49
+Let's go Dungannon, for example, part 2.
+Yeah.
+
+Luke Harrison  59:09
+Anything you can do to minimise the amount of time in Excel and the amount of manual work is a win. So think about, that's what you're competing.
+
+Guilherme De Marchi  59:18
+Look, look.
+Yeah, look at this, Dungannon, for example, right?
+
+Jason Taylor  59:23
+Yeah, I was there for this. It was painful.
+
+Guilherme De Marchi  59:24
+OK, Jason was with me, right? They just for Grace to send to me, she had to split in three, 3 emails. OK, we didn't create a Sharepoint point, but OK, so let's say...
+Labour. Okay, so they have a labour file. Each site has their labour file, the stock file, and so on. So you see how many tabs. Then they have notes, how to do it. Okay, then lots of things here, da, da, da. Then they have the weekly cost. Okay, so this weekly cost is coming from another spreadsheet.
+
+Luke Harrison  59:49
+Yeah.
+
+Guilherme De Marchi  1:00:01
+another tab, weekly employee cost. Then they download, I don't remember, but probably from Kronos. Right? I should not be sharing this, I believe, but it's fine. But you see here, then is all the labour, my time.
+By the team, they copy and paste the labour.
+I have for the team to analyse from Chronos and then there's another tab, Weekly Agency, they got the data from e-mail, they...
+copy and paste, then they have the agency cost, right? In a simple way, hours, cost and rate, okay? And then they have some difference here, they calculate, but this is 1 file, labour. And they go into...
+Consumables.
+For example, they have another file.
+Right? This is what data coming from Sap download. Consumable, Fagalo 3H, a group of accounts, XYZ. Okay, so that is the material. This is the accounts, okay? So what Grace needs to do every week, go into Sap,
+download the consumables, GL, line items, which is this GLs, okay? Supplies, chemicals, employees, da, da, da. She copy and paste, stay here, and segregate what is PPEs, what are the stores, and she got a spreadsheet, a pivot table, saying, no, in that week, this was my cost that week, that week.
+that tweet. And so she used this number to report to us on the overhead consumables, but she has the breakdown below because she had to download, analyse, and see how it goes. So it's just a matter of example, but I have for all sides.
+Very spreadsheet, very way of individual way of working, not process way of working. So if someone is...
+If headache doesn't come to work, probably the weekly will be delayed, you know what I mean?
+
+Chris McCann  1:02:06
+Mhm.
+
+Jason Taylor  1:02:09
+Yeah, they're definitely at a point where you sort of thought there's the point of no return, like how do you ever turn around and fix this and we're trying to come up with a solution for that. They probably wouldn't have been able to do anything about it themselves, given the amount of spreadsheets that they were doing.
+A lot of its replicated stuff, you know, it was just they needed a better flow for the work. I think that's where we step in and just get the source and get everything landed in the Snowflake from that point onwards. It should be a lot more straightforward, but obviously, it's not to say that there's not a good bit of work involved in this, but
+Let's get the POC underway with the kill data, and, as Luke mentioned, this could just keep the keep the chat ongoing. So, I don't know whether we take this meeting and turn it into a group chat and change the name of it or whatever, and we can continue to.
+
+Guilherme De Marchi  1:02:59
+Yeah.
+MD.
+
+Jason Taylor  1:03:09
+Update you with any sort of questions, queries, facts, or findings.
+
+Guilherme De Marchi  1:03:13
+Yeah, so just for my understanding, now I know Peter is where he's sitting. I know if he don't deliver, I can chase him. Chris, where are you based?
+
+Jason Taylor  1:03:21
+The.
+Yeah.
+
+Guilherme De Marchi  1:03:25
+He, he was not saying anything, but I know now, however.
+
+Chris McCann  1:03:25
+I'm.
+
+Jason Taylor  1:03:27
+Just remember who you're talking to: Chris here, this one's this one.
+
+Peter Nwora  1:03:32
+It's been to how many sites, 54 sites. So, Gui is tough, man. You are a tough man. I love the way you collect your data. You see, you know, putting in the work, go extra mile to make sure. Yeah, I remember when we started this journey, you mentioned that different sites, they do differently.
+
+Chris McCann  1:03:32
+I'm a...
+
+Guilherme De Marchi  1:03:35
+I will.
+
+Jason Taylor  1:03:37
+Ha ha ha.
+
+Guilherme De Marchi  1:03:37
+Gonna cross you, yeah.
+
+Chris McCann  1:03:43
+Yeah.
+
+Peter Nwora  1:03:53
+You needed to actually investigate it, and we have done well done, honestly, impressive.
+
+Guilherme De Marchi  1:03:55
+Yeah.
+Yeah.
+
+Peter Nwora  1:04:00
+Wow.
+
+Chris McCann  1:04:01
+I'm in, I'm in Rushmere Gui, so yeah, I can, I'm like right beside Jason, he's right beside me, so.
+
+Guilherme De Marchi  1:04:03
+Rushmere, yeah?
+
+Jason Taylor  1:04:09
+If you need me to throw something at him, just let me know.
+
+Guilherme De Marchi  1:04:10
+Bi.
+Ohh, it's gonna it's gonna be difficult, and I need Peter to come with me or Emma.
+
+Peter Nwora  1:04:15
+Yeah.
+
+Emma Cutler  1:04:16
+Mm.
+
+Jason Taylor  1:04:18
+Emma's in Anna Skelen, and you'll struggle to ever find her.
+
+Chris McCann  1:04:18
+I miss you.
+Yeah.
+
+Guilherme De Marchi  1:04:21
+You're in Enniskillen, Emma.
+
+Chris McCann  1:04:22
+Yeah.
+
+Emma Cutler  1:04:23
+Enniskillen, yeah, Enniskillen, yeah.
+
+Guilherme De Marchi  1:04:25
+Yeah, okay. With Catherine and John, yeah.
+
+Emma Cutler  1:04:30
+Yeah, John, yeah, Danielle, Mark.
+
+Guilherme De Marchi  1:04:33
+Danielle, yeah, I visited Enniskillen, so you know you also can get from them how painful it is to do the weekly PNL, right?
+
+Emma Cutler  1:04:41
+Yeah.
+Yeah, I think when Eduardo was here recently, the guys had a meeting to chat through all of that as well, so they'll be happy.
+
+Guilherme De Marchi  1:04:46
+And...
+Yeah.
+Yeah, you see that this is this is also really good to have you in in a skill and because if we are having any difficulties to understanding any concept, you can advise with them. Yeah, and the process is really good, but Danielle, Danielle do that every week. You know, we need to get this mindset that we need to help.
+
+Emma Cutler  1:05:05
+Mhm.
+
+Guilherme De Marchi  1:05:13
+Danielle, we need, because it's where the workload will go out. John do a lot of work as well, but he's not hands-on as Danielle is doing, you know, so that the release of work is to get Danielle to work more into the actions, initiatives, analyse, and yeah, she can really support.
+
+Emma Cutler  1:05:23
+Hani.
+
+Guilherme De Marchi  1:05:34
+You know, if you want to connect and any questions that we may have, we can also advise with them because it was one of the sites that we visit. So we have all the mapping from Enniskillen as well.
+
+Emma Cutler  1:05:47
+Everything.
+
+Guilherme De Marchi  1:05:50
+Okay.
+
+Jason Taylor  1:05:50
+Emma from Enniskillen is about to get the kill in. Just had to reset. OK, on that on that terrible one, I think that's good enough for one day.
+
+Emma Cutler  1:05:52
+Diss.
+Yeah.
+Yeah.
+
+Guilherme De Marchi  1:05:57
+Yeah.
+
+Emma Cutler  1:06:02
+Yeah.
+
+Guilherme De Marchi  1:06:05
+Yeah, edit, yeah.
+
+Jason Taylor  1:06:06
+We will reconvene next Wednesday by the sound of things. I've put a meeting in, so hopefully we can we can sort of knock our heads together before then, get our green, amber, red in, and see what we can pull together ahead of that.
+
+Guilherme De Marchi  1:06:11
+Yeah.
+Yeah, I'm going to share the files on the chat, the ones that I have. The Node Jason may be worth creating a Sharepoint that I can stick the videos and all the documents and so on if you guys want to have access.
+
+Jason Taylor  1:06:41
+Yeah, we have a team Sharepoint, I guess. Do you want me to create a folder and get grant access to you and you can share it in there?
+
+Chris McCann  1:06:42
+Absolutely.
+
+Guilherme De Marchi  1:06:49
+Yeah, so for example, you see, and is killing, okay, that Emma is there. This is the file that I have from Danielle and John.
+Uh, just for a...
+a reference, they have this payroll as well. You see labour payroll. They have the same logic. They go there. Let me open here. They go there, get the agency costs. You see every week is a tab sometimes. You see every week is a tab. They download from Chronos. They stick into here.
+get the budget, compared to the forecast. So you see all this manual work is done. Yeah. And then they have the POs, purchase order, P&L. The P&L is just a final one. But look at this, in a different format. Okay. Also doesn't help.
+
+Emma Cutler  1:07:27
+Yeah.
+Speaker.
+
+Guilherme De Marchi  1:07:41
+You see volume, revenue, PPV, yield, other. So you see the order of the lines are different. Then you have all the. So sometimes the site finance, the sorry, the site manager and site director, they want to see in a different way.
+
+Emma Cutler  1:07:48
+Mhm.
+
+Guilherme De Marchi  1:08:00
+So the guy normally adapts the PNL in a different layout. That doesn't help as well, but...
+
+Emma Cutler  1:08:00
+Yeah.
+
+Guilherme De Marchi  1:08:07
+It is the number is correct. So we need not to worry about the format. It's just the workload and the number itself. The format.
+If we got everything ready into Snowflake, we should also let the guys work in a layout they want because the side, the head of finance, they will think differently, they want to report differently, is their choice, but the sales need to be a sales correct, the PPV needs to be correct, the number itself for the P&L should be correct.
+All right.
+
+Chris McCann  1:08:44
+Yes.
+
+Guilherme De Marchi  1:08:45
+Cool. Thank you for that. That's nice to have you all on board. So please demand. I'm going to separate most of my time to this. I don't like to start one thing and not finish. And we are on a critical phase now that we need.
+
+Emma Cutler  1:08:45
+Yes, all good.
+
+Chris McCann  1:08:47
+Yeah.
+Mhm.
+
+Guilherme De Marchi  1:09:04
+traction and we need to start because the mapping was already done. So yeah, count with you guys and please demand. That is no stupid question. Ask me anytime.
+
+Chris McCann  1:09:06
+Mhm.
+
+Guilherme De Marchi  1:09:18
+And I would make sure that we can involve the team that can support to deliver this. OK.
+
+Chris McCann  1:09:26
+Thank you, Gui. Appreciate it.
+
+Guilherme De Marchi  1:09:27
+Alright, cheers guys. Here it is. See ya. Bye bye bye.
+
+Emma Cutler  1:09:28
+Thank you. Okay, bye.
+
+Jason Taylor  1:09:28
+Perfect. Cheers. Thank you. Bye now. Bye, bye, bye.
+
+Chris McCann  1:09:29
+Have a good one.
+
+Jason Taylor  1:09:47
+Okay.
