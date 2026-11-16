@@ -47,6 +47,66 @@ Since 2025-01-01, Spalding has 2,333,923 pigs delivered and a `Killed Qty` of 2,
 
 `PROD_RAW.HELLENIC` also has `PIG_*` and `SHP_*` tables, for example `PIG_ANIMAL`. These are copies from 2026-09-07 and do not update. Use the `STG_PIG_*__live` tables.
 
+### Pig kill by pig type
+
+This section is for the P&L line "No. Pigs / lambs / birds" (report category Planning, central owner Kim). Today, the site owners (Chris Kitchen, Ian Chapman) get this from the Hellenic "Ledger Balances and PPV" PDF report on Monday morning. They copy the numbers into the Excel workbook by hand. A query on Snowflake gives the same breakdown with no PDF step. Research date: 2026-11-16.
+
+| Item | Value |
+| --- | --- |
+| Tables (DEV) | `DEV_RAW.HELLENIC.STG_PIG_TRANSACTIONS` (one row for each transaction), `STG_PIG_LOT` (one row for each lot), `"STG_PIG_SUPER CATEGORIES"` (pig type names) |
+| Tables (PROD) | `PROD_RAW.HELLENIC."STG_PIG_TRANSACTIONS__live"`, `"STG_PIG_LOT__live"`, `"STG_PIG_SUPER CATEGORIES__live"` |
+| Joins | Transactions to lot on `"idLOT"`. Lot to super categories on `"idSuperCategory"`. |
+| Sites | `"Participant Code"` on the lot: 001 Spalding, 003 Westerleigh |
+| Date field | `"Kill Date"` on the lot |
+| Measures | Pigs killed = count of transaction rows. Actual gross = sum of `"Payment Value"`. Pay weight = sum of `"Pay Weight"`. Gross p/kg = 100 × gross ÷ pay weight. |
+| Pig types | Grouped from the super category `"Description"`: ODB, R/B, F/R Hamps, Link, Organic, Standard |
+| How checked | Ran the query in DEV for the kill week 14–20 Jun 2026. Compared the totals for each site with PROD. |
+
+The source query is T-SQL on the Hellenic SQL Server database. The Snowflake version is below. For PROD, change the table names to the `__live` names.
+
+```sql
+SELECT
+    CASE l."Participant Code" WHEN '001' THEN 'Spalding' WHEN '003' THEN 'Westerleigh' END AS site,
+    CASE
+        WHEN sc."Description" LIKE 'ODB%'      THEN 'ODB'
+        WHEN sc."Description" LIKE 'R/B%'      THEN 'R/B'
+        WHEN sc."Description" LIKE 'F/R%'      THEN 'F/R Hamps'
+        WHEN sc."Description" LIKE 'Link%'     THEN 'Link'
+        WHEN sc."Description" LIKE 'Organic%'  THEN 'Organic'
+        WHEN sc."Description" LIKE 'Standard%' THEN 'Standard'
+        ELSE TRIM(sc."Description")
+    END                                                         AS pig_type,
+    COUNT(*)                                                    AS pigs_killed,
+    SUM(t."Payment Value")::NUMBER(18,2)                        AS actual_gross,
+    SUM(t."Pay Weight")::NUMBER(18,1)                           AS pay_weight_kg,
+    (100.0 * SUM(t."Payment Value") / NULLIF(SUM(t."Pay Weight"), 0))::NUMBER(10,2) AS gross_p_per_kg
+FROM DEV_RAW.HELLENIC.STG_PIG_TRANSACTIONS t
+JOIN DEV_RAW.HELLENIC.STG_PIG_LOT l                       ON l."idLOT" = t."idLOT"
+LEFT JOIN DEV_RAW.HELLENIC."STG_PIG_SUPER CATEGORIES" sc  ON sc."idSuperCategory" = l."idSuperCategory"
+WHERE t."Species" = 'PIGS' AND l."Species" = 'PIGS'
+  AND l."Participant Code" IN ('001', '003')
+  AND l."Kill Date" >= '2026-06-14' AND l."Kill Date" < '2026-06-21'
+GROUP BY 1, 2
+ORDER BY 1, pigs_killed DESC;
+```
+
+Result for the kill week 14–20 Jun 2026:
+
+| Site | Pig type | Pigs killed | Actual gross (£) | Pay weight (kg) | Gross (p/kg) |
+| --- | --- | --- | --- | --- | --- |
+| Spalding | ODB | 10,038 | 1,879,084.53 | 865,497.8 | 217.11 |
+| Spalding | Standard | 5,813 | 959,933.28 | 528,583.3 | 181.60 |
+| Spalding | Link | 4,611 | 842,756.95 | 405,147.3 | 208.01 |
+| Spalding | F/R Hamps | 3,944 | 700,008.73 | 329,605.4 | 212.38 |
+| Spalding | Organic | 180 | 63,035.71 | 14,440.8 | 436.51 |
+| Spalding | R/B | 60 | 13,348.67 | 4,955.6 | 269.37 |
+| Westerleigh | Standard | 9,626 | 1,546,324.22 | 866,426.0 | 178.47 |
+| Westerleigh | ODB | 9,502 | 1,663,193.84 | 846,110.1 | 196.57 |
+
+Totals: Spalding 24,646 pigs, £4,458,167.87, 2,148,230.2 kg. Westerleigh 19,128 pigs, £3,209,518.06, 1,712,536.1 kg. DEV and PROD give the same totals for each site.
+
+Chris McCann asked Gui for direction on this approach on 2026-11-16. The answer is Unknown.
+
 ## Arolink (pork)
 
 | Item | Value |
@@ -77,6 +137,9 @@ No Innova table in Snowflake is for a poultry site.
 - Mtech: the raw tables last changed on 2026-11-10, with data to 2026-11-08. The load schedule is not known.
 - Hellenic: `"Est Kill Date"` is the estimated kill date. A field for the actual kill date on the booking line is not known. `STG_PIG_ANIMAL__live` has `"Kill Date"` for each pig.
 - Hellenic: the glossary defines kill for poultry only. A definition of kill for pork is not known.
+- Hellenic pig type query: "Pigs killed" counts transaction rows. It is not known if there is one row for each carcass.
+- Hellenic pig type query: the result is not yet compared with the "Ledger Balances and PPV" PDF report.
+- Hellenic pig type query: Westerleigh had only Standard and ODB pigs in the kill week 14–20 Jun 2026. It is not known if this is normal.
 - Ballymena is in Mtech. It is not a pilot site.
 - `PROD_RAW.AGROSOFT` has slaughter tables. This note did not check them.
 
@@ -87,10 +150,12 @@ No Innova table in Snowflake is for a poultry site.
 3. Is there a poultry Innova system that is not in Snowflake? Owner: Unknown.
 4. What is kill for pork: `"Killed Qty"`, or delivered less DOA, DIP and condemned? Owner: Unknown.
 5. How often does the Mtech feed load into Snowflake? Owner: Unknown.
+6. Does the pig type query agree with the "Ledger Balances and PPV" PDF report for one week? Ask Chris Kitchen or Ian Chapman.
+7. Is the pig type query the right approach for "No. Pigs / lambs / birds"? Asked Gui on 2026-11-16.
 
 ## Sources
 
-All checks were read-only SQL (`SELECT`, `SHOW`) on account JBSUSA-PILGRIMS_EUROPE_PROD, on 2026-11-12.
+All checks were read-only SQL (`SELECT`, `SHOW`) on account JBSUSA-PILGRIMS_EUROPE_PROD, on 2026-11-12. The pig type checks were on 2026-11-16.
 
 - `PROD_RAW.INFORMATION_SCHEMA.TABLES` and `.COLUMNS`, schemas `MTECH`, `HELLENIC`, `AROLINK`, `INNOVA`
 - `PROD_STAGING.INFORMATION_SCHEMA.TABLES`, `PROD_ANALYTICS.INFORMATION_SCHEMA.TABLES`
@@ -99,3 +164,5 @@ All checks were read-only SQL (`SELECT`, `SHOW`) on account JBSUSA-PILGRIMS_EURO
 - `PROD_RAW.HELLENIC."STG_PIG_BOOKING DETAIL__live"`, `"STG_PIG_ANIMAL__live"`, `"STG_PIG_PARTICIPANTS__live"`
 - `PROD_STAGING.OPERATIONS.CONDEMNATION_HELLENIC_SPALDING_STG`, `CONDEMNATION_HELLENIC_WESTERLEIGH_STG`
 - `PROD_STAGING.OPERATIONS."11_DAY_DAILY_YIELD_CSV_AROLINK_STG"`
+- `DEV_RAW.HELLENIC.STG_PIG_TRANSACTIONS`, `STG_PIG_LOT`, `"STG_PIG_SUPER CATEGORIES"`, and `DEV_RAW.INFORMATION_SCHEMA.COLUMNS`
+- `PROD_RAW.HELLENIC."STG_PIG_TRANSACTIONS__live"`, `"STG_PIG_LOT__live"`
