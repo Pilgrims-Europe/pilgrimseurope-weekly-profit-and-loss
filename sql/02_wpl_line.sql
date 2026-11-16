@@ -24,7 +24,7 @@ SELECT
     column15::TEXT    AS TICKET
 FROM VALUES
 -- Volume
-(10,  'Volume', 'Kill Pig', 'System', 'Hellenic', 'Green', 'Kill (pork) rule decided in ticket #3.', 'Killed Qty on the Hellenic booking, by Est Kill Date. Detail: TC''d producer resp. and factory resp.', 'head', 'PORK_KILL', NULL, NULL, NULL, NULL, '#10'),
+(10,  'Volume', 'Kill Pig', 'System', 'Hellenic', 'Green', 'Kill (pork) rule decided in ticket #3.', 'Pigs over scale (Killed Qty on the Hellenic booking) less TC''d pigs, by Est Kill Date. Detail: TC''d producer resp. and factory resp.', 'head', 'PORK_KILL', NULL, NULL, NULL, NULL, '#10'),
 (20,  'Volume', 'Kill Chicken', 'System', 'Mtech', 'Green', 'Kill (poultry) uses the Dungannon rule.', 'PLANTHDCOUNT less DOA less all condemnation codes, by kill date. Void loads out.', 'head', 'POULTRY_KILL', NULL, NULL, NULL, NULL, '#10'),
 (30,  'Volume', 'Kill Lamb', 'System', 'HCS', 'Red', 'HCS data is not researched.', NULL, 'head', 'NONE', NULL, NULL, NULL, NULL, NULL),
 (40,  'Volume', 'Sales Tonnage', 'System', 'COPA (FACT_COPAPEUS4)', 'Amber', 'The intercompany rule is Unknown. The two flags do not agree at Redruth.', 'Gold COPA actuals, edible kg, INTERCO_FLAG not Interco, by posting date.', 't', 'PILOT', NULL, NULL, NULL, NULL, '#20'),

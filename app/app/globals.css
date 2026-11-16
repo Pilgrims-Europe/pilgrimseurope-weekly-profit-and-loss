@@ -155,6 +155,17 @@
 }
 
 @layer base {
+  /* Native controls (the filter <select> lists) follow the theme, so dark mode does not draw light text on white. */
+  :root {
+    color-scheme: light;
+  }
+  .dark {
+    color-scheme: dark;
+  }
+  select option {
+    background-color: var(--popover);
+    color: var(--popover-foreground);
+  }
   * {
     @apply border-border;
   }

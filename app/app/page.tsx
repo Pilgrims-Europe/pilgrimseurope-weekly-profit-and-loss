@@ -4,6 +4,7 @@ import { KpiCard } from '@/components/kpi-card';
 import { PlTable } from '@/components/pl-table';
 import { getPl, resolveFilters } from '@/lib/wpl';
 import { formatUnit, toNumber, weekLabel } from '@/lib/wpl-format';
+import { ALL_SITES, rollUp } from '@/lib/wpl-rollup';
 import type React from 'react';
 
 export const dynamic = 'force-dynamic';
@@ -25,10 +26,18 @@ export default async function WeeklyPlPage({
   let filters: React.ComponentProps<typeof FilterBar>['filters'] = [];
 
   try {
-    const { sites, weeks, site, week } = await resolveFilters(params);
-    if (!site || !week) throw new Error('No sites or weeks in WPL_T_WEEKLY_PL. Run WPL_REFRESH.');
+    const { sites, weeks, site: pilot, week } = await resolveFilters(params);
+    if (!pilot || !week) throw new Error('No sites or weeks in WPL_T_WEEKLY_PL. Run WPL_REFRESH.');
+    // All sites is the default: pilot sites for the P&L lines, kill sites for the kill lines.
+    const one = params.site && params.site !== ALL_SITES ? pilot.SITE : undefined;
+    const siteLabel = one ?? ALL_SITES;
     filters = [
-      { param: 'site', label: 'Site', value: site.SITE, options: sites.map((s) => ({ value: s.SITE, label: s.SITE })) },
+      {
+        param: 'site',
+        label: 'Site',
+        value: siteLabel,
+        options: [{ value: ALL_SITES, label: ALL_SITES }, ...sites.map((s) => ({ value: s.SITE, label: s.SITE }))],
+      },
       {
         param: 'week',
         label: 'Week',
@@ -36,7 +45,7 @@ export default async function WeeklyPlPage({
         options: weeks.map((w) => ({ value: w.WEEK_START, label: weekLabel(w.FISCAL_WEEK, w.WEEK_START) })),
       },
     ];
-    const lines = await getPl(site.SITE, week.WEEK_START);
+    const lines = rollUp(await getPl(week.WEEK_START, one));
     const byId = new Map(lines.map((l) => [l.LINE_ID, l]));
     const ebitPct = byId.get('1140');
     const built = lines.filter((l) => l.STATUS === 'Built');
@@ -45,8 +54,9 @@ export default async function WeeklyPlPage({
     content = (
       <>
         <p className="text-sm text-muted-foreground">
-          {site.SITE} · {weekLabel(week.FISCAL_WEEK, week.WEEK_START)} · {built.length} lines built from Snowflake.
+          {siteLabel} · {weekLabel(week.FISCAL_WEEK, week.WEEK_START)} · {built.length} lines built from Snowflake.
           Sales and variances are actual. Overheads are a run rate.
+          {one ? '' : ' Kill is from the kill sites. Click ▸ on a line to see each site and the items behind it.'}
         </p>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {KPI_LINES.map((k) => {
@@ -88,7 +98,7 @@ export default async function WeeklyPlPage({
             linkText="See the Red lines"
           />
         </div>
-        <PlTable lines={lines} site={site.SITE} weekStart={week.WEEK_START} />
+        <PlTable lines={lines} site={siteLabel} weekStart={week.WEEK_START} />
       </>
     );
   } catch (e) {

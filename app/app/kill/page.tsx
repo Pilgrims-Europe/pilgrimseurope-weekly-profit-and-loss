@@ -149,17 +149,18 @@ export default async function KillPage({ searchParams }: { searchParams: Promise
         <>
           <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
             <RagBadge rag="Green" />
-            Kill (pork) = &quot;Killed Qty&quot; on the Hellenic booking, by Est Kill Date. A TC&apos;d pig is not in kill.
+            Kill (pork) = pigs over scale (&quot;Killed Qty&quot; on the Hellenic booking) − TC&apos;d pigs, by Est Kill Date.
+            &quot;Killed Qty&quot; does not take off TC&apos;d pigs.
           </div>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <KpiCard label="Kill (pork)" value={n(sum(days, 'PIGS_KILLED'))} note={`${n(sum(days, 'BOOKINGS'))} bookings`} />
-            <KpiCard label="Pigs delivered" value={n(sum(days, 'PIGS_DELIVERED'))} />
+            <KpiCard label="Pigs over scale" value={n(sum(days, 'KILLED_QTY'))} note={`Killed Qty. Delivered ${n(sum(days, 'PIGS_DELIVERED'))}`} />
             <KpiCard label="TC'd, producer resp." value={n(sum(days, 'TC_PRODUCER_RESP'))} note="Condemnation, 3rd party" />
             <KpiCard label="TC'd, factory resp." value={n(sum(days, 'TC_FACTORY_RESP'))} note="Condemnation, 1st party" tone="bad" />
           </div>
           <Card
             title="Kill by day"
-            note="The producer/factory split of TC'd pigs uses the probable rule in research/kill-data.md. It is not confirmed. Killed Qty is not final on the kill day."
+            note="The producer/factory split of TC'd pigs uses the probable rule in research/kill-data.md. It is not confirmed. Killed Qty is not final on the kill day, so kill for a day is not below 0."
           >
             {days.length === 0 ? (
               <EmptyState title="No bookings this week" className="m-5" />
@@ -173,6 +174,7 @@ export default async function KillPage({ searchParams }: { searchParams: Promise
                     <TableHead numeric>DOA</TableHead>
                     <TableHead numeric>DIP</TableHead>
                     <TableHead numeric>Casualty</TableHead>
+                    <TableHead numeric>Over scale</TableHead>
                     <TableHead numeric>TC&apos;d producer</TableHead>
                     <TableHead numeric>TC&apos;d factory</TableHead>
                     <TableHead numeric>Kill</TableHead>
@@ -187,6 +189,7 @@ export default async function KillPage({ searchParams }: { searchParams: Promise
                       <TableCell numeric>{n(d.DOA)}</TableCell>
                       <TableCell numeric>{n(d.DIP)}</TableCell>
                       <TableCell numeric>{n(d.CASUALTY)}</TableCell>
+                      <TableCell numeric>{n(d.KILLED_QTY)}</TableCell>
                       <TableCell numeric>{n(d.TC_PRODUCER_RESP)}</TableCell>
                       <TableCell numeric>{n(d.TC_FACTORY_RESP)}</TableCell>
                       <TableCell numeric className="font-semibold">{n(d.PIGS_KILLED)}</TableCell>
@@ -196,7 +199,7 @@ export default async function KillPage({ searchParams }: { searchParams: Promise
                 <TableFooter>
                   <TableRow>
                     <TableCell>Week</TableCell>
-                    {['BOOKINGS', 'PIGS_DELIVERED', 'DOA', 'DIP', 'CASUALTY', 'TC_PRODUCER_RESP', 'TC_FACTORY_RESP', 'PIGS_KILLED'].map((k) => (
+                    {['BOOKINGS', 'PIGS_DELIVERED', 'DOA', 'DIP', 'CASUALTY', 'KILLED_QTY', 'TC_PRODUCER_RESP', 'TC_FACTORY_RESP', 'PIGS_KILLED'].map((k) => (
                       <TableCell key={k} numeric>
                         {n(sum(days, k))}
                       </TableCell>

@@ -10,7 +10,7 @@ This app shows the weekly P&L for the pilot sites, Redruth and Bromborough. It a
 
 | Page | What it shows |
 | --- | --- |
-| Weekly P&L (`/`) | The template for one pilot site and week. This week, last week, change, RAG and source for each line. Click a line for its rule, the reason for its RAG, its ticket and its GL accounts. |
+| Weekly P&L (`/`) | The template for one week, for All sites (default) or one pilot site. This week, last week, change, RAG and source for each line. With All sites, P&L lines add the pilot sites and kill lines add the kill sites. Click ▸ to expand a line to its sites, and a site to the items behind its figure: component lines (subtotals), the kill build-up (kill) or GL accounts. Click a line for its rule, the reason for its RAG and its ticket. |
 | Trend (`/trend`) | One line over 13 weeks. Overheads also show the weekly GL actual. |
 | Kill (`/kill`) | Kill (poultry) and Kill (pork) by kill site and day. Poultry has the condemnation codes. Pork has TC'd producer resp. and factory resp. |
 | Lines and rules (`/lines`) | All 82 template lines with source, RAG, reason and the rule used. |
