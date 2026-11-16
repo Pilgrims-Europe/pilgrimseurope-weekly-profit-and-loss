@@ -1,0 +1,41 @@
+# created-by: snowflake-apps-create; template=nextjs-template; skill-version=1.0.0
+version: 2
+
+name: WEEKLY_PL
+database: DEV_ANALYTICS
+schema: FINANCE_PL_WEEKLY
+query_warehouse: STAGING_WH
+
+label: "Weekly P&L"
+description: "Weekly P&L for the pilot sites (Redruth, Bromborough) and kill for the kill sites, built from Snowflake, with the RAG status and rule of each Anaplan template line."
+icon: public/icon.svg
+
+runtime: node
+
+install:
+  commands:
+    - ["npm", "ci", "--include=dev"]
+
+build:
+  commands:
+    - ["npm", "run", "build"]
+    # For standalone mode
+    - ["cp", "-r", ".next/static", ".next/standalone/.next/static"]
+    - ["cp", "-r", "public", ".next/standalone/public"]
+    # Avoid packaging extra node_modules since standalone includes its own
+    - ["rm", "-rf", "node_modules"]
+
+run:
+  command: ["node", ".next/standalone/server.js"]
+
+ignore:
+  - node_modules
+  - .env*
+  - __pycache__
+  - "*.pyc"
+  - .next
+  - .git
+  - snowflake.log
+  - output
+  - "*.tsbuildinfo"
+  - app.yml.builder

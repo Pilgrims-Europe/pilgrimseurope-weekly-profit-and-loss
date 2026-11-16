@@ -1,0 +1,168 @@
+import { EmptyState } from '@/components/empty-state';
+import { KpiCard } from '@/components/kpi-card';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { REPO_URL } from '@/lib/constants';
+import { getFreshness, getUnmapped } from '@/lib/wpl';
+import { formatUnit } from '@/lib/wpl-format';
+import type React from 'react';
+
+export const dynamic = 'force-dynamic';
+
+const OPEN_RULES = [
+  { ticket: 20, title: 'Intercompany rule', lines: 'Sales Tonnage, STD Ext NSV and cost lines, all STO lines' },
+  { ticket: 21, title: 'Standard freight field', lines: 'STD Ext Freight, STD Int Freight, Freight, Distribution' },
+  { ticket: 22, title: 'GL accounts for Consumables, OCI and Traded Good', lines: 'Consumables, Materials (OCI), Packaging (OCI), Traded Good (PPV)' },
+];
+
+const KNOWN = [
+  'Overheads are a run rate: the average of the 13 weeks before. The first weeks of FY2026 use fewer weeks. The run rate period is not decided.',
+  'Kill (poultry) takes off all condemnation codes, including part rejects such as croppings. So kill is lower than "delivered less DOA".',
+  'Anwick reports delivered birds by plant weigh-in time. This app uses the Mtech kill date, so Anwick can differ by day.',
+  'Production Material Yield is GL material consumption less production output credits. Gui\'s method compares actual with standard. The two can differ.',
+  'Production Tonnage counts all Z61 receipts, including semi-finished goods. It can be more than finished output.',
+  'STO is movement type 641 goods issue at the released standard cost. Internal NSV is at standard cost, so internal contribution is close to freight only.',
+  'Substitution and Materials (OCI) are empty: no source field or GL account is known.',
+];
+
+export default async function QualityPage() {
+  let content: React.ReactNode;
+  try {
+    const [fresh, unmapped] = await Promise.all([getFreshness(), getUnmapped()]);
+    const byGroup = new Map<string, { value: number; accounts: number }>();
+    for (const u of unmapped) {
+      const g = String(u.GROUP_NAME ?? 'Not in the P&L account structure');
+      const cur = byGroup.get(g) ?? { value: 0, accounts: 0 };
+      cur.value += Number(u.VALUE) || 0;
+      cur.accounts += 1;
+      byGroup.set(g, cur);
+    }
+    const groups = [...byGroup.entries()].sort((a, b) => Math.abs(b[1].value) - Math.abs(a[1].value));
+
+    content = (
+      <>
+        <p className="text-sm text-muted-foreground">These checks cover all data, whatever filters are set on the other pages.</p>
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <KpiCard
+            label="Latest data refresh"
+            value={fresh[0]?.REFRESHED_AT ? `${fresh[0].REFRESHED_AT} UTC` : 'Unknown'}
+            note="The task WPL_REFRESH_TASK rebuilds the tables daily at 11:00 UTC."
+          />
+          <KpiCard
+            label="GL line items up to"
+            value={fresh.find((f) => f.SOURCE === 'GL line items')?.DATA_TO ?? 'Unknown'}
+            note="Week end of the latest complete week."
+          />
+          <KpiCard
+            label="Open rule tickets"
+            value={OPEN_RULES.length}
+            note="Amber lines use a default rule until these are decided."
+          />
+        </div>
+
+        <section className="overflow-hidden rounded-xl border bg-card shadow-sm">
+          <div className="px-5 pt-5 pb-3">
+            <h2 className="text-base font-semibold">Freshness by source</h2>
+          </div>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Source</TableHead>
+                <TableHead>Object</TableHead>
+                <TableHead>Last loaded (UTC)</TableHead>
+                <TableHead>Data to</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {fresh.map((f) => (
+                <TableRow key={f.SOURCE}>
+                  <TableCell className="font-semibold">{f.SOURCE}</TableCell>
+                  <TableCell className="font-mono text-xs">{f.OBJECT_NAME}</TableCell>
+                  <TableCell>{f.LAST_LOADED ?? 'Unknown'}</TableCell>
+                  <TableCell>{f.DATA_TO ?? 'Unknown'}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </section>
+
+        <section className="overflow-hidden rounded-xl border bg-card shadow-sm">
+          <div className="px-5 pt-5 pb-3">
+            <h2 className="text-base font-semibold">Open rules</h2>
+            <p className="text-sm text-muted-foreground">Questions to Gui are in questionnaires/line-sources-for-gui.html.</p>
+          </div>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Ticket</TableHead>
+                <TableHead>Rule</TableHead>
+                <TableHead>Lines it changes</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {OPEN_RULES.map((r) => (
+                <TableRow key={r.ticket}>
+                  <TableCell>
+                    <a href={`${REPO_URL}/issues/${r.ticket}`} target="_blank" rel="noreferrer" className="font-semibold text-pe-brand hover:underline">
+                      #{r.ticket}
+                    </a>
+                  </TableCell>
+                  <TableCell>{r.title}</TableCell>
+                  <TableCell className="text-muted-foreground">{r.lines}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </section>
+
+        <section className="space-y-2 rounded-xl border border-l-4 border-l-pe-yellow bg-card p-5 shadow-sm">
+          <h2 className="text-base font-semibold">Known limits of the default rules</h2>
+          <ul className="list-disc space-y-1 pl-5 text-sm">
+            {KNOWN.map((k) => (
+              <li key={k}>{k}</li>
+            ))}
+          </ul>
+        </section>
+
+        <section className="overflow-hidden rounded-xl border bg-card shadow-sm">
+          <div className="px-5 pt-5 pb-3">
+            <h2 className="text-base font-semibold">P&amp;L GL accounts that no line uses (FY2026, pilot sites)</h2>
+            <p className="text-sm text-muted-foreground">
+              Sales, cost of sales and direct wages are expected here, because the COPA standard cost lines carry them.
+              Other groups can be a gap in the account map.
+            </p>
+          </div>
+          {groups.length === 0 ? (
+            <EmptyState title="Every P&L account is mapped" className="m-5" />
+          ) : (
+            <Table striped>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>P&amp;L group</TableHead>
+                  <TableHead numeric>Accounts</TableHead>
+                  <TableHead numeric>FY2026 value (£)</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {groups.map(([g, v]) => (
+                  <TableRow key={g}>
+                    <TableCell>{g}</TableCell>
+                    <TableCell numeric>{v.accounts}</TableCell>
+                    <TableCell numeric className={v.value < 0 ? 'text-pe-red' : ''}>
+                      {formatUnit(v.value, 'GBP')}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
+        </section>
+      </>
+    );
+  } catch (e) {
+    console.error(new Date().toISOString(), '[quality] load failed', e);
+    content = (
+      <EmptyState variant="error" title="The checks did not load" description={e instanceof Error ? e.message : 'Unknown error'} />
+    );
+  }
+  return <main className="mx-auto w-full max-w-7xl space-y-6 px-4 py-6 sm:px-6 lg:px-8">{content}</main>;
+}
