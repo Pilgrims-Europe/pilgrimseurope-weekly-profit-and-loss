@@ -7,8 +7,14 @@
 <title>{{TITLE}} – questionnaire</title>
 <!--
   Pilgrim's Europe questionnaire template. See .cortex/skills/pilgrims-reporting/SKILL.md.
-  Edit only the QUESTIONNAIRE object in the script near the end of this file, plus <title> and the metadata block.
-  The page and the .md export are built from that object.
+  The page is static HTML, so it shows in any viewer, also where scripts are blocked.
+  Copy one example block for each question type, and replace every {{PLACEHOLDER}}.
+  - Each <section class="card q"> needs: data-q (1, 2, 3...), data-title, data-type ("choice", "ticks" or "text").
+  - Ticks: set data-tick-label on the section. Each checkbox needs a unique id, data-label (the item name)
+    and data-group (if the row has a group). Pull the rows from Snowflake.
+  - Answer fields need data-field: the label in the export ("Comments", "Who knows", "Answer").
+  - Theme headings are <h2 class="theme">. Set data-slug and data-from on <body>.
+  Do not edit the script at the end. It reads the page for autosave and the .md export.
 -->
 <script type="application/json" id="snowflake-report-metadata">
 {
@@ -86,12 +92,95 @@
   .btn:focus-visible { outline: 3px solid var(--yellow); outline-offset: 2px; }
   .status { font-size: 13px; color: var(--muted); flex: 1 1 200px; }
   @media print { .bar { display: none; } }
+  .js .noscript-warn { display: none; }
 </style>
+<script>document.documentElement.className += ' js';</script>
 </head>
-<body>
+<body data-slug="{{slug}}" data-from="{{FROM}}">
 
-<header class="hero"><div class="wrap" id="hero"></div></header>
-<main class="wrap" id="main"></main>
+<header class="hero">
+  <div class="wrap">
+    <p class="eyebrow">{{PROJECT}} · Discovery questionnaire</p>
+    <h1>{{TITLE}}</h1>
+    <dl class="meta">
+      <div><dt>From</dt><dd>{{FROM}}</dd></div>
+      <div><dt>To</dt><dd>{{TO}}</dd></div>
+      <div><dt>Deadline</dt><dd>Unknown</dd></div>
+    </dl>
+  </div>
+</header>
+
+<main class="wrap" id="main">
+  <div class="card">
+    <p class="purpose"><strong>Purpose:</strong> {{Why this exists and the decision that depends on it.}}</p>
+    <p><strong>How your answers will be used:</strong> {{Where the answers go and what happens next.}}</p>
+  </div>
+
+  <h2 id="context">Context</h2>
+  <div class="card">
+    <p>{{One short paragraph for a reader who was not in the session.}}</p>
+    <div class="callout"><strong>{{TERM}}</strong>, from the project glossary: {{Definition from GLOSSARY.md}}</div>
+  </div>
+
+  <h2 id="how-to-answer">How to answer</h2>
+  <div class="card">
+    <ol class="steps">
+      <li>Type your name below.</li>
+      <li>Answer each question. &quot;Don't know&quot; is a useful answer.</li>
+      <li>If you do not know an answer, write the name of a person who knows.</li>
+      <li>Click Download answers (.md) and send the file to {{FROM}} by email or Teams. Or click Copy answers and paste them into a message.</li>
+    </ol>
+    <p>Time: about {{N}} minutes. Partial answers are useful.</p>
+    <div class="callout warn noscript-warn">Open this file in Edge or Chrome to save and send your answers. If you see it in Teams, Outlook or SharePoint, download it first.</div>
+    <label class="fld"><span>Your name</span><input type="text" id="who" data-save="who" autocomplete="name" /></label>
+  </div>
+
+  <h2 class="theme" id="{{section-id}}">{{Theme}}</h2>
+
+  <section class="card q" data-q="1" data-title="{{One-idea question?}}" data-type="choice">
+    <h3><span class="qnum">1</span>{{One-idea question?}}</h3>
+    <p>{{Optional context.}}</p>
+    <p class="why">Why this matters: {{Optional: why this matters.}}</p>
+    <div class="opts" role="radiogroup" aria-label="Question 1">
+      <label><input type="radio" name="q1" value="{{Option A}}" /> {{Option A}}</label>
+      <label><input type="radio" name="q1" value="{{Option B}}" /> {{Option B}}</label>
+      <label><input type="radio" name="q1" value="Don't know" /> Don't know</label>
+    </div>
+    <label class="fld"><span>Comments</span><textarea data-field="Comments"></textarea></label>
+    <label class="fld"><span>If you don't know, who does?</span><input type="text" data-field="Who knows" /></label>
+  </section>
+
+  <section class="card q" data-q="2" data-title="{{Which items are X?}}" data-type="ticks" data-tick-label="X?">
+    <h3><span class="qnum">2</span>{{Which items are X?}}</h3>
+    <p>{{Tick each item that is X.}}</p>
+    <div class="callout warn">{{Period and units of the numbers.}}</div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>X?</th><th>Item</th><th class="n">{{Measure}}</th></tr></thead>
+        <tbody>
+          <tr class="grp"><td colspan="3">{{Group 1}}</td></tr>
+          <tr><td><input type="checkbox" id="q2r0" data-label="{{Item}}" data-group="{{Group 1}}" aria-label="X? {{Item}}" /></td><td><label for="q2r0">{{Item}}</label></td><td class="n">0</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <label class="fld"><span>Items you are not sure about</span><textarea data-field="Items you are not sure about"></textarea></label>
+    <label class="fld"><span>Comments</span><textarea data-field="Comments"></textarea></label>
+    <label class="fld"><span>If you don't know, who does?</span><input type="text" data-field="Who knows" /></label>
+  </section>
+
+  <section class="card q" data-q="3" data-title="{{Open question?}}" data-type="text">
+    <h3><span class="qnum">3</span>{{Open question?}}</h3>
+    <label class="fld"><span>Comments</span><textarea data-field="Comments"></textarea></label>
+    <label class="fld"><span>If you don't know, who does?</span><input type="text" data-field="Who knows" /></label>
+  </section>
+
+  <h2 class="theme" id="anything-else">Anything else?</h2>
+
+  <section class="card q" data-q="4" data-title="Anything else?" data-type="text" data-plain="true">
+    <p>Is there something that we did not ask, but should know?</p>
+    <label class="fld"><span>Your answer</span><textarea data-field="Answer"></textarea></label>
+  </section>
+</main>
 
 <div class="bar">
   <div class="bar-in">
@@ -101,151 +190,26 @@
     <span class="status" id="status" role="status" aria-live="polite"></span>
   </div>
 </div>
-
 <script>
-/* ================== EDIT THIS OBJECT ONLY ==================
-   Question types:
-     "choice" - radio buttons. options: ["...", "..."]. Add "Don't know" as the last option.
-     "text"   - free text only.
-     "ticks"  - tick-box table. columns: [{ key, label, num? }], rows: [{ group?, values... }].
-                tickLabel = column title for the tick box. The first column is the item name.
-   Every question gets a "Comments" box. Set whoKnows: false to hide "If you don't know, who does?".
-   Text rules: /wait-what (STE, max 20 words a sentence, one idea a question, glossary terms, no invented facts).
-*/
-var QUESTIONNAIRE = {
-  slug: '{{slug}}',
-  eyebrow: '{{PROJECT}} · Discovery questionnaire',
-  title: '{{TITLE}}',
-  from: '{{FROM}}',
-  to: '{{TO}}',
-  deadline: 'Unknown',
-  purpose: '{{Why this exists and the decision that depends on it.}}',
-  use: '{{Where the answers go and what happens next.}}',
-  context: ['{{One short paragraph for a reader who was not in the session.}}'],
-  glossary: [{ term: '{{TERM}}', text: '{{Definition from GLOSSARY.md}}' }],
-  effort: 'about {{N}} minutes',
-  sections: [
-    {
-      id: '{{section-id}}', title: '{{Theme}}',
-      questions: [
-        { type: 'choice', title: '{{One-idea question?}}', context: '{{Optional context.}}', why: '{{Optional: why this matters.}}',
-          options: ['{{Option A}}', '{{Option B}}', "Don't know"] },
-        { type: 'ticks', title: '{{Which items are X?}}', context: '{{Tick each item that is X.}}', why: '',
-          note: '{{Period and units of the numbers.}}', tickLabel: 'X?',
-          columns: [{ key: 'name', label: 'Item' }, { key: 'v1', label: '{{Measure}}', num: true }],
-          rows: [{ group: '{{Group 1}}', name: '{{Item}}', v1: 0 }],
-          extraField: 'Items you are not sure about' },
-        { type: 'text', title: '{{Open question?}}', context: '', why: '' }
-      ]
-    }
-  ],
-  anythingElse: true
-};
-/* ================== END OF EDITABLE PART ================== */
-
-(function (Q) {
-  var el = function (tag, attrs, text) {
-    var e = document.createElement(tag);
-    Object.keys(attrs || {}).forEach(function (k) { if (k === 'class') e.className = attrs[k]; else e.setAttribute(k, attrs[k]); });
-    if (text != null) e.textContent = text;
-    return e;
-  };
-  var fmt = function (v) { return typeof v === 'number' ? v.toLocaleString('en-GB') : (v == null ? '' : String(v)); };
-
-  // Header
-  var hero = document.getElementById('hero');
-  hero.appendChild(el('p', { class: 'eyebrow' }, Q.eyebrow));
-  hero.appendChild(el('h1', {}, Q.title));
-  var dl = el('dl', { class: 'meta' });
-  [['From', Q.from], ['To', Q.to], ['Deadline', Q.deadline || 'Unknown']].forEach(function (m) {
-    var d = el('div'); d.appendChild(el('dt', {}, m[0])); d.appendChild(el('dd', {}, m[1])); dl.appendChild(d);
-  });
-  hero.appendChild(dl);
-
-  // Intro
+/* Questionnaire script. Do not edit it for a new questionnaire.
+   It reads the static page: body data-slug and data-from, the .purpose paragraph,
+   h2.theme headings, and section.q blocks (data-q, data-title, data-type, data-tick-label).
+   Tick boxes carry data-label and data-group. Answer fields carry data-field (the export label). */
+(function () {
+  var body = document.body;
+  var SLUG = body.dataset.slug || 'questionnaire';
+  var FROM = body.dataset.from || 'Unknown';
   var main = document.getElementById('main');
-  var intro = el('div', { class: 'card' });
-  var p1 = el('p'); p1.appendChild(el('strong', {}, 'Purpose: ')); p1.appendChild(document.createTextNode(Q.purpose)); intro.appendChild(p1);
-  var p2 = el('p'); p2.appendChild(el('strong', {}, 'How your answers will be used: ')); p2.appendChild(document.createTextNode(Q.use)); intro.appendChild(p2);
-  main.appendChild(intro);
+  var whoIn = document.getElementById('who');
+  var questions = main.querySelectorAll('section.q');
 
-  main.appendChild(el('h2', { id: 'context' }, 'Context'));
-  var ctx = el('div', { class: 'card' });
-  Q.context.forEach(function (t) { ctx.appendChild(el('p', {}, t)); });
-  (Q.glossary || []).forEach(function (g) {
-    var c = el('div', { class: 'callout' }); c.appendChild(el('strong', {}, g.term)); c.appendChild(document.createTextNode(', from the project glossary: ' + g.text)); ctx.appendChild(c);
-  });
-  main.appendChild(ctx);
-
-  main.appendChild(el('h2', { id: 'how-to-answer' }, 'How to answer'));
-  var how = el('div', { class: 'card' });
-  var ol = el('ol', { class: 'steps' });
-  ['Type your name below.', 'Answer each question. "Don\'t know" is a useful answer.', 'If you do not know an answer, write the name of a person who knows.',
-   'Click Download answers (.md) and send the file to ' + Q.from + ' by email or Teams. Or click Copy answers and paste them into a message.']
-    .forEach(function (s) { ol.appendChild(el('li', {}, s)); });
-  how.appendChild(ol);
-  how.appendChild(el('p', {}, 'Time: ' + Q.effort + '. Partial answers are useful.'));
-  var who = el('label', { class: 'fld' }); who.appendChild(el('span', {}, 'Your name'));
-  var whoIn = el('input', { type: 'text', id: 'who', 'data-save': 'who', autocomplete: 'name' }); who.appendChild(whoIn);
-  how.appendChild(who);
-  main.appendChild(how);
-
-  // Questions
-  var n = 0;
-  var addField = function (box, label, key) {
-    var l = el('label', { class: 'fld' }); l.appendChild(el('span', {}, label));
-    var input = label.indexOf('who does') > -1 ? el('input', { type: 'text' }) : el('textarea');
-    input.dataset.save = key; input.dataset.field = label; l.appendChild(input); box.appendChild(l);
-  };
-  var sections = Q.sections.slice();
-  if (Q.anythingElse) sections.push({ id: 'anything-else', title: 'Anything else?', questions: [{ type: 'text', title: 'Anything else?', plain: true, whoKnows: false,
-    context: 'Is there something that we did not ask, but should know?' }] });
-  sections.forEach(function (s) {
-    main.appendChild(el('h2', { id: s.id }, s.title));
-    s.questions.forEach(function (q) {
-      n += 1; q._n = n;
-      var box = el('section', { class: 'card q', 'data-n': n });
-      q._box = box;
-      if (!q.plain) { var h = el('h3'); h.appendChild(el('span', { class: 'qnum' }, String(n))); h.appendChild(document.createTextNode(q.title)); box.appendChild(h); }
-      if (q.context) box.appendChild(el('p', {}, q.context));
-      if (q.why) box.appendChild(el('p', { class: 'why' }, 'Why this matters: ' + q.why));
-      if (q.type === 'choice') {
-        var opts = el('div', { class: 'opts', role: 'radiogroup', 'aria-label': 'Question ' + n });
-        q.options.forEach(function (o) {
-          var l = el('label'); var r = el('input', { type: 'radio', name: 'q' + n, value: o }); l.appendChild(r); l.appendChild(document.createTextNode(' ' + o)); opts.appendChild(l);
-        });
-        box.appendChild(opts);
-      }
-      if (q.type === 'ticks') {
-        if (q.note) box.appendChild(el('div', { class: 'callout warn' }, q.note));
-        var wrap = el('div', { class: 'table-wrap' }); var t = el('table'); var thead = el('thead'); var hr = el('tr');
-        hr.appendChild(el('th', {}, q.tickLabel || 'Yes?'));
-        q.columns.forEach(function (c) { hr.appendChild(el('th', c.num ? { class: 'n' } : {}, c.label)); });
-        thead.appendChild(hr); t.appendChild(thead);
-        var tb = el('tbody'); var last = null;
-        q.rows.forEach(function (r, i) {
-          if (r.group && r.group !== last) { last = r.group; var g = el('tr', { class: 'grp' }); var gt = el('td', { colspan: q.columns.length + 1 }, r.group); g.appendChild(gt); tb.appendChild(g); }
-          var tr = el('tr'); var td0 = el('td');
-          var cb = el('input', { type: 'checkbox', id: 'q' + n + 'r' + i, 'aria-label': (q.tickLabel || 'Yes') + ' ' + r[q.columns[0].key] });
-          cb.dataset.tick = 'q' + n; cb.dataset.row = i; td0.appendChild(cb); tr.appendChild(td0);
-          q.columns.forEach(function (c, j) {
-            var td = el('td', c.num ? { class: 'n' } : {});
-            if (j === 0) { var lab = el('label', { for: cb.id }, fmt(r[c.key])); td.appendChild(lab); } else td.textContent = fmt(r[c.key]);
-            tr.appendChild(td);
-          });
-          tb.appendChild(tr);
-        });
-        t.appendChild(tb); wrap.appendChild(t); box.appendChild(wrap);
-        if (q.extraField) addField(box, q.extraField, 'q' + n + ':extra');
-      }
-      addField(box, q.plain ? 'Your answer' : 'Comments', 'q' + n + ':comments');
-      if (q.whoKnows !== false) addField(box, "If you don't know, who does?", 'q' + n + ':who');
-      main.appendChild(box);
-    });
+  // Give every answer field a stable key, for autosave.
+  questions.forEach(function (s) {
+    s.querySelectorAll('[data-field]').forEach(function (e) { e.dataset.save = 'q' + s.dataset.q + ':' + e.dataset.field; });
   });
 
   // Autosave: works in a normal browser; skipped where storage is blocked (Snowflake sandbox).
-  var KEY = 'pe-questionnaire-' + Q.slug;
+  var KEY = 'pe-questionnaire-' + SLUG;
   var store = null;
   try { store = window.localStorage; store.setItem(KEY + ':t', '1'); store.removeItem(KEY + ':t'); } catch (e) { store = null; }
   function save() {
@@ -253,7 +217,7 @@ var QUESTIONNAIRE = {
     var d = {};
     document.querySelectorAll('[data-save]').forEach(function (e) { d[e.dataset.save] = e.value; });
     document.querySelectorAll('input[type=radio]:checked').forEach(function (e) { d['r:' + e.name] = e.value; });
-    d.ticks = Array.prototype.map.call(document.querySelectorAll('input[data-tick]:checked'), function (e) { return e.id; });
+    d.ticks = Array.prototype.map.call(document.querySelectorAll('input[data-label]:checked'), function (e) { return e.id; });
     try { store.setItem(KEY, JSON.stringify(d)); } catch (e) {}
   }
   (function load() {
@@ -269,34 +233,32 @@ var QUESTIONNAIRE = {
 
   // Markdown export, in the to-questionnaire template shape.
   var quote = function (t) { t = (t || '').trim(); return t ? t.split(/\r?\n/).map(function (l) { return '> ' + l; }).join('\n') : '> (no answer)'; };
-  var val = function (key) { var e = document.querySelector('[data-save="' + key + '"]'); return e ? e.value : ''; };
+  var cell = function (t) { return String(t || '').replace(/\|/g, '\\|'); };
   function buildMarkdown() {
     var name = whoIn.value.trim() || 'Unknown';
-    var out = ['# ' + Q.title + ': answers', '', '**From:** ' + name + ', **To:** ' + Q.from + ', **Date:** ' + new Date().toISOString().slice(0, 10), '', Q.purpose];
-    sections.forEach(function (s) {
-      out.push('', '## ' + s.title);
-      s.questions.forEach(function (q) {
-        if (!q.plain) out.push('', '### ' + q._n + '. ' + q.title);
-        if (q.type === 'choice') {
-          var r = q._box.querySelector('input[type=radio]:checked');
-          out.push('', '**Answer:**', quote(r ? r.value : ''));
-        }
-        if (q.type === 'ticks') {
-          var ticked = Array.prototype.filter.call(q._box.querySelectorAll('input[data-tick]'), function (e) { return e.checked; });
-          out.push('', '**' + (q.tickLabel || 'Ticked') + ' (' + ticked.length + ' of ' + q.rows.length + '):**', '');
-          if (ticked.length) {
-            var gcol = q.rows.some(function (r) { return r.group; });
-            out.push('| ' + q.columns[0].label + (gcol ? ' | Group' : '') + ' |', '| --- |' + (gcol ? ' --- |' : ''));
-            ticked.forEach(function (e) {
-              var r = q.rows[+e.dataset.row];
-              out.push('| ' + String(r[q.columns[0].key]).replace(/\|/g, '\\|') + (gcol ? ' | ' + (r.group || '') : '') + ' |');
-            });
-          } else out.push('> (none ticked)');
-          if (q.extraField) out.push('', '**' + q.extraField + ':**', quote(val('q' + q._n + ':extra')));
-        }
-        out.push('', '**' + (q.plain ? 'Answer' : 'Comments') + ':**', quote(val('q' + q._n + ':comments')));
-        if (q.whoKnows !== false) out.push('', "**Who knows:**", quote(val('q' + q._n + ':who')));
-      });
+    var title = document.querySelector('h1').textContent.trim();
+    var purpose = (document.querySelector('.purpose') || { textContent: '' }).textContent.trim().replace(/\s+/g, ' ');
+    var out = ['# ' + title + ': answers', '', '**From:** ' + name + ', **To:** ' + FROM + ', **Date:** ' + new Date().toISOString().slice(0, 10), '', purpose];
+    Array.prototype.forEach.call(main.children, function (el) {
+      if (el.tagName === 'H2' && el.classList.contains('theme')) out.push('', '## ' + el.textContent.trim());
+      if (!el.matches('section.q')) return;
+      if (el.dataset.plain !== 'true') out.push('', '### ' + el.dataset.q + '. ' + el.dataset.title);
+      if (el.dataset.type === 'choice') {
+        var r = el.querySelector('input[type=radio]:checked');
+        out.push('', '**Answer:**', quote(r ? r.value : ''));
+      }
+      if (el.dataset.type === 'ticks') {
+        var boxes = Array.prototype.slice.call(el.querySelectorAll('input[data-label]'));
+        var ticked = boxes.filter(function (e) { return e.checked; });
+        out.push('', '**' + (el.dataset.tickLabel || 'Ticked') + ' (' + ticked.length + ' of ' + boxes.length + '):**', '');
+        if (ticked.length) {
+          var gcol = boxes.some(function (e) { return e.dataset.group; });
+          var head = el.querySelector('thead th:nth-child(2)');
+          out.push('| ' + (head ? head.textContent.trim() : 'Item') + (gcol ? ' | Group' : '') + ' |', '| --- |' + (gcol ? ' --- |' : ''));
+          ticked.forEach(function (e) { out.push('| ' + cell(e.dataset.label) + (gcol ? ' | ' + cell(e.dataset.group) : '') + ' |'); });
+        } else out.push('> (none ticked)');
+      }
+      el.querySelectorAll('[data-field]').forEach(function (f) { out.push('', '**' + f.dataset.field + ':**', quote(f.value)); });
     });
     out.push('');
     return out.join('\n');
@@ -306,9 +268,9 @@ var QUESTIONNAIRE = {
   document.getElementById('dl').addEventListener('click', function () {
     var nm = (whoIn.value.trim() || 'unknown').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
     var blob = new Blob([buildMarkdown()], { type: 'text/markdown;charset=utf-8' });
-    var a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = Q.slug + '-answers-' + (nm || 'unknown') + '.md';
+    var a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = SLUG + '-answers-' + (nm || 'unknown') + '.md';
     document.body.appendChild(a); a.click(); a.remove(); setTimeout(function () { URL.revokeObjectURL(a.href); }, 1000);
-    status.textContent = 'File downloaded. Attach it to an email or a Teams message to ' + Q.from + '.';
+    status.textContent = 'File downloaded. Attach it to an email or a Teams message to ' + FROM + '.';
   });
   document.getElementById('cp').addEventListener('click', function () {
     var declined = function () { status.textContent = 'Answers were not copied. Use Download answers (.md) instead.'; };
@@ -322,7 +284,7 @@ var QUESTIONNAIRE = {
     document.querySelectorAll('input[type=radio], input[type=checkbox]').forEach(function (e) { e.checked = false; });
     save(); status.textContent = 'All answers cleared.';
   });
-})(QUESTIONNAIRE);
+})();
 </script>
 </body>
 </html>

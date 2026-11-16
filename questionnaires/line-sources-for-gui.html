@@ -7,7 +7,7 @@
 <title>Sources for the Amber weekly P&amp;L lines – questionnaire</title>
 <!--
   Pilgrim's Europe questionnaire. Built from .cortex/skills/pilgrims-reporting/templates/questionnaire.html.
-  Edit only the QUESTIONNAIRE object in the script near the end of this file, plus <title> and the metadata block.
+  The page is static HTML. Do not edit the script at the end. It reads the page for autosave and the .md export.
 -->
 <script type="application/json" id="snowflake-report-metadata">
 {
@@ -97,12 +97,266 @@
   .btn:focus-visible { outline: 3px solid var(--yellow); outline-offset: 2px; }
   .status { font-size: 13px; color: var(--muted); flex: 1 1 200px; }
   @media print { .bar { display: none; } }
+  .js .noscript-warn { display: none; }
 </style>
+<script>document.documentElement.className += ' js';</script>
 </head>
-<body>
+<body data-slug="line-sources-for-gui" data-from="Chris McCann">
 
-<header class="hero"><div class="wrap" id="hero"></div></header>
-<main class="wrap" id="main"></main>
+<header class="hero">
+  <div class="wrap">
+    <p class="eyebrow">Weekly P&amp;L · Discovery questionnaire</p>
+    <h1>Sources for the Amber weekly P&amp;L lines</h1>
+    <dl class="meta">
+      <div><dt>From</dt><dd>Chris McCann</dd></div>
+      <div><dt>To</dt><dd>Guilherme De Marchi (Gui)</dd></div>
+      <div><dt>Deadline</dt><dd>Unknown</dd></div>
+    </dl>
+  </div>
+</header>
+
+<main class="wrap" id="main">
+  <div class="card">
+    <p class="purpose"><strong>Purpose:</strong> Many lines of the Anaplan weekly template are Amber. The data is in Snowflake, but a rule or an account list is not known. Your answers make these lines Green, so the team can build them.</p>
+    <p><strong>How your answers will be used:</strong> Chris adds each answer to its ticket (#20, #21, #22 or #4) and to the line tags report. The team then builds the lines. This questionnaire replaces the GL questionnaire from Peter.</p>
+  </div>
+
+  <h2 id="context">Context</h2>
+  <div class="card">
+    <p>Each line of the Anaplan weekly template now has a source and a RAG for Redruth and Bromborough. 9 lines are Green, 39 are Amber and 13 are Red.</p>
+    <p>This questionnaire asks only about Amber lines and the GL line item questions from ticket #4. The account lists come from your PHASE 1 sheet. The amounts come from the GL line item table in Snowflake.</p>
+    <div class="callout"><strong>Ledger</strong>, from the project glossary: A SAP set of books. Ledgers 0L and 1L hold the same GL line items. The weekly P&amp;L uses 1L only.</div>
+    <div class="callout"><strong>GL line item</strong>, from the project glossary: One posted line of a GL document, as site finance sees it in the SAP report FAGLL03H.</div>
+  </div>
+
+  <h2 id="how-to-answer">How to answer</h2>
+  <div class="card">
+    <ol class="steps">
+      <li>Type your name below.</li>
+      <li>Answer each question. &quot;Don't know&quot; is a useful answer.</li>
+      <li>If you do not know an answer, write the name of a person who knows.</li>
+      <li>Click Download answers (.md) and send the file to Chris McCann by email or Teams. Or click Copy answers and paste them into a message.</li>
+    </ol>
+    <p>Time: about 20 minutes. Partial answers are useful.</p>
+    <div class="callout warn noscript-warn">Open this file in Edge or Chrome to save and send your answers. If you see it in Teams, Outlook or SharePoint, download it first.</div>
+    <label class="fld"><span>Your name</span><input type="text" id="who" data-save="who" autocomplete="name" /></label>
+  </div>
+
+  <h2 class="theme" id="sales-split">External and internal sales</h2>
+
+  <section class="card q" data-q="1" data-title="Which rule finds an intercompany sale?" data-type="choice">
+    <h3><span class="qnum">1</span>Which rule finds an intercompany sale?</h3>
+    <p>Snowflake has two intercompany flags. One flag comes from SAP. The other rule uses the payer account group (Z100 or Z109). In 2026, at Redruth, the payer account group rule finds 544 sales lines that SAP does not flag. Their net revenue is GBP 1.72 million. At Bromborough, SAP flags 3,419 lines that the payer account group rule does not find.</p>
+    <p class="why">Why this matters: This rule puts each sale in the external sales lines or in the STO lines. It affects 8 lines.</p>
+    <div class="opts" role="radiogroup" aria-label="Question 1">
+      <label><input type="radio" name="q1" value="The SAP flag" /> The SAP flag</label>
+      <label><input type="radio" name="q1" value="The payer account group (Z100, Z109)" /> The payer account group (Z100, Z109)</label>
+      <label><input type="radio" name="q1" value="Other. Write the rule in Comments." /> Other. Write the rule in Comments.</label>
+      <label><input type="radio" name="q1" value="Don't know" /> Don't know</label>
+    </div>
+    <label class="fld"><span>Comments</span><textarea data-field="Comments"></textarea></label>
+    <label class="fld"><span>If you don't know, who does?</span><input type="text" data-field="Who knows" /></label>
+  </section>
+
+  <h2 class="theme" id="freight">Standard freight</h2>
+
+  <section class="card q" data-q="2" data-title="Which field is standard freight?" data-type="choice">
+    <h3><span class="qnum">2</span>Which field is standard freight?</h3>
+    <p>COPA has two freight fields. At Redruth, the SAP condition ZUF2 gives 0.198 GBP per kg. Inland freight gives 0.138 GBP per kg. For company 125 actuals, the gold COPA table uses ZUF2. The Qlik sales app reads this table. Your PHASE 2 sheet says supply chain finance must manage standard freight rates.</p>
+    <p class="why">Why this matters: This field sets STD Ext Freight, STD Int Freight, Freight and Distribution.</p>
+    <div class="opts" role="radiogroup" aria-label="Question 2">
+      <label><input type="radio" name="q2" value="The SAP condition ZUF2" /> The SAP condition ZUF2</label>
+      <label><input type="radio" name="q2" value="Inland freight" /> Inland freight</label>
+      <label><input type="radio" name="q2" value="Neither. Supply chain finance gives a rate per kg." /> Neither. Supply chain finance gives a rate per kg.</label>
+      <label><input type="radio" name="q2" value="Other. Write it in Comments." /> Other. Write it in Comments.</label>
+      <label><input type="radio" name="q2" value="Don't know" /> Don't know</label>
+    </div>
+    <label class="fld"><span>Comments</span><textarea data-field="Comments"></textarea></label>
+    <label class="fld"><span>If you don't know, who does?</span><input type="text" data-field="Who knows" /></label>
+  </section>
+
+  <h2 class="theme" id="gl-accounts">GL accounts</h2>
+
+  <section class="card q" data-q="3" data-title="Which accounts are in each PPV and STK line, at both pilot sites?" data-type="ticks" data-tick-label="Correct?">
+    <h3><span class="qnum">3</span>Which accounts are in each PPV and STK line, at both pilot sites?</h3>
+    <p>Your PHASE 1 sheet lists these accounts for Redruth. For Bromborough it lists fewer accounts, and none for 3 of these lines. Tick each account that belongs to its line at both sites.</p>
+    <p class="why">Why this matters: These 7 lines are Green. The build starts with them, so the account list must be correct.</p>
+    <div class="callout warn">Values are GBP, ledger 1L, fiscal year 2026 to 16 November 2026. A minus value is a credit.</div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Correct?</th><th>GL account</th><th>Name</th><th class="n">Redruth (GBP)</th><th class="n">Bromborough (GBP)</th></tr></thead>
+        <tbody>
+          <tr class="grp"><td colspan="5">Materials (PPV)</td></tr>
+          <tr><td><input type="checkbox" id="q3r0" data-label="5000800" data-group="Materials (PPV)" aria-label="Correct? 5000800" /></td><td><label for="q3r0">5000800</label></td><td>COGS-POV-Raw Mat</td><td class="n">-174,260</td><td class="n">-247,327</td></tr>
+          <tr><td><input type="checkbox" id="q3r1" data-label="5000820" data-group="Materials (PPV)" aria-label="Correct? 5000820" /></td><td><label for="q3r1">5000820</label></td><td>COGS-POV-Ingredients</td><td class="n">-15,164</td><td class="n">-35,157</td></tr>
+          <tr><td><input type="checkbox" id="q3r2" data-label="5000810" data-group="Materials (PPV)" aria-label="Correct? 5000810" /></td><td><label for="q3r2">5000810</label></td><td>COGS-POV-FinishedGds</td><td class="n">-17</td><td class="n">-3,890</td></tr>
+          <tr><td><input type="checkbox" id="q3r3" data-label="5000895" data-group="Materials (PPV)" aria-label="Correct? 5000895" /></td><td><label for="q3r3">5000895</label></td><td>COGS-POV-Other</td><td class="n">8,784</td><td class="n">0</td></tr>
+          <tr class="grp"><td colspan="5">Packaging (PPV)</td></tr>
+          <tr><td><input type="checkbox" id="q3r4" data-label="5030025" data-group="Packaging (PPV)" aria-label="Correct? 5030025" /></td><td><label for="q3r4">5030025</label></td><td>Pkg-Inv PO Var Man</td><td class="n">-17,855</td><td class="n">23,117</td></tr>
+          <tr class="grp"><td colspan="5">Intersite Tfrs (PPV)</td></tr>
+          <tr><td><input type="checkbox" id="q3r5" data-label="5030050" data-group="Intersite Tfrs (PPV)" aria-label="Correct? 5030050" /></td><td><label for="q3r5">5030050</label></td><td>Pkg-Inv Trfs G/L</td><td class="n">-861</td><td class="n">-376</td></tr>
+          <tr><td><input type="checkbox" id="q3r6" data-label="5000700" data-group="Intersite Tfrs (PPV)" aria-label="Correct? 5000700" /></td><td><label for="q3r6">5000700</label></td><td>COGS-G/L Inv Tsf-Raw</td><td class="n">9,508</td><td class="n">-11,850</td></tr>
+          <tr><td><input type="checkbox" id="q3r7" data-label="5000705" data-group="Intersite Tfrs (PPV)" aria-label="Correct? 5000705" /></td><td><label for="q3r7">5000705</label></td><td>COGS-G/L Inv Tsf-Sem</td><td class="n">472</td><td class="n">55,359</td></tr>
+          <tr><td><input type="checkbox" id="q3r8" data-label="5000710" data-group="Intersite Tfrs (PPV)" aria-label="Correct? 5000710" /></td><td><label for="q3r8">5000710</label></td><td>COGS-G/L Inv Tsf-FG</td><td class="n">2,152</td><td class="n">967</td></tr>
+          <tr><td><input type="checkbox" id="q3r9" data-label="5000805" data-group="Intersite Tfrs (PPV)" aria-label="Correct? 5000805" /></td><td><label for="q3r9">5000805</label></td><td>COGS-POV-Semi-Finish</td><td class="n">0</td><td class="n">0</td></tr>
+          <tr class="grp"><td colspan="5">Materials (STK)</td></tr>
+          <tr><td><input type="checkbox" id="q3r10" data-label="5001000" data-group="Materials (STK)" aria-label="Correct? 5001000" /></td><td><label for="q3r10">5001000</label></td><td>COGS-Mat Scrp-RawMat</td><td class="n">5,245</td><td class="n">20,360</td></tr>
+          <tr><td><input type="checkbox" id="q3r11" data-label="5001020" data-group="Materials (STK)" aria-label="Correct? 5001020" /></td><td><label for="q3r11">5001020</label></td><td>COGS-Mat Scrp-Ingred</td><td class="n">-65,814</td><td class="n">96,391</td></tr>
+          <tr class="grp"><td colspan="5">Packaging (STK)</td></tr>
+          <tr><td><input type="checkbox" id="q3r12" data-label="5030070" data-group="Packaging (STK)" aria-label="Correct? 5030070" /></td><td><label for="q3r12">5030070</label></td><td>Pkg-Inv Scrapped</td><td class="n">0</td><td class="n">0</td></tr>
+          <tr><td><input type="checkbox" id="q3r13" data-label="5030075" data-group="Packaging (STK)" aria-label="Correct? 5030075" /></td><td><label for="q3r13">5030075</label></td><td>Pkg-Inv Scrapped Obs</td><td class="n">-131,109</td><td class="n">8,007</td></tr>
+          <tr class="grp"><td colspan="5">WIP (STK)</td></tr>
+          <tr><td><input type="checkbox" id="q3r14" data-label="5001005" data-group="WIP (STK)" aria-label="Correct? 5001005" /></td><td><label for="q3r14">5001005</label></td><td>COGS-Mat Scrp-SF</td><td class="n">58,101</td><td class="n">12,705</td></tr>
+          <tr class="grp"><td colspan="5">F.Goods (STK)</td></tr>
+          <tr><td><input type="checkbox" id="q3r15" data-label="5001010" data-group="F.Goods (STK)" aria-label="Correct? 5001010" /></td><td><label for="q3r15">5001010</label></td><td>COGS-Mat Scrp-FG</td><td class="n">17,940</td><td class="n">22,643</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <label class="fld"><span>Accounts that are missing from this list</span><textarea data-field="Accounts that are missing from this list"></textarea></label>
+    <label class="fld"><span>Comments</span><textarea data-field="Comments"></textarea></label>
+    <label class="fld"><span>If you don't know, who does?</span><input type="text" data-field="Who knows" /></label>
+  </section>
+
+  <section class="card q" data-q="4" data-title="Do the physical inventory accounts go in the STK lines?" data-type="ticks" data-tick-label="In STK?">
+    <h3><span class="qnum">4</span>Do the physical inventory accounts go in the STK lines?</h3>
+    <p>These 4 accounts post at both pilot sites. They are not in your PHASE 1 sheet. Tick each account that goes in an STK line. Write the line in Comments.</p>
+    <p class="why">Why this matters: If they belong in STK, the STK lines are not complete without them.</p>
+    <div class="callout warn">Values are GBP, ledger 1L, fiscal year 2026 to 16 November 2026. A minus value is a credit.</div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>In STK?</th><th>GL account</th><th>Name</th><th class="n">Redruth (GBP)</th><th class="n">Bromborough (GBP)</th></tr></thead>
+        <tbody>
+          <tr><td><input type="checkbox" id="q4r0" data-label="5000500" aria-label="In STK? 5000500" /></td><td><label for="q4r0">5000500</label></td><td>COGS-Phy Inv G/L-Raw</td><td class="n">-61,162</td><td class="n">133,358</td></tr>
+          <tr><td><input type="checkbox" id="q4r1" data-label="5000505" aria-label="In STK? 5000505" /></td><td><label for="q4r1">5000505</label></td><td>COGS-Phy Inv G/L-SF</td><td class="n">34,502</td><td class="n">-5,230</td></tr>
+          <tr><td><input type="checkbox" id="q4r2" data-label="5000510" aria-label="In STK? 5000510" /></td><td><label for="q4r2">5000510</label></td><td>COGS-Phy Inv G/L-FG</td><td class="n">-8,287</td><td class="n">-41,054</td></tr>
+          <tr><td><input type="checkbox" id="q4r3" data-label="5000520" aria-label="In STK? 5000520" /></td><td><label for="q4r3">5000520</label></td><td>COGS-Phy Inv G/L-Ing</td><td class="n">28,329</td><td class="n">-3,266</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <label class="fld"><span>Comments</span><textarea data-field="Comments"></textarea></label>
+    <label class="fld"><span>If you don't know, who does?</span><input type="text" data-field="Who knows" /></label>
+  </section>
+
+  <section class="card q" data-q="5" data-title="Which accounts are in Consumables?" data-type="ticks" data-tick-label="Consumables?">
+    <h3><span class="qnum">5</span>Which accounts are in Consumables?</h3>
+    <p>You want Consumables from all GL accounts in the consumables P&amp;L group. Your PHASE 1 sheet lists 20 accounts for Bromborough. Redruth uses a run rate. 8 more supply accounts post at the pilot sites, but they are not in the list. Tick each account that is in Consumables.</p>
+    <p class="why">Why this matters: This list makes Consumables a system line, not a run rate.</p>
+    <div class="callout warn">Values are GBP, ledger 1L, fiscal year 2026 to 16 November 2026. A minus value is a credit.</div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Consumables?</th><th>GL account</th><th>Name</th><th class="n">Redruth (GBP)</th><th class="n">Bromborough (GBP)</th></tr></thead>
+        <tbody>
+          <tr class="grp"><td colspan="5">In your Bromborough list</td></tr>
+          <tr><td><input type="checkbox" id="q5r0" data-label="5290000" data-group="In your Bromborough list" aria-label="Consumables? 5290000" /></td><td><label for="q5r0">5290000</label></td><td>Sup-Office</td><td class="n">23,949</td><td class="n">64,791</td></tr>
+          <tr><td><input type="checkbox" id="q5r1" data-label="5291400" data-group="In your Bromborough list" aria-label="Consumables? 5291400" /></td><td><label for="q5r1">5291400</label></td><td>Sup-Inv PO Var Man</td><td class="n">48</td><td class="n">-123</td></tr>
+          <tr><td><input type="checkbox" id="q5r2" data-label="5291500" data-group="In your Bromborough list" aria-label="Consumables? 5291500" /></td><td><label for="q5r2">5291500</label></td><td>Sup-Inv Adjustment</td><td class="n">-479</td><td class="n">4,116</td></tr>
+          <tr><td><input type="checkbox" id="q5r3" data-label="5292000" data-group="In your Bromborough list" aria-label="Consumables? 5292000" /></td><td><label for="q5r3">5292000</label></td><td>Sup-Employee</td><td class="n">25</td><td class="n">4,681</td></tr>
+          <tr><td><input type="checkbox" id="q5r4" data-label="5292010" data-group="In your Bromborough list" aria-label="Consumables? 5292010" /></td><td><label for="q5r4">5292010</label></td><td>Sup-EE Clothing</td><td class="n">0</td><td class="n">17,275</td></tr>
+          <tr><td><input type="checkbox" id="q5r5" data-label="5292020" data-group="In your Bromborough list" aria-label="Consumables? 5292020" /></td><td><label for="q5r5">5292020</label></td><td>Sup-EE Boots</td><td class="n">7,931</td><td class="n">16,768</td></tr>
+          <tr><td><input type="checkbox" id="q5r6" data-label="5292040" data-group="In your Bromborough list" aria-label="Consumables? 5292040" /></td><td><label for="q5r6">5292040</label></td><td>Sup-EE Knives</td><td class="n">860</td><td class="n">1,994</td></tr>
+          <tr><td><input type="checkbox" id="q5r7" data-label="5292050" data-group="In your Bromborough list" aria-label="Consumables? 5292050" /></td><td><label for="q5r7">5292050</label></td><td>Sup-EE PP&amp;E</td><td class="n">108,257</td><td class="n">90,812</td></tr>
+          <tr><td><input type="checkbox" id="q5r8" data-label="5292070" data-group="In your Bromborough list" aria-label="Consumables? 5292070" /></td><td><label for="q5r8">5292070</label></td><td>Sup-EE PP&amp;E Safety</td><td class="n">0</td><td class="n">4,654</td></tr>
+          <tr><td><input type="checkbox" id="q5r9" data-label="5292080" data-group="In your Bromborough list" aria-label="Consumables? 5292080" /></td><td><label for="q5r9">5292080</label></td><td>Sup-EE Disposables</td><td class="n">0</td><td class="n">0</td></tr>
+          <tr><td><input type="checkbox" id="q5r10" data-label="5293000" data-group="In your Bromborough list" aria-label="Consumables? 5293000" /></td><td><label for="q5r10">5293000</label></td><td>Sup-Production</td><td class="n">96,775</td><td class="n">122,180</td></tr>
+          <tr><td><input type="checkbox" id="q5r11" data-label="5294000" data-group="In your Bromborough list" aria-label="Consumables? 5294000" /></td><td><label for="q5r11">5294000</label></td><td>Sup-Chem</td><td class="n">79,595</td><td class="n">1,399</td></tr>
+          <tr><td><input type="checkbox" id="q5r12" data-label="5294010" data-group="In your Bromborough list" aria-label="Consumables? 5294010" /></td><td><label for="q5r12">5294010</label></td><td>Sup-Chem Process</td><td class="n">0</td><td class="n">2,222</td></tr>
+          <tr><td><input type="checkbox" id="q5r13" data-label="5294100" data-group="In your Bromborough list" aria-label="Consumables? 5294100" /></td><td><label for="q5r13">5294100</label></td><td>Sup-Chem Foods Sfty</td><td class="n">0</td><td class="n">4,726</td></tr>
+          <tr><td><input type="checkbox" id="q5r14" data-label="5294800" data-group="In your Bromborough list" aria-label="Consumables? 5294800" /></td><td><label for="q5r14">5294800</label></td><td>Sup-Grease/Oil</td><td class="n">0</td><td class="n">11,097</td></tr>
+          <tr><td><input type="checkbox" id="q5r15" data-label="5295000" data-group="In your Bromborough list" aria-label="Consumables? 5295000" /></td><td><label for="q5r15">5295000</label></td><td>Sup-Food Safety</td><td class="n">34,211</td><td class="n">9,241</td></tr>
+          <tr><td><input type="checkbox" id="q5r16" data-label="5295100" data-group="In your Bromborough list" aria-label="Consumables? 5295100" /></td><td><label for="q5r16">5295100</label></td><td>Sup-Medical/Safety</td><td class="n">92</td><td class="n">696</td></tr>
+          <tr><td><input type="checkbox" id="q5r17" data-label="5295200" data-group="In your Bromborough list" aria-label="Consumables? 5295200" /></td><td><label for="q5r17">5295200</label></td><td>Sup-Janitorial/Clean</td><td class="n">92,604</td><td class="n">43,842</td></tr>
+          <tr><td><input type="checkbox" id="q5r18" data-label="5297200" data-group="In your Bromborough list" aria-label="Consumables? 5297200" /></td><td><label for="q5r18">5297200</label></td><td>Sup-Blades</td><td class="n">153,317</td><td class="n">381,929</td></tr>
+          <tr><td><input type="checkbox" id="q5r19" data-label="5298000" data-group="In your Bromborough list" aria-label="Consumables? 5298000" /></td><td><label for="q5r19">5298000</label></td><td>Sup-Freight In</td><td class="n">0</td><td class="n">71,100</td></tr>
+          <tr class="grp"><td colspan="5">Not in your list</td></tr>
+          <tr><td><input type="checkbox" id="q5r20" data-label="5291000" data-group="Not in your list" aria-label="Consumables? 5291000" /></td><td><label for="q5r20">5291000</label></td><td>Sup-Inv Mat Consump</td><td class="n">0</td><td class="n">3,868</td></tr>
+          <tr><td><input type="checkbox" id="q5r21" data-label="5292030" data-group="Not in your list" aria-label="Consumables? 5292030" /></td><td><label for="q5r21">5292030</label></td><td>Sup-EE Gloves</td><td class="n">71</td><td class="n">0</td></tr>
+          <tr><td><input type="checkbox" id="q5r22" data-label="5293200" data-group="Not in your list" aria-label="Consumables? 5293200" /></td><td><label for="q5r22">5293200</label></td><td>Sup-Operating</td><td class="n">5,097</td><td class="n">0</td></tr>
+          <tr><td><input type="checkbox" id="q5r23" data-label="5294020" data-group="Not in your list" aria-label="Consumables? 5294020" /></td><td><label for="q5r23">5294020</label></td><td>Sup-Chem Surcharge</td><td class="n">446</td><td class="n">0</td></tr>
+          <tr><td><input type="checkbox" id="q5r24" data-label="5294600" data-group="Not in your list" aria-label="Consumables? 5294600" /></td><td><label for="q5r24">5294600</label></td><td>Sup-TSP/Antimicrobia</td><td class="n">0</td><td class="n">0</td></tr>
+          <tr><td><input type="checkbox" id="q5r25" data-label="5294900" data-group="Not in your list" aria-label="Consumables? 5294900" /></td><td><label for="q5r25">5294900</label></td><td>Sup-Labs/Testing</td><td class="n">3,693</td><td class="n">30,155</td></tr>
+          <tr><td><input type="checkbox" id="q5r26" data-label="5297000" data-group="Not in your list" aria-label="Consumables? 5297000" /></td><td><label for="q5r26">5297000</label></td><td>Sup-Maintenance</td><td class="n">305,582</td><td class="n">60,901</td></tr>
+          <tr><td><input type="checkbox" id="q5r27" data-label="5297100" data-group="Not in your list" aria-label="Consumables? 5297100" /></td><td><label for="q5r27">5297100</label></td><td>Sup-Tools</td><td class="n">6,749</td><td class="n">42,375</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <label class="fld"><span>Accounts you are not sure about</span><textarea data-field="Accounts you are not sure about"></textarea></label>
+    <label class="fld"><span>Comments</span><textarea data-field="Comments"></textarea></label>
+    <label class="fld"><span>If you don't know, who does?</span><input type="text" data-field="Who knows" /></label>
+  </section>
+
+  <section class="card q" data-q="6" data-title="Which line do the stock revaluation accounts go in?" data-type="choice">
+    <h3><span class="qnum">6</span>Which line do the stock revaluation accounts go in?</h3>
+    <p>For Traded Good (PPV), your PHASE 1 sheet gives 5000600, 5000605, 5000610 and 5000620 for Redruth. Their names are &quot;COGS-G/L InvReval&quot;: they are stock revaluation accounts. Redruth has no traded goods. Your PHASE 2 sheet has a &quot;Revaluation (STK)&quot; line. That line is not on the weekly P&amp;L sheet.</p>
+    <p class="why">Why this matters: The answer also decides if stock revaluation needs its own P&amp;L line.</p>
+    <div class="opts" role="radiogroup" aria-label="Question 6">
+      <label><input type="radio" name="q6" value="Traded Good (PPV)" /> Traded Good (PPV)</label>
+      <label><input type="radio" name="q6" value="A new line, Revaluation (STK)" /> A new line, Revaluation (STK)</label>
+      <label><input type="radio" name="q6" value="Other. Write the line in Comments." /> Other. Write the line in Comments.</label>
+      <label><input type="radio" name="q6" value="Don't know" /> Don't know</label>
+    </div>
+    <label class="fld"><span>Comments</span><textarea data-field="Comments"></textarea></label>
+    <label class="fld"><span>If you don't know, who does?</span><input type="text" data-field="Who knows" /></label>
+  </section>
+
+  <section class="card q" data-q="7" data-title="Does Bromborough use the same Packaging (OCI) accounts as Redruth?" data-type="choice">
+    <h3><span class="qnum">7</span>Does Bromborough use the same Packaging (OCI) accounts as Redruth?</h3>
+    <p>For Redruth, your PHASE 1 sheet gives production gas: 5005100 (COGS-Fuel-Gas) and 5900230 (Taxes-UK Plastic Pac). For Bromborough, the sheet is empty. In 2026, both accounts post at both sites.</p>
+    <div class="opts" role="radiogroup" aria-label="Question 7">
+      <label><input type="radio" name="q7" value="Yes, the same 2 accounts" /> Yes, the same 2 accounts</label>
+      <label><input type="radio" name="q7" value="No. Write the Bromborough accounts in Comments." /> No. Write the Bromborough accounts in Comments.</label>
+      <label><input type="radio" name="q7" value="Don't know" /> Don't know</label>
+    </div>
+    <label class="fld"><span>Comments</span><textarea data-field="Comments"></textarea></label>
+    <label class="fld"><span>If you don't know, who does?</span><input type="text" data-field="Who knows" /></label>
+  </section>
+
+  <section class="card q" data-q="8" data-title="Do the pilot sites use Materials (OCI)?" data-type="choice">
+    <h3><span class="qnum">8</span>Do the pilot sites use Materials (OCI)?</h3>
+    <p>Your PHASE 1 sheet has no source for Materials (OCI) at Redruth or Bromborough. Spalding uses CO2 usage against standard. Dungannon uses sundries, rendering and factory shop items.</p>
+    <div class="opts" role="radiogroup" aria-label="Question 8">
+      <label><input type="radio" name="q8" value="Yes. Write the GL accounts or source in Comments." /> Yes. Write the GL accounts or source in Comments.</label>
+      <label><input type="radio" name="q8" value="No. The line is zero at the pilot sites." /> No. The line is zero at the pilot sites.</label>
+      <label><input type="radio" name="q8" value="Don't know" /> Don't know</label>
+    </div>
+    <label class="fld"><span>Comments</span><textarea data-field="Comments"></textarea></label>
+    <label class="fld"><span>If you don't know, who does?</span><input type="text" data-field="Who knows" /></label>
+  </section>
+
+  <h2 class="theme" id="fagll03h">Matching to FAGLL03H</h2>
+
+  <section class="card q" data-q="9" data-title="Can site finance work without the line item number, posting key, assignment and reference?" data-type="choice">
+    <h3><span class="qnum">9</span>Can site finance work without the line item number, posting key, assignment and reference?</h3>
+    <p>Snowflake GL line items do not have these 4 fields. Site finance can see each line by account, cost centre, document and material. But site finance cannot match each FAGLL03H line one to one. We recommend yes for v1. BW can add the fields later.</p>
+    <p class="why">Why this matters: If the answer is no, the build must wait for BW to add these fields.</p>
+    <div class="opts" role="radiogroup" aria-label="Question 9">
+      <label><input type="radio" name="q9" value="Yes, for v1" /> Yes, for v1</label>
+      <label><input type="radio" name="q9" value="No. We need these fields first." /> No. We need these fields first.</label>
+      <label><input type="radio" name="q9" value="Don't know" /> Don't know</label>
+    </div>
+    <label class="fld"><span>Comments</span><textarea data-field="Comments"></textarea></label>
+    <label class="fld"><span>If you don't know, who does?</span><input type="text" data-field="Who knows" /></label>
+  </section>
+
+  <section class="card q" data-q="10" data-title="Does the weekly P&amp;L need PPV by supplier?" data-type="choice">
+    <h3><span class="qnum">10</span>Does the weekly P&amp;L need PPV by supplier?</h3>
+    <p>Invoice lines in Snowflake have no supplier. They have the PO. We recommend no for v1: show PPV by material and PO.</p>
+    <p class="why">Why this matters: A supplier view needs a PO table, and that is extra work.</p>
+    <div class="opts" role="radiogroup" aria-label="Question 10">
+      <label><input type="radio" name="q10" value="No, by material and PO is enough for v1" /> No, by material and PO is enough for v1</label>
+      <label><input type="radio" name="q10" value="Yes, we need PPV by supplier" /> Yes, we need PPV by supplier</label>
+      <label><input type="radio" name="q10" value="Don't know" /> Don't know</label>
+    </div>
+    <label class="fld"><span>Comments</span><textarea data-field="Comments"></textarea></label>
+    <label class="fld"><span>If you don't know, who does?</span><input type="text" data-field="Who knows" /></label>
+  </section>
+
+  <h2 class="theme" id="anything-else">Anything else?</h2>
+
+  <section class="card q" data-q="11" data-title="Anything else?" data-type="text" data-plain="true">
+    <p>Is there something that we did not ask, but should know?</p>
+    <label class="fld"><span>Your answer</span><textarea data-field="Answer"></textarea></label>
+  </section>
+</main>
 
 <div class="bar">
   <div class="bar-in">
@@ -112,263 +366,26 @@
     <span class="status" id="status" role="status" aria-live="polite"></span>
   </div>
 </div>
-
 <script>
-/* ================== EDIT THIS OBJECT ONLY ==================
-   Question types:
-     "choice" - radio buttons. options: ["...", "..."]. Add "Don't know" as the last option.
-     "text"   - free text only.
-     "ticks"  - tick-box table. columns: [{ key, label, num? }], rows: [{ group?, values... }].
-                tickLabel = column title for the tick box. The first column is the item name.
-   Every question gets a "Comments" box. Set whoKnows: false to hide "If you don't know, who does?".
-   Text rules: /wait-what (STE, max 20 words a sentence, one idea a question, glossary terms, no invented facts).
-*/
-var GBP_NOTE = 'Values are GBP, ledger 1L, fiscal year 2026 to 16 November 2026. A minus value is a credit.';
-var GBP_COLS = [
-  { key: 'gl', label: 'GL account' }, { key: 'name', label: 'Name' },
-  { key: 'red', label: 'Redruth (GBP)', num: true }, { key: 'bro', label: 'Bromborough (GBP)', num: true }
-];
-var QUESTIONNAIRE = {
-  slug: 'line-sources-for-gui',
-  eyebrow: 'Weekly P&L · Discovery questionnaire',
-  title: 'Sources for the Amber weekly P&L lines',
-  from: 'Chris McCann',
-  to: 'Guilherme De Marchi (Gui)',
-  deadline: 'Unknown',
-  purpose: 'Many lines of the Anaplan weekly template are Amber. The data is in Snowflake, but a rule or an account list is not known. Your answers make these lines Green, so the team can build them.',
-  use: 'Chris adds each answer to its ticket (#20, #21, #22 or #4) and to the line tags report. The team then builds the lines. This questionnaire replaces the GL questionnaire from Peter.',
-  context: [
-    'Each line of the Anaplan weekly template now has a source and a RAG for Redruth and Bromborough. 9 lines are Green, 39 are Amber and 13 are Red.',
-    'This questionnaire asks only about Amber lines and the GL line item questions from ticket #4. The account lists come from your PHASE 1 sheet. The amounts come from the GL line item table in Snowflake.'
-  ],
-  glossary: [
-    { term: 'Ledger', text: 'A SAP set of books. Ledgers 0L and 1L hold the same GL line items. The weekly P&L uses 1L only.' },
-    { term: 'GL line item', text: 'One posted line of a GL document, as site finance sees it in the SAP report FAGLL03H.' }
-  ],
-  effort: 'about 20 minutes',
-  sections: [
-    {
-      id: 'sales-split', title: 'External and internal sales',
-      questions: [
-        { type: 'choice', title: 'Which rule finds an intercompany sale?',
-          context: 'Snowflake has two intercompany flags. One flag comes from SAP. The other rule uses the payer account group (Z100 or Z109). In 2026, at Redruth, the payer account group rule finds 544 sales lines that SAP does not flag. Their net revenue is GBP 1.72 million. At Bromborough, SAP flags 3,419 lines that the payer account group rule does not find.',
-          why: 'This rule puts each sale in the external sales lines or in the STO lines. It affects 8 lines.',
-          options: ['The SAP flag', 'The payer account group (Z100, Z109)', 'Other. Write the rule in Comments.', "Don't know"] }
-      ]
-    },
-    {
-      id: 'freight', title: 'Standard freight',
-      questions: [
-        { type: 'choice', title: 'Which field is standard freight?',
-          context: 'COPA has two freight fields. At Redruth, the SAP condition ZUF2 gives 0.198 GBP per kg. Inland freight gives 0.138 GBP per kg. For company 125 actuals, the gold COPA table uses ZUF2. The Qlik sales app reads this table. Your PHASE 2 sheet says supply chain finance must manage standard freight rates.',
-          why: 'This field sets STD Ext Freight, STD Int Freight, Freight and Distribution.',
-          options: ['The SAP condition ZUF2', 'Inland freight', 'Neither. Supply chain finance gives a rate per kg.', 'Other. Write it in Comments.', "Don't know"] }
-      ]
-    },
-    {
-      id: 'gl-accounts', title: 'GL accounts',
-      questions: [
-        { type: 'ticks', title: 'Which accounts are in each PPV and STK line, at both pilot sites?',
-          context: 'Your PHASE 1 sheet lists these accounts for Redruth. For Bromborough it lists fewer accounts, and none for 3 of these lines. Tick each account that belongs to its line at both sites.',
-          why: 'These 7 lines are Green. The build starts with them, so the account list must be correct.',
-          note: GBP_NOTE, tickLabel: 'Correct?', columns: GBP_COLS,
-          rows: [
-            { group: 'Materials (PPV)', gl: '5000800', name: 'COGS-POV-Raw Mat', red: -174260, bro: -247327 },
-            { group: 'Materials (PPV)', gl: '5000820', name: 'COGS-POV-Ingredients', red: -15164, bro: -35157 },
-            { group: 'Materials (PPV)', gl: '5000810', name: 'COGS-POV-FinishedGds', red: -17, bro: -3890 },
-            { group: 'Materials (PPV)', gl: '5000895', name: 'COGS-POV-Other', red: 8784, bro: 0 },
-            { group: 'Packaging (PPV)', gl: '5030025', name: 'Pkg-Inv PO Var Man', red: -17855, bro: 23117 },
-            { group: 'Intersite Tfrs (PPV)', gl: '5030050', name: 'Pkg-Inv Trfs G/L', red: -861, bro: -376 },
-            { group: 'Intersite Tfrs (PPV)', gl: '5000700', name: 'COGS-G/L Inv Tsf-Raw', red: 9508, bro: -11850 },
-            { group: 'Intersite Tfrs (PPV)', gl: '5000705', name: 'COGS-G/L Inv Tsf-Sem', red: 472, bro: 55359 },
-            { group: 'Intersite Tfrs (PPV)', gl: '5000710', name: 'COGS-G/L Inv Tsf-FG', red: 2152, bro: 967 },
-            { group: 'Intersite Tfrs (PPV)', gl: '5000805', name: 'COGS-POV-Semi-Finish', red: 0, bro: 0 },
-            { group: 'Materials (STK)', gl: '5001000', name: 'COGS-Mat Scrp-RawMat', red: 5245, bro: 20360 },
-            { group: 'Materials (STK)', gl: '5001020', name: 'COGS-Mat Scrp-Ingred', red: -65814, bro: 96391 },
-            { group: 'Packaging (STK)', gl: '5030070', name: 'Pkg-Inv Scrapped', red: 0, bro: 0 },
-            { group: 'Packaging (STK)', gl: '5030075', name: 'Pkg-Inv Scrapped Obs', red: -131109, bro: 8007 },
-            { group: 'WIP (STK)', gl: '5001005', name: 'COGS-Mat Scrp-SF', red: 58101, bro: 12705 },
-            { group: 'F.Goods (STK)', gl: '5001010', name: 'COGS-Mat Scrp-FG', red: 17940, bro: 22643 }
-          ],
-          extraField: 'Accounts that are missing from this list' },
-        { type: 'ticks', title: 'Do the physical inventory accounts go in the STK lines?',
-          context: 'These 4 accounts post at both pilot sites. They are not in your PHASE 1 sheet. Tick each account that goes in an STK line. Write the line in Comments.',
-          why: 'If they belong in STK, the STK lines are not complete without them.',
-          note: GBP_NOTE, tickLabel: 'In STK?', columns: GBP_COLS,
-          rows: [
-            { gl: '5000500', name: 'COGS-Phy Inv G/L-Raw', red: -61162, bro: 133358 },
-            { gl: '5000505', name: 'COGS-Phy Inv G/L-SF', red: 34502, bro: -5230 },
-            { gl: '5000510', name: 'COGS-Phy Inv G/L-FG', red: -8287, bro: -41054 },
-            { gl: '5000520', name: 'COGS-Phy Inv G/L-Ing', red: 28329, bro: -3266 }
-          ] },
-        { type: 'ticks', title: 'Which accounts are in Consumables?',
-          context: 'You want Consumables from all GL accounts in the consumables P&L group. Your PHASE 1 sheet lists 20 accounts for Bromborough. Redruth uses a run rate. 8 more supply accounts post at the pilot sites, but they are not in the list. Tick each account that is in Consumables.',
-          why: 'This list makes Consumables a system line, not a run rate.',
-          note: GBP_NOTE, tickLabel: 'Consumables?', columns: GBP_COLS,
-          rows: [
-            { group: 'In your Bromborough list', gl: '5290000', name: 'Sup-Office', red: 23949, bro: 64791 },
-            { group: 'In your Bromborough list', gl: '5291400', name: 'Sup-Inv PO Var Man', red: 48, bro: -123 },
-            { group: 'In your Bromborough list', gl: '5291500', name: 'Sup-Inv Adjustment', red: -479, bro: 4116 },
-            { group: 'In your Bromborough list', gl: '5292000', name: 'Sup-Employee', red: 25, bro: 4681 },
-            { group: 'In your Bromborough list', gl: '5292010', name: 'Sup-EE Clothing', red: 0, bro: 17275 },
-            { group: 'In your Bromborough list', gl: '5292020', name: 'Sup-EE Boots', red: 7931, bro: 16768 },
-            { group: 'In your Bromborough list', gl: '5292040', name: 'Sup-EE Knives', red: 860, bro: 1994 },
-            { group: 'In your Bromborough list', gl: '5292050', name: 'Sup-EE PP&E', red: 108257, bro: 90812 },
-            { group: 'In your Bromborough list', gl: '5292070', name: 'Sup-EE PP&E Safety', red: 0, bro: 4654 },
-            { group: 'In your Bromborough list', gl: '5292080', name: 'Sup-EE Disposables', red: 0, bro: 0 },
-            { group: 'In your Bromborough list', gl: '5293000', name: 'Sup-Production', red: 96775, bro: 122180 },
-            { group: 'In your Bromborough list', gl: '5294000', name: 'Sup-Chem', red: 79595, bro: 1399 },
-            { group: 'In your Bromborough list', gl: '5294010', name: 'Sup-Chem Process', red: 0, bro: 2222 },
-            { group: 'In your Bromborough list', gl: '5294100', name: 'Sup-Chem Foods Sfty', red: 0, bro: 4726 },
-            { group: 'In your Bromborough list', gl: '5294800', name: 'Sup-Grease/Oil', red: 0, bro: 11097 },
-            { group: 'In your Bromborough list', gl: '5295000', name: 'Sup-Food Safety', red: 34211, bro: 9241 },
-            { group: 'In your Bromborough list', gl: '5295100', name: 'Sup-Medical/Safety', red: 92, bro: 696 },
-            { group: 'In your Bromborough list', gl: '5295200', name: 'Sup-Janitorial/Clean', red: 92604, bro: 43842 },
-            { group: 'In your Bromborough list', gl: '5297200', name: 'Sup-Blades', red: 153317, bro: 381929 },
-            { group: 'In your Bromborough list', gl: '5298000', name: 'Sup-Freight In', red: 0, bro: 71100 },
-            { group: 'Not in your list', gl: '5291000', name: 'Sup-Inv Mat Consump', red: 0, bro: 3868 },
-            { group: 'Not in your list', gl: '5292030', name: 'Sup-EE Gloves', red: 71, bro: 0 },
-            { group: 'Not in your list', gl: '5293200', name: 'Sup-Operating', red: 5097, bro: 0 },
-            { group: 'Not in your list', gl: '5294020', name: 'Sup-Chem Surcharge', red: 446, bro: 0 },
-            { group: 'Not in your list', gl: '5294600', name: 'Sup-TSP/Antimicrobia', red: 0, bro: 0 },
-            { group: 'Not in your list', gl: '5294900', name: 'Sup-Labs/Testing', red: 3693, bro: 30155 },
-            { group: 'Not in your list', gl: '5297000', name: 'Sup-Maintenance', red: 305582, bro: 60901 },
-            { group: 'Not in your list', gl: '5297100', name: 'Sup-Tools', red: 6749, bro: 42375 }
-          ],
-          extraField: 'Accounts you are not sure about' },
-        { type: 'choice', title: 'Which line do the stock revaluation accounts go in?',
-          context: 'For Traded Good (PPV), your PHASE 1 sheet gives 5000600, 5000605, 5000610 and 5000620 for Redruth. Their names are "COGS-G/L InvReval": they are stock revaluation accounts. Redruth has no traded goods. Your PHASE 2 sheet has a "Revaluation (STK)" line. That line is not on the weekly P&L sheet.',
-          why: 'The answer also decides if stock revaluation needs its own P&L line.',
-          options: ['Traded Good (PPV)', 'A new line, Revaluation (STK)', 'Other. Write the line in Comments.', "Don't know"] },
-        { type: 'choice', title: 'Does Bromborough use the same Packaging (OCI) accounts as Redruth?',
-          context: 'For Redruth, your PHASE 1 sheet gives production gas: 5005100 (COGS-Fuel-Gas) and 5900230 (Taxes-UK Plastic Pac). For Bromborough, the sheet is empty. In 2026, both accounts post at both sites.',
-          options: ['Yes, the same 2 accounts', 'No. Write the Bromborough accounts in Comments.', "Don't know"] },
-        { type: 'choice', title: 'Do the pilot sites use Materials (OCI)?',
-          context: 'Your PHASE 1 sheet has no source for Materials (OCI) at Redruth or Bromborough. Spalding uses CO2 usage against standard. Dungannon uses sundries, rendering and factory shop items.',
-          options: ['Yes. Write the GL accounts or source in Comments.', 'No. The line is zero at the pilot sites.', "Don't know"] }
-      ]
-    },
-    {
-      id: 'fagll03h', title: 'Matching to FAGLL03H',
-      questions: [
-        { type: 'choice', title: 'Can site finance work without the line item number, posting key, assignment and reference?',
-          context: 'Snowflake GL line items do not have these 4 fields. Site finance can see each line by account, cost centre, document and material. But site finance cannot match each FAGLL03H line one to one. We recommend yes for v1. BW can add the fields later.',
-          why: 'If the answer is no, the build must wait for BW to add these fields.',
-          options: ['Yes, for v1', 'No. We need these fields first.', "Don't know"] },
-        { type: 'choice', title: 'Does the weekly P&L need PPV by supplier?',
-          context: 'Invoice lines in Snowflake have no supplier. They have the PO. We recommend no for v1: show PPV by material and PO.',
-          why: 'A supplier view needs a PO table, and that is extra work.',
-          options: ['No, by material and PO is enough for v1', 'Yes, we need PPV by supplier', "Don't know"] }
-      ]
-    }
-  ],
-  anythingElse: true
-};
-/* ================== END OF EDITABLE PART ================== */
-
-(function (Q) {
-  var el = function (tag, attrs, text) {
-    var e = document.createElement(tag);
-    Object.keys(attrs || {}).forEach(function (k) { if (k === 'class') e.className = attrs[k]; else e.setAttribute(k, attrs[k]); });
-    if (text != null) e.textContent = text;
-    return e;
-  };
-  var fmt = function (v) { return typeof v === 'number' ? v.toLocaleString('en-GB') : (v == null ? '' : String(v)); };
-
-  // Header
-  var hero = document.getElementById('hero');
-  hero.appendChild(el('p', { class: 'eyebrow' }, Q.eyebrow));
-  hero.appendChild(el('h1', {}, Q.title));
-  var dl = el('dl', { class: 'meta' });
-  [['From', Q.from], ['To', Q.to], ['Deadline', Q.deadline || 'Unknown']].forEach(function (m) {
-    var d = el('div'); d.appendChild(el('dt', {}, m[0])); d.appendChild(el('dd', {}, m[1])); dl.appendChild(d);
-  });
-  hero.appendChild(dl);
-
-  // Intro
+/* Questionnaire script. Do not edit it for a new questionnaire.
+   It reads the static page: body data-slug and data-from, the .purpose paragraph,
+   h2.theme headings, and section.q blocks (data-q, data-title, data-type, data-tick-label).
+   Tick boxes carry data-label and data-group. Answer fields carry data-field (the export label). */
+(function () {
+  var body = document.body;
+  var SLUG = body.dataset.slug || 'questionnaire';
+  var FROM = body.dataset.from || 'Unknown';
   var main = document.getElementById('main');
-  var intro = el('div', { class: 'card' });
-  var p1 = el('p'); p1.appendChild(el('strong', {}, 'Purpose: ')); p1.appendChild(document.createTextNode(Q.purpose)); intro.appendChild(p1);
-  var p2 = el('p'); p2.appendChild(el('strong', {}, 'How your answers will be used: ')); p2.appendChild(document.createTextNode(Q.use)); intro.appendChild(p2);
-  main.appendChild(intro);
+  var whoIn = document.getElementById('who');
+  var questions = main.querySelectorAll('section.q');
 
-  main.appendChild(el('h2', { id: 'context' }, 'Context'));
-  var ctx = el('div', { class: 'card' });
-  Q.context.forEach(function (t) { ctx.appendChild(el('p', {}, t)); });
-  (Q.glossary || []).forEach(function (g) {
-    var c = el('div', { class: 'callout' }); c.appendChild(el('strong', {}, g.term)); c.appendChild(document.createTextNode(', from the project glossary: ' + g.text)); ctx.appendChild(c);
-  });
-  main.appendChild(ctx);
-
-  main.appendChild(el('h2', { id: 'how-to-answer' }, 'How to answer'));
-  var how = el('div', { class: 'card' });
-  var ol = el('ol', { class: 'steps' });
-  ['Type your name below.', 'Answer each question. "Don\'t know" is a useful answer.', 'If you do not know an answer, write the name of a person who knows.',
-   'Click Download answers (.md) and send the file to ' + Q.from + ' by email or Teams. Or click Copy answers and paste them into a message.']
-    .forEach(function (s) { ol.appendChild(el('li', {}, s)); });
-  how.appendChild(ol);
-  how.appendChild(el('p', {}, 'Time: ' + Q.effort + '. Partial answers are useful.'));
-  var who = el('label', { class: 'fld' }); who.appendChild(el('span', {}, 'Your name'));
-  var whoIn = el('input', { type: 'text', id: 'who', 'data-save': 'who', autocomplete: 'name' }); who.appendChild(whoIn);
-  how.appendChild(who);
-  main.appendChild(how);
-
-  // Questions
-  var n = 0;
-  var addField = function (box, label, key) {
-    var l = el('label', { class: 'fld' }); l.appendChild(el('span', {}, label));
-    var input = label.indexOf('who does') > -1 ? el('input', { type: 'text' }) : el('textarea');
-    input.dataset.save = key; input.dataset.field = label; l.appendChild(input); box.appendChild(l);
-  };
-  var sections = Q.sections.slice();
-  if (Q.anythingElse) sections.push({ id: 'anything-else', title: 'Anything else?', questions: [{ type: 'text', title: 'Anything else?', plain: true, whoKnows: false,
-    context: 'Is there something that we did not ask, but should know?' }] });
-  sections.forEach(function (s) {
-    main.appendChild(el('h2', { id: s.id }, s.title));
-    s.questions.forEach(function (q) {
-      n += 1; q._n = n;
-      var box = el('section', { class: 'card q', 'data-n': n });
-      q._box = box;
-      if (!q.plain) { var h = el('h3'); h.appendChild(el('span', { class: 'qnum' }, String(n))); h.appendChild(document.createTextNode(q.title)); box.appendChild(h); }
-      if (q.context) box.appendChild(el('p', {}, q.context));
-      if (q.why) box.appendChild(el('p', { class: 'why' }, 'Why this matters: ' + q.why));
-      if (q.type === 'choice') {
-        var opts = el('div', { class: 'opts', role: 'radiogroup', 'aria-label': 'Question ' + n });
-        q.options.forEach(function (o) {
-          var l = el('label'); var r = el('input', { type: 'radio', name: 'q' + n, value: o }); l.appendChild(r); l.appendChild(document.createTextNode(' ' + o)); opts.appendChild(l);
-        });
-        box.appendChild(opts);
-      }
-      if (q.type === 'ticks') {
-        if (q.note) box.appendChild(el('div', { class: 'callout warn' }, q.note));
-        var wrap = el('div', { class: 'table-wrap' }); var t = el('table'); var thead = el('thead'); var hr = el('tr');
-        hr.appendChild(el('th', {}, q.tickLabel || 'Yes?'));
-        q.columns.forEach(function (c) { hr.appendChild(el('th', c.num ? { class: 'n' } : {}, c.label)); });
-        thead.appendChild(hr); t.appendChild(thead);
-        var tb = el('tbody'); var last = null;
-        q.rows.forEach(function (r, i) {
-          if (r.group && r.group !== last) { last = r.group; var g = el('tr', { class: 'grp' }); var gt = el('td', { colspan: q.columns.length + 1 }, r.group); g.appendChild(gt); tb.appendChild(g); }
-          var tr = el('tr'); var td0 = el('td');
-          var cb = el('input', { type: 'checkbox', id: 'q' + n + 'r' + i, 'aria-label': (q.tickLabel || 'Yes') + ' ' + r[q.columns[0].key] });
-          cb.dataset.tick = 'q' + n; cb.dataset.row = i; td0.appendChild(cb); tr.appendChild(td0);
-          q.columns.forEach(function (c, j) {
-            var td = el('td', c.num ? { class: 'n' } : {});
-            if (j === 0) { var lab = el('label', { for: cb.id }, fmt(r[c.key])); td.appendChild(lab); } else td.textContent = fmt(r[c.key]);
-            tr.appendChild(td);
-          });
-          tb.appendChild(tr);
-        });
-        t.appendChild(tb); wrap.appendChild(t); box.appendChild(wrap);
-        if (q.extraField) addField(box, q.extraField, 'q' + n + ':extra');
-      }
-      addField(box, q.plain ? 'Your answer' : 'Comments', 'q' + n + ':comments');
-      if (q.whoKnows !== false) addField(box, "If you don't know, who does?", 'q' + n + ':who');
-      main.appendChild(box);
-    });
+  // Give every answer field a stable key, for autosave.
+  questions.forEach(function (s) {
+    s.querySelectorAll('[data-field]').forEach(function (e) { e.dataset.save = 'q' + s.dataset.q + ':' + e.dataset.field; });
   });
 
   // Autosave: works in a normal browser; skipped where storage is blocked (Snowflake sandbox).
-  var KEY = 'pe-questionnaire-' + Q.slug;
+  var KEY = 'pe-questionnaire-' + SLUG;
   var store = null;
   try { store = window.localStorage; store.setItem(KEY + ':t', '1'); store.removeItem(KEY + ':t'); } catch (e) { store = null; }
   function save() {
@@ -376,7 +393,7 @@ var QUESTIONNAIRE = {
     var d = {};
     document.querySelectorAll('[data-save]').forEach(function (e) { d[e.dataset.save] = e.value; });
     document.querySelectorAll('input[type=radio]:checked').forEach(function (e) { d['r:' + e.name] = e.value; });
-    d.ticks = Array.prototype.map.call(document.querySelectorAll('input[data-tick]:checked'), function (e) { return e.id; });
+    d.ticks = Array.prototype.map.call(document.querySelectorAll('input[data-label]:checked'), function (e) { return e.id; });
     try { store.setItem(KEY, JSON.stringify(d)); } catch (e) {}
   }
   (function load() {
@@ -392,34 +409,32 @@ var QUESTIONNAIRE = {
 
   // Markdown export, in the to-questionnaire template shape.
   var quote = function (t) { t = (t || '').trim(); return t ? t.split(/\r?\n/).map(function (l) { return '> ' + l; }).join('\n') : '> (no answer)'; };
-  var val = function (key) { var e = document.querySelector('[data-save="' + key + '"]'); return e ? e.value : ''; };
+  var cell = function (t) { return String(t || '').replace(/\|/g, '\\|'); };
   function buildMarkdown() {
     var name = whoIn.value.trim() || 'Unknown';
-    var out = ['# ' + Q.title + ': answers', '', '**From:** ' + name + ', **To:** ' + Q.from + ', **Date:** ' + new Date().toISOString().slice(0, 10), '', Q.purpose];
-    sections.forEach(function (s) {
-      out.push('', '## ' + s.title);
-      s.questions.forEach(function (q) {
-        if (!q.plain) out.push('', '### ' + q._n + '. ' + q.title);
-        if (q.type === 'choice') {
-          var r = q._box.querySelector('input[type=radio]:checked');
-          out.push('', '**Answer:**', quote(r ? r.value : ''));
-        }
-        if (q.type === 'ticks') {
-          var ticked = Array.prototype.filter.call(q._box.querySelectorAll('input[data-tick]'), function (e) { return e.checked; });
-          out.push('', '**' + (q.tickLabel || 'Ticked') + ' (' + ticked.length + ' of ' + q.rows.length + '):**', '');
-          if (ticked.length) {
-            var gcol = q.rows.some(function (r) { return r.group; });
-            out.push('| ' + q.columns[0].label + (gcol ? ' | Group' : '') + ' |', '| --- |' + (gcol ? ' --- |' : ''));
-            ticked.forEach(function (e) {
-              var r = q.rows[+e.dataset.row];
-              out.push('| ' + String(r[q.columns[0].key]).replace(/\|/g, '\\|') + (gcol ? ' | ' + (r.group || '') : '') + ' |');
-            });
-          } else out.push('> (none ticked)');
-          if (q.extraField) out.push('', '**' + q.extraField + ':**', quote(val('q' + q._n + ':extra')));
-        }
-        out.push('', '**' + (q.plain ? 'Answer' : 'Comments') + ':**', quote(val('q' + q._n + ':comments')));
-        if (q.whoKnows !== false) out.push('', "**Who knows:**", quote(val('q' + q._n + ':who')));
-      });
+    var title = document.querySelector('h1').textContent.trim();
+    var purpose = (document.querySelector('.purpose') || { textContent: '' }).textContent.trim().replace(/\s+/g, ' ');
+    var out = ['# ' + title + ': answers', '', '**From:** ' + name + ', **To:** ' + FROM + ', **Date:** ' + new Date().toISOString().slice(0, 10), '', purpose];
+    Array.prototype.forEach.call(main.children, function (el) {
+      if (el.tagName === 'H2' && el.classList.contains('theme')) out.push('', '## ' + el.textContent.trim());
+      if (!el.matches('section.q')) return;
+      if (el.dataset.plain !== 'true') out.push('', '### ' + el.dataset.q + '. ' + el.dataset.title);
+      if (el.dataset.type === 'choice') {
+        var r = el.querySelector('input[type=radio]:checked');
+        out.push('', '**Answer:**', quote(r ? r.value : ''));
+      }
+      if (el.dataset.type === 'ticks') {
+        var boxes = Array.prototype.slice.call(el.querySelectorAll('input[data-label]'));
+        var ticked = boxes.filter(function (e) { return e.checked; });
+        out.push('', '**' + (el.dataset.tickLabel || 'Ticked') + ' (' + ticked.length + ' of ' + boxes.length + '):**', '');
+        if (ticked.length) {
+          var gcol = boxes.some(function (e) { return e.dataset.group; });
+          var head = el.querySelector('thead th:nth-child(2)');
+          out.push('| ' + (head ? head.textContent.trim() : 'Item') + (gcol ? ' | Group' : '') + ' |', '| --- |' + (gcol ? ' --- |' : ''));
+          ticked.forEach(function (e) { out.push('| ' + cell(e.dataset.label) + (gcol ? ' | ' + cell(e.dataset.group) : '') + ' |'); });
+        } else out.push('> (none ticked)');
+      }
+      el.querySelectorAll('[data-field]').forEach(function (f) { out.push('', '**' + f.dataset.field + ':**', quote(f.value)); });
     });
     out.push('');
     return out.join('\n');
@@ -429,9 +444,9 @@ var QUESTIONNAIRE = {
   document.getElementById('dl').addEventListener('click', function () {
     var nm = (whoIn.value.trim() || 'unknown').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
     var blob = new Blob([buildMarkdown()], { type: 'text/markdown;charset=utf-8' });
-    var a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = Q.slug + '-answers-' + (nm || 'unknown') + '.md';
+    var a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = SLUG + '-answers-' + (nm || 'unknown') + '.md';
     document.body.appendChild(a); a.click(); a.remove(); setTimeout(function () { URL.revokeObjectURL(a.href); }, 1000);
-    status.textContent = 'File downloaded. Attach it to an email or a Teams message to ' + Q.from + '.';
+    status.textContent = 'File downloaded. Attach it to an email or a Teams message to ' + FROM + '.';
   });
   document.getElementById('cp').addEventListener('click', function () {
     var declined = function () { status.textContent = 'Answers were not copied. Use Download answers (.md) instead.'; };
@@ -445,7 +460,7 @@ var QUESTIONNAIRE = {
     document.querySelectorAll('input[type=radio], input[type=checkbox]').forEach(function (e) { e.checked = false; });
     save(); status.textContent = 'All answers cleared.';
   });
-})(QUESTIONNAIRE);
+})();
 </script>
 </body>
 </html>
