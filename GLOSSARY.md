@@ -13,8 +13,12 @@ The finance team at one site that builds and explains the weekly P&L.
 _Avoid_: Site accountants
 
 **Kill (poultry)**:
-Birds delivered, less dead on arrival, less rejects: the net birds onto the line.
-_Avoid_: Birds delivered, live weight
+Birds delivered, less dead on arrival, less condemnations: the net birds onto the line. Condemnations are all Mtech condemnation codes. Void loads are not included. All sites use this rule (the Dungannon rule).
+_Avoid_: Birds delivered, live weight, rejects
+
+**Kill (pork)**:
+The pigs killed, from `"Killed Qty"` on the Hellenic booking, in head. TC'd pigs are not in kill.
+_Avoid_: Pigs delivered, pigs over scale, pay weight
 
 Mtech and Anaplan may show different kill for the same site and week. This is expected, not an error.
 
@@ -23,6 +27,18 @@ The system that holds production transactions.
 
 **Anaplan**:
 The system that holds planned transactions.
+
+**GL line item**:
+One posted line of a GL document, as site finance sees it in the SAP report FAGLL03H.
+_Avoid_: GL transaction, journal line
+
+**Ledger**:
+A SAP set of books. Ledgers 0L and 1L hold the same GL line items. The weekly P&L uses 1L only.
+_Avoid_: Book
+
+**Fiscal week**:
+The week of a GL line item, as the BW field FISCALYEARWEEK gives it. Opening balances (period 000) have no fiscal week and are not in the weekly P&L.
+_Avoid_: Posting week
 
 **Run rate**:
 The average weekly cost of a GL line over a selected period. Site finance can override it with a comment.

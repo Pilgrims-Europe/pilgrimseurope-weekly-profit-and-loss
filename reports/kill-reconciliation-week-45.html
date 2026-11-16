@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="snowflake-source" content="cortex-agent-authored" />
+  <title>Kill reconciliation, week 45 2026</title>
+  <script type="application/json" id="snowflake-report-metadata">
+  {
+    "generated": "2026-11-16",
+    "intent": "Reconcile the site kill chicken figures for week 45 2026 against DEV_ANALYTICS.FINANCE_PL_WEEKLY.MTECH_BIRDKILL.",
+    "dataSources": [
+      { "type": "file", "path": "Weekly Reporting screenshot supplied by Emma Cutler, kill chicken row, week 45" }
+    ],
+    "sections": [
+      { "id": "reconciliation",
+        "title": "Reconciliation by site",
+        "dataSources": [
+          { "type": "query", "sql": "SELECT SITE_NAME, ISO_WEEK, COUNT(DISTINCT KILL_DATE) AS KILL_DAYS, SUM(LOADS) AS LOADS, SUM(BIRDS_DELIVERED) AS BIRDS_DELIVERED, SUM(DOA) AS DOA, SUM(BIRDS_KILLED) AS BIRDS_KILLED FROM DEV_ANALYTICS.FINANCE_PL_WEEKLY.MTECH_BIRDKILL WHERE ISO_YEAR = 2026 AND ISO_WEEK = 45 GROUP BY ALL ORDER BY SITE_NAME" },
+          { "type": "query", "sql": "SELECT 'Mon 2 - Sat 7 Nov' AS WINDOW_LABEL, COUNT(DISTINCT KILL_DATE) AS KILL_DAYS, SUM(BIRDS_DELIVERED) AS BIRDS_DELIVERED, SUM(DOA) AS DOA, SUM(BIRDS_KILLED) AS BIRDS_KILLED FROM DEV_ANALYTICS.FINANCE_PL_WEEKLY.MTECH_BIRDKILL WHERE SITE_CODE='S11' AND KILL_DATE BETWEEN '2026-11-02' AND '2026-11-07' UNION ALL SELECT 'Mon 2 - Sun 8 Nov (ISO wk 45)', COUNT(DISTINCT KILL_DATE), SUM(BIRDS_DELIVERED), SUM(DOA), SUM(BIRDS_KILLED) FROM DEV_ANALYTICS.FINANCE_PL_WEEKLY.MTECH_BIRDKILL WHERE SITE_CODE='S11' AND KILL_DATE BETWEEN '2026-11-02' AND '2026-11-08'" },
+          { "type": "query", "sql": "SELECT c.CONDEMNATIONNO AS CODE, c.CALCULATIONCATEGORY AS CAT, SUM(CASE WHEN p.PLANTNO='S11' THEN d.HEAD ELSE 0 END) AS ANWICK, SUM(CASE WHEN p.PLANTNO='S10' THEN d.HEAD ELSE 0 END) AS ASHBOURNE, SUM(CASE WHEN p.PLANTNO='S40' THEN d.HEAD ELSE 0 END) AS BALLYMENA, SUM(CASE WHEN p.PLANTNO='S01' THEN d.HEAD ELSE 0 END) AS DUNGANNON, SUM(d.HEAD) AS TOTAL_HEAD FROM PROD_RAW.MTECH.PMTSCONDEMNTRANSDETAILS d JOIN PROD_RAW.MTECH.PMTSCONDEMNTRANS t ON t.IRN = d.PMTSCONDEMNTRANSIRN JOIN PROD_RAW.MTECH.PMTSCONDEMNATIONS c ON c.IRN = d.PMTSCONDEMNATIONSIRN JOIN PROD_RAW.MTECH.PROTEINFACILITYPLANTS p ON p.IRN = t.PROTEINFACILITYPLANTSIRN WHERE p.PLANTNO IN ('S01','S10','S11','S40') AND NOT t.VOIDFLAG AND YEAROFWEEKISO(t.EVENTDATE) = 2026 AND WEEKISO(t.EVENTDATE) = 45 GROUP BY ALL ORDER BY TOTAL_HEAD DESC" },
+          { "type": "query", "sql": "SELECT PLANTNAME, SUM(IFF(EVENTDATE::DATE BETWEEN '2026-11-02' AND '2026-11-08', PLANTHDCOUNT, 0)) AS KILL_DATE_DELIVERED, SUM(IFF(PLANTWTTIME::DATE BETWEEN '2026-11-02' AND '2026-11-08', PLANTHDCOUNT, 0)) AS WEIGH_IN_DATE_DELIVERED FROM PROD_RAW.MTECH.MVPMTSPROCRECVTRANSHOUSEDETAIL WHERE PLANTNO IN ('S11','S10','S01','S40') AND SPECIESTYPE = 1 AND BIRDTYPE = 3 AND NOT VOIDFLAG AND EVENTDATE >= '2026-10-25' AND EVENTDATE < '2026-11-12' GROUP BY 1 ORDER BY 1" }
+        ],
+        "producerNotes": "Site figures are typed from the Weekly Reporting screenshot. The Anwick Mon-Sat figure is the second query; the fourth query shows it also matches delivered by plant weigh-in date. Condemnation head counts (all codes) are the third query and are not in the view; which codes count as rejects is not yet agreed." }
+    ]
+  }
+  </script>
+  <style>
+    :root {
+      color-scheme: light dark;
+      --brand: light-dark(#00406E, #5BA3D0);
+      --brand-navy: light-dark(#1A2B37, #0D1419);
+      --red: light-dark(#E11F20, #F26B6C);
+      --yellow: light-dark(#FF9D00, #FFB84D);
+      --text: light-dark(#374151, #D1D5DB);
+      --muted: light-dark(#6B7280, #9CA3AF);
+      --line: light-dark(#E5E7EB, #374151);
+      --page: light-dark(#F9FAFB, #111827);
+      --match-bg: light-dark(#DFF0D8, #2F4A2C);
+      --match-text: light-dark(#2E4A1E, #BFE0A8);
+      --diff-bg: light-dark(#FDE2E2, #4A2C2C);
+      --diff-text: light-dark(#8B1A1A, #F2B8B8);
+    }
+    * { box-sizing: border-box; }
+    body {
+      font-family: Montserrat, 'Segoe UI', -apple-system, system-ui, sans-serif;
+      max-width: 880px; width: 100%;
+      margin: 0 auto; padding: clamp(16px, 4vw, 24px);
+      background: var(--page); color: var(--text); line-height: 1.55;
+    }
+    h1 { font-family: moret, Georgia, 'Times New Roman', serif; font-weight: 400; font-size: clamp(1.5rem, 5vw, 2rem); margin: 0; color: #fff; }
+    h2 { font-family: 'Fjalla One', 'Arial Narrow', 'Segoe UI', sans-serif; font-weight: 400; color: var(--brand); font-size: 1.15rem; margin: 28px 0 4px; }
+    .hero { background: var(--brand-navy); border-bottom: 4px solid var(--red); border-radius: 1.25rem; padding: clamp(18px, 4vw, 28px); margin-bottom: 20px; }
+    .eyebrow { font-family: 'Fjalla One', 'Arial Narrow', sans-serif; color: var(--yellow); text-transform: uppercase; letter-spacing: .08em; font-size: .78rem; margin: 0 0 6px; }
+    .hero p.lede { color: #C8D4DD; margin: 10px 0 0; font-size: .92rem; }
+    .key { display: flex; flex-wrap: wrap; gap: 16px; margin: 10px 0; font-size: .82rem; }
+    .key span { display: inline-flex; align-items: center; gap: 6px; }
+    .swatch { width: 15px; height: 15px; border-radius: 3px; border: 1px solid var(--line); display: inline-block; }
+    .table-wrap { overflow-x: auto; margin: 12px 0; border-radius: .5rem; }
+    table { border-collapse: collapse; width: 100%; font-size: .88rem; }
+    th, td { border: 1px solid var(--line); padding: 8px 10px; text-align: left; }
+    th { background: var(--brand); color: #fff; font-family: 'Fjalla One', 'Arial Narrow', sans-serif; font-weight: 400; }
+    td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+    tr.total td { font-weight: 600; background: light-dark(#F3F4F6, #22333F); }
+    td.match { background: var(--match-bg); color: var(--match-text); font-weight: 600; }
+    td.diff { background: var(--diff-bg); color: var(--diff-text); font-weight: 600; }
+    .callout { border-radius: .5rem; padding: 12px 14px; margin: 14px 0; font-size: .88rem; border-left: 4px solid var(--yellow); background: light-dark(#FFF7E6, #3A2E13); }
+    .callout strong { font-family: 'Fjalla One', 'Arial Narrow', sans-serif; font-weight: 400; }
+    p { margin: 8px 0; }
+    .caption { font-size: .78rem; color: var(--muted); margin-top: 6px; }
+  </style>
+</head>
+<body>
+
+  <div class="hero">
+    <p class="eyebrow">Weekly P&amp;L &middot; Kill proof of concept</p>
+    <h1>Kill reconciliation, week 45 2026</h1>
+    <p class="lede">The four sites gave their kill chicken figures for week 45, 2&ndash;8 November 2026.
+      The same rule is not applied at each site. Dungannon takes off DOA; Anwick, Ashbourne and Ballymena report
+      birds delivered. No site takes off rejects.</p>
+  </div>
+
+  <h2 id="reconciliation">Reconciliation by site</h2>
+  <div class="key">
+    <span><i class="swatch" style="background:var(--match-bg)"></i> Matches the site figure</span>
+    <span><i class="swatch" style="background:var(--diff-bg)"></i> Does not match</span>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Site</th>
+          <th class="num">Site figure</th>
+          <th class="num">Delivered</th>
+          <th class="num">DOA</th>
+          <th class="num">Condemnations (all codes)*</th>
+          <th class="num">Kill (delivered &minus; DOA)</th>
+          <th class="num">Anwick excl. Sun 8 Nov</th>
+          <th>What the site reports</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Anwick</td>
+          <td class="num">1,771,123</td>
+          <td class="num diff">1,884,127</td>
+          <td class="num">1,606</td>
+          <td class="num">230,667</td>
+          <td class="num diff">1,882,521</td>
+          <td class="num match">1,771,123</td>
+          <td>Delivered, Sunday 8 Nov left out. No DOA or rejects taken off.</td>
+        </tr>
+        <tr>
+          <td>Ashbourne</td>
+          <td class="num">833,935</td>
+          <td class="num match">833,935</td>
+          <td class="num">1,079</td>
+          <td class="num">153,036</td>
+          <td class="num diff">832,856</td>
+          <td class="num">&ndash;</td>
+          <td>Delivered. No DOA or rejects taken off.</td>
+        </tr>
+        <tr>
+          <td>Ballymena</td>
+          <td class="num">149,023</td>
+          <td class="num match">149,023</td>
+          <td class="num">67</td>
+          <td class="num">4,204</td>
+          <td class="num diff">148,956</td>
+          <td class="num">&ndash;</td>
+          <td>Delivered. No DOA or rejects taken off.</td>
+        </tr>
+        <tr>
+          <td>Dungannon</td>
+          <td class="num">2,127,036</td>
+          <td class="num diff">2,127,525</td>
+          <td class="num">489</td>
+          <td class="num">644,080</td>
+          <td class="num match">2,127,036</td>
+          <td class="num">&ndash;</td>
+          <td>Delivered less DOA. Rejects not taken off.</td>
+        </tr>
+        <tr class="total">
+          <td>Total</td>
+          <td class="num">4,881,117</td>
+          <td class="num">4,994,610</td>
+          <td class="num">3,241</td>
+          <td class="num">1,031,987</td>
+          <td class="num">4,991,369</td>
+          <td class="num">&ndash;</td>
+          <td>Site total is 110,252 below the view&rsquo;s kill total (113,493 below delivered).</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="caption">View: DEV_ANALYTICS.FINANCE_PL_WEEKLY.MTECH_BIRDKILL. Site figures: Weekly Reporting,
+    kill chicken row. *Condemnations are every MTech condemnation code, including croppings, so they are
+    not a rejects figure. Which codes count as rejects is still to be agreed; the view holds rejects at 0.</p>
+
+  <div class="callout">
+    <strong>Anwick:</strong> the site figure leaves out Sunday 8 November (113,004 birds). It matches exactly
+    when loads are dated by plant weigh-in time instead of kill date, so Anwick may report on a weigh-in date
+    basis. Sunday 1 November is not in the figure either. Another week of Anwick figures would confirm which.
+  </div>
+
+  <div class="callout">
+    <strong>Rejects:</strong> croppings is 941,475 of the 1,031,987 condemned head, and 30% of birds
+    delivered at Dungannon. That is too high for whole birds, so croppings is very probably a part reject.
+    Gui must confirm the rule. It sets kill between 3,959,382 and 4,991,369.
+  </div>
+
+</body>
+</html>
