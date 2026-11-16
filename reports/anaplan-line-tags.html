@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="snowflake-source" content="cortex-agent-authored" />
+<title>Anaplan weekly template: source and RAG for each line</title>
+<script type="application/json" id="snowflake-report-metadata">
+{
+  "generated": "2026-11-16",
+  "intent": "Tag each line of the Anaplan weekly template by source type, system and RAG, for the pilot sites. Resolves ticket #11.",
+  "dataSources": [
+    { "type": "file", "path": "SharePoint: Weekly Profit and Loss/WEEKLY TESTING MODEL FOR ALL SITES/WEEKLY P&L - PHASE 2.xlsx (sheets 'weekly P&L', 'PHASE 1', 'PHASE 2')" },
+    { "type": "file", "path": "research/gl-line-items.md" },
+    { "type": "file", "path": "research/sales-margin.md" },
+    { "type": "file", "path": "research/stock-bom.md" },
+    { "type": "file", "path": "research/kill-data.md" },
+    { "type": "file", "path": "research/kill-data-in-snowflake.md" }
+  ],
+  "sections": [
+    { "id": "summary", "title": "Summary", "dataSources": [], "producerNotes": "Counts are from the table in section 'lines'. Recount if a tag changes." },
+    { "id": "rules", "title": "Rules", "dataSources": [], "producerNotes": "Decided by Chris McCann on 2026-11-16 in ticket #11." },
+    { "id": "lines", "title": "Each line", "dataSources": [], "producerNotes": "Line names and order are from the 'weekly P&L' sheet. Current sources and GL accounts are from the 'PHASE 1' sheet (Redruth, Bromborough). No Snowflake queries ran for this report; Snowflake facts are from the research notes." },
+    { "id": "findings", "title": "Other findings", "dataSources": [], "producerNotes": "" }
+  ]
+}
+</script>
+<style>
+  :root {
+    color-scheme: light dark;
+    --brand: light-dark(#00406E, #7FB3E0);
+    --brand-light: light-dark(#025895, #9CC5EA);
+    --brand-navy: #1A2B37;
+    --red: #E11F20;
+    --red-dark: #CB1011;
+    --yellow: #FF9D00;
+    --green: light-dark(#5B6C43, #A3B88A);
+    --text: light-dark(#374151, #E5E7EB);
+    --muted: light-dark(#6B7280, #9CA3AF);
+    --line: light-dark(#E5E7EB, #374151);
+    --page: light-dark(#F9FAFB, #111827);
+    --card: light-dark(#FFFFFF, #1F2937);
+    --tint-brand: light-dark(#EEF4FA, #16324A);
+    --tint-yellow: light-dark(#FFF7E6, #3A2A0A);
+    --tint-green: light-dark(#EFF3EA, #1F2A16);
+    --tint-red: light-dark(#FDECEC, #3A1A1A);
+    --head: 'Fjalla One', 'Arial Narrow', 'Segoe UI', sans-serif;
+    --body: Montserrat, 'Segoe UI', -apple-system, system-ui, sans-serif;
+    --serif: moret, Georgia, 'Times New Roman', serif;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--page); color: var(--text); font-family: var(--body); font-size: 15px; line-height: 1.6; }
+  img, svg { max-width: 100%; height: auto; }
+  a { color: var(--brand); }
+
+  .hero { background: var(--brand-navy); color: #fff; border-bottom: 6px solid var(--red); }
+  .wrap { max-width: 880px; width: 100%; margin: 0 auto; padding: clamp(16px, 4vw, 32px); }
+  .eyebrow { font-family: var(--head); letter-spacing: .08em; text-transform: uppercase; color: var(--yellow); font-size: 14px; margin: 0 0 6px; }
+  h1 { font-family: var(--serif); font-weight: 400; font-size: clamp(28px, 5vw, 42px); line-height: 1.15; margin: 0 0 14px; }
+  .lede { margin: 0 0 16px; color: #E5E7EB; max-width: 65ch; }
+  .meta { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px 24px; margin: 0; font-size: 14px; }
+  .meta dt { font-family: var(--head); text-transform: uppercase; letter-spacing: .06em; color: #9CC5EA; font-size: 12px; }
+  .meta dd { margin: 0; }
+  .meta a { color: #9CC5EA; }
+
+  h2 { font-family: var(--head); font-weight: 400; color: var(--brand); font-size: 26px; line-height: 1.2; margin: 40px 0 12px; }
+  h3 { font-family: var(--head); font-weight: 400; color: var(--brand); font-size: 20px; line-height: 1.3; margin: 0 0 8px; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 1.25rem; padding: clamp(16px, 3vw, 24px); margin: 0 0 18px; }
+  .card.accent { border-left: 6px solid var(--brand); }
+  .card > :last-child { margin-bottom: 0; }
+
+  .kpi-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 14px; margin: 0 0 18px; }
+  .kpi { background: var(--card); border: 1px solid var(--line); border-top: 4px solid var(--brand); border-radius: 1.25rem; padding: 16px 18px; }
+  .kpi.good { border-top-color: var(--green); }
+  .kpi.warn { border-top-color: var(--yellow); }
+  .kpi.bad { border-top-color: var(--red); }
+  .kpi .label { font-family: var(--head); text-transform: uppercase; letter-spacing: .06em; font-size: 12px; color: var(--muted); }
+  .kpi .value { font-family: var(--head); font-size: 30px; line-height: 1.2; color: var(--brand); font-variant-numeric: tabular-nums; }
+  .kpi .delta { font-size: 13px; color: var(--muted); }
+
+  .callout { border-radius: .5rem; padding: 10px 14px; margin: 10px 0; border-left: 4px solid var(--brand); background: var(--tint-brand); }
+  .callout.warn { border-color: var(--yellow); background: var(--tint-yellow); }
+  .callout.good { border-color: var(--green); background: var(--tint-green); }
+  .badge { display: inline-block; font-family: var(--head); letter-spacing: .04em; font-size: 12px; padding: 2px 10px; border-radius: 9999px; background: var(--tint-brand); color: var(--brand); }
+  .badge.good { background: var(--tint-green); color: var(--green); }
+  .badge.warn { background: var(--tint-yellow); color: light-dark(#976611, #FFC966); }
+  .badge.bad { background: var(--tint-red); color: var(--red); }
+
+  .table-wrap { overflow-x: auto; margin: 12px 0; border: 1px solid var(--line); border-radius: .5rem; }
+  table { border-collapse: collapse; width: 100%; font-size: 13px; }
+  th, td { padding: 7px 10px; border-bottom: 1px solid var(--line); text-align: left; white-space: nowrap; vertical-align: top; }
+  td.wrap { white-space: normal; min-width: 240px; }
+  th { background: var(--brand); color: #fff; font-family: var(--head); font-weight: 400; letter-spacing: .03em; }
+  td.n, th.n { text-align: right; font-variant-numeric: tabular-nums; }
+  tr.group td { background: var(--tint-brand); color: var(--brand); font-family: var(--head); letter-spacing: .04em; }
+  tr.sub td { color: var(--muted); }
+  caption { caption-side: bottom; text-align: left; padding: 8px 10px; color: var(--muted); font-size: 12px; }
+  ul { margin: 0 0 10px; padding-left: 20px; }
+
+  .bar { position: sticky; bottom: 0; background: var(--card); border-top: 4px solid var(--red); box-shadow: 0 -4px 16px rgba(0,0,0,.08); }
+  .bar-in { max-width: 880px; margin: 0 auto; padding: 12px clamp(16px, 4vw, 32px); display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+  .btn { font-family: var(--head); letter-spacing: .05em; text-transform: uppercase; font-size: 14px; border: 2px solid var(--red); background: var(--red); color: #fff; border-radius: 9999px; padding: 9px 20px; cursor: pointer; }
+  .btn:hover { background: var(--red-dark); border-color: var(--red-dark); }
+  .btn.alt { background: transparent; color: var(--brand); border-color: var(--brand); }
+  .btn.alt:hover { background: var(--brand); color: #fff; }
+  .btn:focus-visible { outline: 3px solid var(--yellow); outline-offset: 2px; }
+  .status { font-size: 13px; color: var(--muted); flex: 1 1 200px; }
+
+  footer.src { color: var(--muted); font-size: 12px; margin-top: 32px; }
+  @media print { .bar { display: none; } .hero { -webkit-print-color-adjust: exact; print-color-adjust: exact; } }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <p class="eyebrow">Weekly P&amp;L v1 · Decision</p>
+    <h1>Anaplan weekly template: source and RAG for each line</h1>
+    <p class="lede">This report tags each line of the Anaplan weekly template with its source and a RAG. The build starts on the Green lines, because they are easy wins.</p>
+    <dl class="meta">
+      <div><dt>Author</dt><dd>Chris McCann</dd></div>
+      <div><dt>Ticket</dt><dd><a href="https://github.com/Pilgrims-Europe/pilgrimseurope-weekly-profit-and-loss/issues/11">#11 Tag each Anaplan line by source and RAG</a></dd></div>
+      <div><dt>Sites</dt><dd>Redruth, Bromborough</dd></div>
+      <div><dt>Decided</dt><dd>2026-11-16</dd></div>
+    </dl>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <h2 id="summary">Summary</h2>
+  <div class="kpi-row">
+    <div class="kpi good"><div class="label">Green</div><div class="value">9</div><div class="delta">Build now</div></div>
+    <div class="kpi warn"><div class="label">Amber</div><div class="value">39</div><div class="delta">Rule or mapping Unknown</div></div>
+    <div class="kpi bad"><div class="label">Red</div><div class="value">13</div><div class="delta">Manual, or not in Snowflake</div></div>
+    <div class="kpi"><div class="label">Subtotal</div><div class="value">21</div><div class="delta">Formula, no RAG</div></div>
+  </div>
+  <div class="card accent">
+    <h3>What to build first</h3>
+    <p>Build the 2 kill lines and the 7 PPV and stock variance lines first.</p>
+    <p>All 7 variance lines read the GL line item table in Snowflake. Gui's PHASE 1 sheet gives the GL accounts for each line.</p>
+    <div class="callout warn"><strong>Largest Amber group:</strong> the 16 overhead lines. The data is in the GL, but the run rate period is not decided.</div>
+  </div>
+
+  <h2 id="rules">Rules</h2>
+  <div class="card">
+    <h3>Source type</h3>
+    <ul>
+      <li>System: the value comes from one source system.</li>
+      <li>Calculation: a rule makes the value from system data.</li>
+      <li>Manual: site finance or another team enters the value.</li>
+      <li>Subtotal: a formula on other template lines. A subtotal has no RAG.</li>
+    </ul>
+    <h3>RAG</h3>
+    <ul>
+      <li><span class="badge good">Green</span> The data is in a PROD Snowflake schema and the rule is known.</li>
+      <li><span class="badge warn">Amber</span> The data is in Snowflake, but the rule or mapping is Unknown. Or the data is only in a silver table, or only by period.</li>
+      <li><span class="badge bad">Red</span> The value is manual, or the source is not in Snowflake, or the source is not researched.</li>
+    </ul>
+    <p>The RAG is for the pilot sites, Redruth and Bromborough. The pilot sites do not kill. So the kill lines use the kill sites: Anwick, Ashbourne and Dungannon for poultry, and Spalding for pork.</p>
+    <p>GL accounts in Gui's PHASE 1 sheet count as confirmed.</p>
+  </div>
+
+  <h2 id="lines">Each line</h2>
+  <div class="card">
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Line</th><th>Source type</th><th>System</th><th>RAG</th><th>Reason</th></tr></thead>
+        <tbody>
+          <tr class="group"><td colspan="5">Volume</td></tr>
+          <tr><td>Kill Pig</td><td>System</td><td>Hellenic</td><td><span class="badge good">Green</span></td><td class="wrap">Kill (pork) rule decided in ticket #3. Ticket #10 builds the table.</td></tr>
+          <tr><td>Kill Chicken</td><td>System</td><td>Mtech</td><td><span class="badge good">Green</span></td><td class="wrap">Kill (poultry) uses the Dungannon rule. Ticket #10 builds the table.</td></tr>
+          <tr><td>Kill Lamb</td><td>System</td><td>HCS</td><td><span class="badge bad">Red</span></td><td class="wrap">HCS data is not researched.</td></tr>
+          <tr><td>Sales Tonnage</td><td>System</td><td>COPA (FACT_COPAPEUS4)</td><td><span class="badge warn">Amber</span></td><td class="wrap">The intercompany rule is Unknown. The two flags do not agree at Redruth.</td></tr>
+          <tr><td>Sales Tonnage (Inedible)</td><td>System</td><td>COPA</td><td><span class="badge warn">Amber</span></td><td class="wrap">The rule that finds inedible sales is Unknown.</td></tr>
+          <tr><td>Production Tonnage</td><td>System</td><td>SAP goods movements</td><td><span class="badge warn">Amber</span></td><td class="wrap">The pilot sites have no production orders. Movement type Z61 is Unknown.</td></tr>
+          <tr class="group"><td colspan="5">External sales at standard</td></tr>
+          <tr><td>STD Ext NSV</td><td>System</td><td>COPA (NET_REVENUE)</td><td><span class="badge warn">Amber</span></td><td class="wrap">The intercompany rule is Unknown.</td></tr>
+          <tr><td>STD Ext Material Cost</td><td>System</td><td>COPA silver table</td><td><span class="badge warn">Amber</span></td><td class="wrap">The cost split is only in the silver table.</td></tr>
+          <tr><td>STD Ext Packaging</td><td>System</td><td>COPA silver table</td><td><span class="badge warn">Amber</span></td><td class="wrap">The cost split is only in the silver table.</td></tr>
+          <tr><td>STD Ext Labour</td><td>System</td><td>COPA silver table</td><td><span class="badge warn">Amber</span></td><td class="wrap">Silver table only. The labour cost components are not confirmed.</td></tr>
+          <tr class="sub"><td>Total Ext Material Cost</td><td>Subtotal</td><td></td><td></td><td></td></tr>
+          <tr><td>STD Ext Freight</td><td>System</td><td>COPA</td><td><span class="badge warn">Amber</span></td><td class="wrap">The standard freight field is Unknown.</td></tr>
+          <tr class="sub"><td>STD Ext Contribution</td><td>Subtotal</td><td></td><td></td><td></td></tr>
+          <tr class="sub"><td>Percentage Ext C/S</td><td>Subtotal</td><td></td><td></td><td></td></tr>
+          <tr class="group"><td colspan="5">Internal sales (STO)</td></tr>
+          <tr><td>Internal Sales Tonnage (STO)</td><td>System</td><td>SAP goods movements, COPA</td><td><span class="badge warn">Amber</span></td><td class="wrap">Movement type 641 and the intercompany flag are in Snowflake. The STO rule is Unknown.</td></tr>
+          <tr><td>STD Internal NSV</td><td>Calculation</td><td>STO kg, released standard cost</td><td><span class="badge warn">Amber</span></td><td class="wrap">Depends on the STO rule.</td></tr>
+          <tr><td>STD Int Material Cost</td><td>Calculation</td><td>STO kg, released standard cost</td><td><span class="badge warn">Amber</span></td><td class="wrap">Depends on the STO rule.</td></tr>
+          <tr><td>STD Int Packaging</td><td>Calculation</td><td>STO kg, released standard cost</td><td><span class="badge warn">Amber</span></td><td class="wrap">Depends on the STO rule.</td></tr>
+          <tr><td>STD Int Labour</td><td>Calculation</td><td>STO kg, released standard cost</td><td><span class="badge warn">Amber</span></td><td class="wrap">Depends on the STO rule.</td></tr>
+          <tr class="sub"><td>Total Int Material Cost</td><td>Subtotal</td><td></td><td></td><td></td></tr>
+          <tr><td>STD Int Freight</td><td>Calculation</td><td>COPA</td><td><span class="badge warn">Amber</span></td><td class="wrap">The STO rule and the standard freight field are Unknown.</td></tr>
+          <tr class="sub"><td>STD Int Contribution</td><td>Subtotal</td><td></td><td></td><td></td></tr>
+          <tr class="sub"><td>Contribution Int £/Kg</td><td>Subtotal</td><td></td><td></td><td></td></tr>
+          <tr class="group"><td colspan="5">Sales adjustments</td></tr>
+          <tr><td>Credit Note Adj</td><td>Manual</td><td>Excel by email (central finance)</td><td><span class="badge bad">Red</span></td><td class="wrap">Not in Snowflake.</td></tr>
+          <tr><td>Price Corrections</td><td>Manual</td><td>Excel by email</td><td><span class="badge bad">Red</span></td><td class="wrap">Not in Snowflake.</td></tr>
+          <tr><td>Overrider Adj</td><td>Manual</td><td>Unknown</td><td><span class="badge bad">Red</span></td><td class="wrap">Manual overrider adjustments are in the fog.</td></tr>
+          <tr><td>Promotional Adj</td><td>Manual</td><td>Excel promotion workbooks</td><td><span class="badge bad">Red</span></td><td class="wrap">Not in Snowflake.</td></tr>
+          <tr class="sub"><td>Total Sales Adjustments</td><td>Subtotal</td><td></td><td></td><td></td></tr>
+          <tr class="group"><td colspan="5">Production variances</td></tr>
+          <tr><td>Production Material Yield</td><td>Calculation</td><td>GL (5000295, 5000395, 5000435), goods movements</td><td><span class="badge warn">Amber</span></td><td class="wrap">The variance method is in the fog.</td></tr>
+          <tr><td>Substitution</td><td>Calculation</td><td>Arolink yield (FACTS_YIELD)</td><td><span class="badge warn">Amber</span></td><td class="wrap">The variance method is in the fog.</td></tr>
+          <tr><td>Slicing Material Yield</td><td>Calculation</td><td>Arolink yield (FACTS_YIELD)</td><td><span class="badge warn">Amber</span></td><td class="wrap">The variance method is in the fog.</td></tr>
+          <tr><td>Packaging Yield</td><td>Calculation</td><td>GL (5030210, 5030220, 5030230), released standard cost</td><td><span class="badge warn">Amber</span></td><td class="wrap">The variance method is in the fog.</td></tr>
+          <tr><td>Labour Efficiency</td><td>Manual</td><td>Agency sheet, payroll</td><td><span class="badge bad">Red</span></td><td class="wrap">The agency sheet is manual. Agency labour integration is out of scope.</td></tr>
+          <tr class="sub"><td>Total Production Variances</td><td>Subtotal</td><td></td><td></td><td></td></tr>
+          <tr class="group"><td colspan="5">Price variances (PPV)</td></tr>
+          <tr><td>Materials (PPV)</td><td>System</td><td>GL (5000800, 5000810, 5000820, 5000895)</td><td><span class="badge good">Green</span></td><td class="wrap">GL line items, ledger 1L, by fiscal week.</td></tr>
+          <tr><td>Packaging (PPV)</td><td>System</td><td>GL (5030025)</td><td><span class="badge good">Green</span></td><td class="wrap">GL line items, ledger 1L, by fiscal week.</td></tr>
+          <tr><td>Traded Good (PPV)</td><td>System</td><td>GL (5000600, 5000605, 5000610, 5000620)</td><td><span class="badge warn">Amber</span></td><td class="wrap">The account list is not confirmed. Redruth reports no traded goods.</td></tr>
+          <tr><td>Agriculture Standard Cost Variance (PPV)</td><td>Manual</td><td>Airsoft, plan Excel</td><td><span class="badge bad">Red</span></td><td class="wrap">Not in Snowflake. Not used at the pilot sites.</td></tr>
+          <tr><td>Intersite Tfrs (PPV)</td><td>System</td><td>GL (5030050, 5000700, 5000705, 5000710, 5000805)</td><td><span class="badge good">Green</span></td><td class="wrap">GL line items, ledger 1L, by fiscal week.</td></tr>
+          <tr class="sub"><td>Total Price Variances</td><td>Subtotal</td><td></td><td></td><td></td></tr>
+          <tr class="group"><td colspan="5">Stock variances (STK)</td></tr>
+          <tr><td>Materials (STK)</td><td>System</td><td>GL (5001000, 5001020)</td><td><span class="badge good">Green</span></td><td class="wrap">GL line items, ledger 1L, by fiscal week.</td></tr>
+          <tr><td>Packaging (STK)</td><td>System</td><td>GL (5030070, 5030075)</td><td><span class="badge good">Green</span></td><td class="wrap">GL line items, ledger 1L, by fiscal week.</td></tr>
+          <tr><td>WIP (STK)</td><td>System</td><td>GL (5001005)</td><td><span class="badge good">Green</span></td><td class="wrap">GL line items, ledger 1L, by fiscal week.</td></tr>
+          <tr><td>F.Goods (STK)</td><td>System</td><td>GL (5001010)</td><td><span class="badge good">Green</span></td><td class="wrap">GL line items, ledger 1L, by fiscal week.</td></tr>
+          <tr class="sub"><td>Total Stock Variances</td><td>Subtotal</td><td></td><td></td><td></td></tr>
+          <tr class="group"><td colspan="5">Other costs and income (OCI)</td></tr>
+          <tr><td>Materials (OCI)</td><td>System</td><td>GL</td><td><span class="badge warn">Amber</span></td><td class="wrap">The GL accounts are not confirmed.</td></tr>
+          <tr><td>Packaging (OCI)</td><td>System</td><td>GL (5005100, 5900230)</td><td><span class="badge warn">Amber</span></td><td class="wrap">The GL accounts are not confirmed for each pilot site.</td></tr>
+          <tr><td>WIP (OCI)</td><td>Unknown</td><td>Unknown</td><td><span class="badge bad">Red</span></td><td class="wrap">Gui's sheets give no source.</td></tr>
+          <tr><td>F.Goods (OCI)</td><td>Manual</td><td>Excel</td><td><span class="badge bad">Red</span></td><td class="wrap">Not in Snowflake.</td></tr>
+          <tr class="sub"><td>Total Other Costs\Income</td><td>Subtotal</td><td></td><td></td><td></td></tr>
+          <tr class="group"><td colspan="5">Freight and distribution variances</td></tr>
+          <tr><td>Freight</td><td>Calculation</td><td>GL (5010000, 5012000), COPA</td><td><span class="badge warn">Amber</span></td><td class="wrap">The standard freight field is Unknown.</td></tr>
+          <tr><td>Distribution</td><td>Calculation</td><td>COPA</td><td><span class="badge warn">Amber</span></td><td class="wrap">The standard freight field is Unknown.</td></tr>
+          <tr class="sub"><td>Total Freight\Dist Variances</td><td>Subtotal</td><td></td><td></td><td></td></tr>
+          <tr class="sub"><td>Total Operational Variances</td><td>Subtotal</td><td></td><td></td><td></td></tr>
+          <tr class="sub"><td>Total Net Revenue</td><td>Subtotal</td><td></td><td></td><td></td></tr>
+          <tr class="sub"><td>Actual Contribution</td><td>Subtotal</td><td></td><td></td><td></td></tr>
+          <tr class="group"><td colspan="5">Overheads</td></tr>
+          <tr><td>Indirect Wages/Salaries</td><td>Manual</td><td>Run rate from GL</td><td><span class="badge warn">Amber</span></td><td class="wrap">The run rate period is in the fog.</td></tr>
+          <tr><td>Employee Benefits</td><td>Manual</td><td>Run rate from GL</td><td><span class="badge warn">Amber</span></td><td class="wrap">The run rate period is in the fog.</td></tr>
+          <tr><td>Travel Costs</td><td>Manual</td><td>Run rate from GL</td><td><span class="badge warn">Amber</span></td><td class="wrap">The run rate period is in the fog.</td></tr>
+          <tr><td>Utilities</td><td>Manual</td><td>Run rate from GL</td><td><span class="badge warn">Amber</span></td><td class="wrap">The run rate period is in the fog.</td></tr>
+          <tr><td>Engineering Costs</td><td>Manual</td><td>Run rate from GL</td><td><span class="badge warn">Amber</span></td><td class="wrap">The run rate period is in the fog.</td></tr>
+          <tr><td>Hire/Rental</td><td>Manual</td><td>Run rate from GL</td><td><span class="badge warn">Amber</span></td><td class="wrap">The run rate period is in the fog.</td></tr>
+          <tr><td>Site Services</td><td>Manual</td><td>Run rate from GL</td><td><span class="badge warn">Amber</span></td><td class="wrap">The run rate period is in the fog.</td></tr>
+          <tr><td>Information Technology</td><td>Manual</td><td>Run rate from GL</td><td><span class="badge warn">Amber</span></td><td class="wrap">The run rate period is in the fog.</td></tr>
+          <tr><td>Fees</td><td>Manual</td><td>Run rate from GL</td><td><span class="badge warn">Amber</span></td><td class="wrap">The run rate period is in the fog.</td></tr>
+          <tr><td>Consumables</td><td>System</td><td>GL</td><td><span class="badge warn">Amber</span></td><td class="wrap">Gui wants all GL accounts in the consumables P&amp;L group. The account list is Unknown.</td></tr>
+          <tr><td>Fleet Costs</td><td>Manual</td><td>Run rate from GL</td><td><span class="badge warn">Amber</span></td><td class="wrap">The run rate period is in the fog.</td></tr>
+          <tr><td>Insurance</td><td>Manual</td><td>Run rate from GL</td><td><span class="badge warn">Amber</span></td><td class="wrap">The run rate period is in the fog.</td></tr>
+          <tr><td>Marketing Costs</td><td>Manual</td><td>Run rate from GL</td><td><span class="badge warn">Amber</span></td><td class="wrap">The run rate period is in the fog.</td></tr>
+          <tr><td>Others</td><td>Manual</td><td>Run rate from GL</td><td><span class="badge warn">Amber</span></td><td class="wrap">The run rate period is in the fog.</td></tr>
+          <tr><td>Depreciation</td><td>Manual</td><td>Run rate from GL</td><td><span class="badge warn">Amber</span></td><td class="wrap">The run rate period is in the fog. Today the source is SAP report S_ALR_87012936, which is not in Snowflake.</td></tr>
+          <tr><td>Recharges</td><td>Manual</td><td>Run rate from GL</td><td><span class="badge warn">Amber</span></td><td class="wrap">The run rate period is in the fog.</td></tr>
+          <tr class="sub"><td>Total Overheads</td><td>Subtotal</td><td></td><td></td><td></td></tr>
+          <tr class="group"><td colspan="5">Result</td></tr>
+          <tr class="sub"><td>EBIT</td><td>Subtotal</td><td></td><td></td><td></td></tr>
+          <tr class="sub"><td>EBIT Excl MC</td><td>Subtotal</td><td></td><td></td><td class="wrap">Needs management charges. The template has no line for them.</td></tr>
+          <tr class="sub"><td>EBITDA</td><td>Subtotal</td><td></td><td></td><td></td></tr>
+          <tr class="sub"><td>EBIT %</td><td>Subtotal</td><td></td><td></td><td></td></tr>
+          <tr class="group"><td colspan="5">Headcount</td></tr>
+          <tr><td>Direct Employed FTE</td><td>Manual</td><td>Kronos, payroll</td><td><span class="badge bad">Red</span></td><td class="wrap">Kronos is not researched.</td></tr>
+          <tr><td>Indirect Employed FTE</td><td>Manual</td><td>Kronos, payroll</td><td><span class="badge bad">Red</span></td><td class="wrap">Kronos is not researched.</td></tr>
+          <tr><td>Direct Agency FTE</td><td>Manual</td><td>Agency sheet</td><td><span class="badge bad">Red</span></td><td class="wrap">The agency sheet is manual.</td></tr>
+          <tr><td>Indirect Agency FTE</td><td>Manual</td><td>Agency sheet</td><td><span class="badge bad">Red</span></td><td class="wrap">The agency sheet is manual.</td></tr>
+          <tr class="sub"><td>Total FTE</td><td>Subtotal</td><td></td><td></td><td></td></tr>
+        </tbody>
+        <caption>Sources: Gui's file "WEEKLY P&amp;L - PHASE 2.xlsx" (sheets weekly P&amp;L, PHASE 1, PHASE 2) and the research notes in research/. "Fog" means the "Not yet specified" list on the Weekly P&amp;L v1 map.</caption>
+      </table>
+    </div>
+  </div>
+
+  <h2 id="findings">Other findings</h2>
+  <div class="card">
+    <p>"Revaluation (STK)" is on Gui's PHASE 2 sheet. It is not on the weekly P&amp;L sheet. This is the stock revaluation question in the fog.</p>
+    <p>"EBIT Excl MC" needs management charges. The template has no line for them. Gui's PHASE 1 sheet says management charges are in Anaplan, but sites do not enter them.</p>
+  </div>
+
+  <footer class="src">Pilgrim's Europe · Weekly P&amp;L v1 · Generated 2026-11-16</footer>
+</main>
+
+<div class="bar">
+  <div class="bar-in">
+    <button type="button" class="btn" id="dl">Download as .md</button>
+    <button type="button" class="btn alt" id="cp">Copy</button>
+    <span class="status" id="status" role="status" aria-live="polite"></span>
+  </div>
+</div>
+
+<script>
+(function () {
+  // Export: the Markdown must hold the same content as the page.
+  function buildMarkdown() {
+    var out = [];
+    out.push('# ' + document.querySelector('h1').textContent.trim());
+    out.push('');
+    out.push(document.querySelector('.lede').textContent.trim());
+    document.querySelectorAll('main h2').forEach(function (h) {
+      out.push(''); out.push('## ' + h.textContent.trim());
+      var el = h.nextElementSibling;
+      while (el && el.tagName !== 'H2' && el.tagName !== 'FOOTER') {
+        el.querySelectorAll('.kpi').forEach(function (k) {
+          out.push('- **' + k.querySelector('.label').textContent.trim() + ':** ' + k.querySelector('.value').textContent.trim() +
+            (k.querySelector('.delta') ? ' (' + k.querySelector('.delta').textContent.trim() + ')' : ''));
+        });
+        el.querySelectorAll(':scope > p, :scope > h3, :scope > ul > li, .callout').forEach(function (p) {
+          var text = p.textContent.trim().replace(/\s+/g, ' ');
+          out.push(''); out.push((p.tagName === 'H3' ? '### ' : p.tagName === 'LI' ? '- ' : '') + text);
+        });
+        el.querySelectorAll('table').forEach(function (t) {
+          out.push('');
+          t.querySelectorAll('tr').forEach(function (tr, i) {
+            if (tr.classList.contains('group')) {
+              out.push('| **' + tr.textContent.trim() + '** |  |  |  |  |');
+              return;
+            }
+            var cells = Array.prototype.map.call(tr.children, function (c) { return c.textContent.trim().replace(/\|/g, '\\|'); });
+            out.push('| ' + cells.join(' | ') + ' |');
+            if (i === 0) out.push('|' + cells.map(function () { return ' --- '; }).join('|') + '|');
+          });
+          var cap = t.querySelector('caption'); if (cap) { out.push(''); out.push('_' + cap.textContent.trim() + '_'); }
+        });
+        el = el.nextElementSibling;
+      }
+    });
+    out.push('');
+    return out.join('\n');
+  }
+
+  var status = document.getElementById('status');
+  var dl = document.getElementById('dl');
+  if (dl) dl.addEventListener('click', function () {
+    var blob = new Blob([buildMarkdown()], { type: 'text/markdown;charset=utf-8' });
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob); a.download = 'anaplan-line-tags.md';
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function () { URL.revokeObjectURL(a.href); }, 1000);
+    status.textContent = 'File downloaded. Attach it to an email or a Teams message.';
+  });
+  var cp = document.getElementById('cp');
+  if (cp) cp.addEventListener('click', function () {
+    var declined = function () { status.textContent = 'Not copied. Use Download as .md instead.'; };
+    status.textContent = 'Copying…';
+    try { navigator.clipboard.writeText(buildMarkdown()).then(function () { status.textContent = 'Copied. Paste it into an email or a Teams message.'; }, declined); }
+    catch (e) { declined(); }
+  });
+})();
+</script>
+</body>
+</html>
