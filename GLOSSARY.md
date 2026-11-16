@@ -16,6 +16,14 @@ _Avoid_: Site accountants
 Birds delivered, less dead on arrival, less rejects: the net birds onto the line.
 _Avoid_: Birds delivered, live weight
 
+Mtech and Anaplan may show different kill for the same site and week. This is expected, not an error.
+
+**Mtech**:
+The system that holds production transactions.
+
+**Anaplan**:
+The system that holds planned transactions.
+
 **Run rate**:
 The average weekly cost of a GL line over a selected period. Site finance can override it with a comment.
 _Avoid_: Default, baseline
