@@ -140,6 +140,7 @@ These decisions give the kill rules for the weekly P&L. Reports must let the rea
 | Pork condemnations | Two types. Show each one. `TC'd Producer Resp` = condemnation, 3rd party. `TC'd Factory Resp` = condemnation, 1st party. The "Pig Purchase Analysis" report has both, in kg and in head. | Chris McCann |
 | Pork measure | Use quantity (head). Do not use weight for now. | Chris McCann |
 | Poultry kill | Delivered − DOA − condemnations (all codes) | Chris McCann |
+| Birds delivered field | `PLANTHDCOUNT` | Chris McCann |
 | Poultry condemnation detail | Expand to all codes | Chris McCann |
 | Void loads | Exclude void loads (`VOIDFLAG`) from all figures | Chris McCann |
 | Poultry source | Mtech only. There is no Innova poultry system. | Chris McCann |
@@ -161,7 +162,7 @@ Anwick matches exactly when loads are dated by plant weigh-in time, not kill dat
 ## Gaps
 
 - Mtech: the meaning of `CALCULATIONCATEGORY` 1 and 2 is not known. All codes are used, so this does not block the kill figure.
-- Mtech: `FARMHDCOUNT` and `PLANTHDCOUNT` are different at Dungannon and Ballymena. The correct field for birds delivered is not known.
+- Mtech: `FARMHDCOUNT` and `PLANTHDCOUNT` are different at Dungannon and Ballymena. Decided 2026-11-16: use `PLANTHDCOUNT`.
 - Mtech: the raw tables last changed on 2026-11-10, with data to 2026-11-08. The load schedule is not known.
 - Hellenic: `"Est Kill Date"` is the estimated kill date. A field for the actual kill date on the booking line is not known. `STG_PIG_ANIMAL__live` has `"Kill Date"` for each pig.
 - Hellenic: the glossary defines kill for poultry only. It does not have the pork kill decision yet.
@@ -171,7 +172,12 @@ Anwick matches exactly when loads are dated by plant weigh-in time, not kill dat
 - Hellenic condemnation fields (found 2026-11-16, not confirmed):
   - Whole pig TC'd: `"STG_PIG_TRANSACTIONS__live"."Remark Code"` = 1 ("TC" in `"STG_PIG_CONDEMNED REMARKS__live"`). On 2026-11-13 at Westerleigh this gives 17 pigs. The report shows 17 TC'd producer resp. and 0 TC'd factory resp.
   - Part condemnations: `"STG_PIG_CONDEMNED PARTS__live"` has `"Producer Responsible"` and `"Factory Responsible"` for each `"idTransaction"`. On 2026-11-13 at Westerleigh, 4 parts had factory responsible.
-  - The field that marks a TC'd pig as producer or factory responsible is not known.
+  - The field that marks a TC'd pig as producer or factory responsible is probably `"STG_PIG_CONDEMNED PARTS__live"."Factory"`, joined on `"idTransaction"`. Rule: a TC'd pig with a parts row where `"Factory"` = TRUE is factory responsible (1st party). All other TC'd pigs are producer responsible (3rd party). Evidence:
+    - Remark code 1 (TC) is the only whole-pig code. Its `"Factory Responsible"` in `"STG_PIG_CONDEMNED REMARKS__live"` is FALSE, so the remark code does not split the two types.
+    - Westerleigh 2026-11-13: the 17 TC'd pigs match the report lot by lot. 16 have a parts row with `"Factory"` = FALSE. 1 has no parts row. All 17 have `"Payment Value"` 0. The report shows 17 producer resp. and 0 factory resp.
+    - In 2026, most TC'd pigs with `"Factory"` = TRUE still have `"Payment Value"` > 0. This agrees with the factory paying for its own fault.
+    - In 2026, 259 TC'd pigs have `"Payment Value"` > 0 but no factory parts row. Most are in March and June. The reason is not known.
+  - To confirm the rule, compare with a "Pig Purchase Analysis" report for a day with factory TC'd pigs: Westerleigh 2026-09-16 (11 in Snowflake) or Spalding 2026-10-27 (4).
 - Hellenic pig type query: the result is not yet compared with the "Ledger Balances and PPV" PDF report.
 - Hellenic pig type query: Westerleigh had only Standard and ODB pigs in the kill week 14–20 Jun 2026. It is not known if this is normal.
 - Ballymena is in Mtech. It is not a pilot site.
@@ -180,14 +186,14 @@ Anwick matches exactly when loads are dated by plant weigh-in time, not kill dat
 ## Open questions
 
 1. Which Mtech condemnation codes are rejects for the weekly P&L? Answered 2026-11-16: use all codes, and expand to all codes.
-2. For birds delivered, use `FARMHDCOUNT` or `PLANTHDCOUNT`? Owner: Unknown.
+2. For birds delivered, use `FARMHDCOUNT` or `PLANTHDCOUNT`? Answered 2026-11-16: `PLANTHDCOUNT`.
 3. Is there a poultry Innova system that is not in Snowflake? Answered 2026-11-16: no. Mtech only.
 4. What is kill for pork? Answered 2026-11-16 (Gui): `"Killed Qty"` on the booking. A TC'd pig is not in kill: kill = pigs over scale − TC'd pigs. Open: is `"Killed Qty"` the same as pigs over scale, or pigs over scale − TC'd? Check when `"Killed Qty"` is final for 2026-11-13.
 5. How often does the Mtech feed load into Snowflake? Owner: Unknown.
 6. Does the pig type query agree with the "Ledger Balances and PPV" PDF report for one week? Ask Chris Kitchen or Ian Chapman.
 7. Is the pig type query the right approach for "No. Pigs / lambs / birds"? Gui gave direction on 2026-11-16: use `"Killed Qty"` on the booking. The pig type query counts transaction rows, so it must change.
 8. When is `"Killed Qty"` final after the kill day? Owner: Unknown.
-9. Which field marks a TC'd pig as producer responsible or factory responsible? Owner: Unknown.
+9. Which field marks a TC'd pig as producer responsible or factory responsible? Probable answer: `"STG_PIG_CONDEMNED PARTS__live"."Factory"` (see Gaps). Open: confirm with the report for Westerleigh 2026-09-16 or Spalding 2026-10-27.
 10. Anwick: is the date basis kill date or plant weigh-in time? Check with another week of Anwick figures.
 
 ## Sources
