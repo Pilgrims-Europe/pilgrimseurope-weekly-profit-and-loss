@@ -105,7 +105,7 @@ Result for the kill week 14–20 Jun 2026:
 
 Totals: Spalding 24,646 pigs, £4,458,167.87, 2,148,230.2 kg. Westerleigh 19,128 pigs, £3,209,518.06, 1,712,536.1 kg. DEV and PROD give the same totals for each site.
 
-Chris McCann asked Gui for direction on this approach on 2026-11-16. The answer is Unknown.
+Gui decided on 2026-11-16 that pork kill is `"Killed Qty"` on the booking (see Decisions). This query counts transaction rows, so it is not the kill figure. Use it for pig type detail only.
 
 ## Arolink (pork)
 
@@ -129,15 +129,49 @@ Chris McCann asked Gui for direction on this approach on 2026-11-16. The answer 
 
 No Innova table in Snowflake is for a poultry site.
 
+## Decisions (2026-11-16)
+
+These decisions give the kill rules for the weekly P&L. Reports must let the reader expand each kill figure to the detail below.
+
+| Item | Decision | Source |
+| --- | --- | --- |
+| Pork kill | `"Killed Qty"` on the booking | Gui confirmed |
+| Pork kill and TC'd pigs | A TC'd pig is not in kill. Kill = pigs over scale − TC'd pigs. | Chris McCann |
+| Pork condemnations | Two types. Show each one. `TC'd Producer Resp` = condemnation, 3rd party. `TC'd Factory Resp` = condemnation, 1st party. The "Pig Purchase Analysis" report has both, in kg and in head. | Chris McCann |
+| Pork measure | Use quantity (head). Do not use weight for now. | Chris McCann |
+| Poultry kill | Delivered − DOA − condemnations (all codes) | Chris McCann |
+| Poultry condemnation detail | Expand to all codes | Chris McCann |
+| Void loads | Exclude void loads (`VOIDFLAG`) from all figures | Chris McCann |
+| Poultry source | Mtech only. There is no Innova poultry system. | Chris McCann |
+| Site rules | Gui tells the sites that all sites use the Dungannon rule | Chris McCann |
+| Poultry master process | Dungannon. Its definition is the correct one. | Chris McCann |
+| Anwick late loads | Include them. The late Sunday 8 Nov figures (113,004 birds) are a manual entry issue. | Chris McCann and Gui |
+
+Emma's review of week 45 (2–8 Nov), against Mtech view `DEV_ANALYTICS.FINANCE_PL_WEEKLY.MTECH_BIRDKILL`, shows the sites do not use one rule:
+
+| Site | Site figure | What the site reports |
+| --- | --- | --- |
+| Anwick | 1,771,123 | Delivered. No DOA or rejects taken off. Sunday 8 Nov is left out. |
+| Ashbourne | 833,935 | Delivered. No DOA or rejects taken off. |
+| Ballymena | 149,023 | Delivered. No DOA or rejects taken off. |
+| Dungannon | 2,127,036 | Delivered less DOA. Rejects not taken off. |
+
+Anwick matches exactly when loads are dated by plant weigh-in time, not kill date. Sunday 1 Nov is also not in the Anwick figure. Another week of Anwick figures would show which date basis the site uses. The Mtech condemnation total is every code, including cropping. So the "all codes" rule takes off more birds than a rejects figure would.
+
 ## Gaps
 
-- Mtech rejects: the condemnation codes that make up rejects are not known. Some codes are part rejects.
-- Mtech: the meaning of `CALCULATIONCATEGORY` 1 and 2 is not known.
+- Mtech: the meaning of `CALCULATIONCATEGORY` 1 and 2 is not known. All codes are used, so this does not block the kill figure.
 - Mtech: `FARMHDCOUNT` and `PLANTHDCOUNT` are different at Dungannon and Ballymena. The correct field for birds delivered is not known.
 - Mtech: the raw tables last changed on 2026-11-10, with data to 2026-11-08. The load schedule is not known.
 - Hellenic: `"Est Kill Date"` is the estimated kill date. A field for the actual kill date on the booking line is not known. `STG_PIG_ANIMAL__live` has `"Kill Date"` for each pig.
-- Hellenic: the glossary defines kill for poultry only. A definition of kill for pork is not known.
-- Hellenic pig type query: "Pigs killed" counts transaction rows. It is not known if there is one row for each carcass.
+- Hellenic: the glossary defines kill for poultry only. It does not have the pork kill decision yet.
+- Hellenic: `"Killed Qty"` is sometimes more than pigs delivered, for example Westerleigh on 2026-11-12 (3,941 against 3,918).
+- Hellenic: `"Killed Qty"` is not final on the kill day. The 2026-11-13 data loaded on 2026-11-16 at 11:52. Only 1 of 19 Westerleigh bookings had a `"Killed Qty"` (lot 000111: 76, against 75 pigs over scale on the report). The other 18 bookings showed 0.
+- Hellenic, Westerleigh 2026-11-13: the "Pig Purchase Analysis" report shows 3,344 pigs over scale. Snowflake has 3,345 transaction rows. The extra row is not found.
+- Hellenic condemnation fields (found 2026-11-16, not confirmed):
+  - Whole pig TC'd: `"STG_PIG_TRANSACTIONS__live"."Remark Code"` = 1 ("TC" in `"STG_PIG_CONDEMNED REMARKS__live"`). On 2026-11-13 at Westerleigh this gives 17 pigs. The report shows 17 TC'd producer resp. and 0 TC'd factory resp.
+  - Part condemnations: `"STG_PIG_CONDEMNED PARTS__live"` has `"Producer Responsible"` and `"Factory Responsible"` for each `"idTransaction"`. On 2026-11-13 at Westerleigh, 4 parts had factory responsible.
+  - The field that marks a TC'd pig as producer or factory responsible is not known.
 - Hellenic pig type query: the result is not yet compared with the "Ledger Balances and PPV" PDF report.
 - Hellenic pig type query: Westerleigh had only Standard and ODB pigs in the kill week 14–20 Jun 2026. It is not known if this is normal.
 - Ballymena is in Mtech. It is not a pilot site.
@@ -145,13 +179,16 @@ No Innova table in Snowflake is for a poultry site.
 
 ## Open questions
 
-1. Which Mtech condemnation codes are rejects for the weekly P&L? Ask Emma or the poultry site finance teams.
+1. Which Mtech condemnation codes are rejects for the weekly P&L? Answered 2026-11-16: use all codes, and expand to all codes.
 2. For birds delivered, use `FARMHDCOUNT` or `PLANTHDCOUNT`? Owner: Unknown.
-3. Is there a poultry Innova system that is not in Snowflake? Owner: Unknown.
-4. What is kill for pork: `"Killed Qty"`, or delivered less DOA, DIP and condemned? Owner: Unknown.
+3. Is there a poultry Innova system that is not in Snowflake? Answered 2026-11-16: no. Mtech only.
+4. What is kill for pork? Answered 2026-11-16 (Gui): `"Killed Qty"` on the booking. A TC'd pig is not in kill: kill = pigs over scale − TC'd pigs. Open: is `"Killed Qty"` the same as pigs over scale, or pigs over scale − TC'd? Check when `"Killed Qty"` is final for 2026-11-13.
 5. How often does the Mtech feed load into Snowflake? Owner: Unknown.
 6. Does the pig type query agree with the "Ledger Balances and PPV" PDF report for one week? Ask Chris Kitchen or Ian Chapman.
-7. Is the pig type query the right approach for "No. Pigs / lambs / birds"? Asked Gui on 2026-11-16.
+7. Is the pig type query the right approach for "No. Pigs / lambs / birds"? Gui gave direction on 2026-11-16: use `"Killed Qty"` on the booking. The pig type query counts transaction rows, so it must change.
+8. When is `"Killed Qty"` final after the kill day? Owner: Unknown.
+9. Which field marks a TC'd pig as producer responsible or factory responsible? Owner: Unknown.
+10. Anwick: is the date basis kill date or plant weigh-in time? Check with another week of Anwick figures.
 
 ## Sources
 
