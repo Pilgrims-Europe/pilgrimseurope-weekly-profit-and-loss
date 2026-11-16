@@ -13,17 +13,24 @@ The finance team at one site that builds and explains the weekly P&L.
 _Avoid_: Site accountants
 
 **Kill (poultry)**:
-Birds delivered, less dead on arrival, less condemnations: the net birds onto the line. Condemnations are all Mtech condemnation codes. Void loads are not included. All sites use this rule (the Dungannon rule).
+Birds delivered, less dead on arrival, less condemnations, in head. Birds delivered is `PLANTHDCOUNT` in Mtech. Condemnations are all Mtech condemnation codes. Void loads are not included. All sites use the Dungannon rule.
 _Avoid_: Birds delivered, live weight, rejects
 
 **Kill (pork)**:
-The pigs killed, from `"Killed Qty"` on the Hellenic booking, in head. TC'd pigs are not in kill.
+Pigs over scale, less TC'd pigs, in head. The source field is `"Killed Qty"` on the Hellenic booking. Ticket #10 checks if `"Killed Qty"` already takes off TC'd pigs.
 _Avoid_: Pigs delivered, pigs over scale, pay weight
 
-Mtech and Anaplan may show different kill for the same site and week. This is expected, not an error.
+**Dungannon rule**:
+The poultry kill rule that Dungannon uses. Dungannon is the poultry master process. All sites use this rule.
+
+**TC'd**:
+Total Condemned. A TC'd pig is a whole pig that is condemned. A TC'd pig is not in kill.
+
+**Hellenic**:
+The pig processing system.
 
 **Mtech**:
-The system that holds production transactions.
+The system that holds production transactions. Mtech and Anaplan can show different kill for the same site and week. This is expected. It is not an error.
 
 **Anaplan**:
 The system that holds planned transactions.
