@@ -1,0 +1,206 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+/* dark: utilities follow the .dark class set by components/theme-provider.tsx */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/*
+ * THEMING
+ * -------
+ * Brand colors are defined as CSS variables below.
+ * To change the color scheme, edit the values in :root.
+ * Light/dark mode is handled automatically via the variable overrides below.
+ */
+
+@layer base {
+  :root {
+    /* Brand tokens: pilgrimseurope.com (see .cortex/skills/pilgrims-reporting/SKILL.md) */
+    --brand-primary: #00406e;
+    --brand-primary-foreground: #ffffff;
+    --brand-nav-bg: #1b2d4a;
+    --brand-nav-fg: #ffffff;
+    --pe-brand: #00406e;
+    --pe-brand-light: #025895;
+    --pe-navy: #1a2b37;
+    --pe-red: #e11f20;
+    --pe-red-dark: #cb1011;
+    --pe-yellow: #ff9d00;
+    --pe-green: #5b6c43;
+    --pe-tint-brand: #eef4fa;
+    --pe-tint-green: #eff3ea;
+    --pe-tint-yellow: #fff7e6;
+    --pe-tint-red: #fdecec;
+
+    /* shadcn/ui semantic tokens */
+    --background: #f7f9fb;        /* page grey, as in the Travel Expense Dashboard */
+    --foreground: #1f2937;
+    --card: #ffffff;
+    --card-foreground: #1f2937;
+    --popover: #ffffff;
+    --popover-foreground: #0f172a;
+
+    /* Primary wired to brand color */
+    --primary: var(--brand-primary);
+    --primary-foreground: var(--brand-primary-foreground);
+
+    --secondary: #f1f5f9;         /* slate-100 */
+    --secondary-foreground: #0f172a;
+    --muted: #f1f5f9;             /* slate-100 */
+    --muted-foreground: #64748b;  /* slate-500 */
+    --accent: #f1f5f9;            /* slate-100 */
+    --accent-foreground: #0f172a;
+    --destructive: oklch(0.577 0.245 27.325);
+    --destructive-foreground: #ffffff;
+    --border: #e2e8f0;            /* slate-200 */
+    --input: #e2e8f0;             /* slate-200 */
+    --ring: var(--brand-primary);
+    --radius: 0.625rem;
+
+    /* Status colors (brand green and yellow) */
+    --success: #5b6c43;
+    --warning: #b06d00;
+
+    /* Chart palette, in the house order */
+    --chart-1: #00406e;
+    --chart-2: #e11f20;
+    --chart-3: #ff9d00;
+    --chart-4: #5b6c43;
+    --chart-5: #025895;
+    --chart-grid: #e2e8f0;        /* slate-200 */
+    --chart-axis: #64748b;        /* slate-500 */
+  }
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-pe-brand: var(--pe-brand);
+  --color-pe-brand-light: var(--pe-brand-light);
+  --color-pe-navy: var(--pe-navy);
+  --color-pe-red: var(--pe-red);
+  --color-pe-yellow: var(--pe-yellow);
+  --color-pe-green: var(--pe-green);
+  --color-pe-tint-brand: var(--pe-tint-brand);
+  --color-pe-tint-green: var(--pe-tint-green);
+  --color-pe-tint-yellow: var(--pe-tint-yellow);
+  --color-pe-tint-red: var(--pe-tint-red);
+  --font-sans: "Segoe UI", Montserrat, Inter, ui-sans-serif, system-ui, -apple-system, Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-head: "Fjalla One", "Arial Narrow", "Segoe UI", sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+
+@layer base {
+  .dark {
+    --background: #0b1220;       /* darker than cards so they lift off the page */
+    --foreground: #f8fafc;       /* slate-50 */
+    --card: #111a2e;
+    --card-foreground: #f8fafc;
+    --popover: #1e293b;
+    --popover-foreground: #f8fafc;
+    --secondary: #1e293b;        /* slate-800 */
+    --secondary-foreground: #f8fafc;
+    --muted: #1e293b;            /* slate-800 */
+    --muted-foreground: #94a3b8; /* slate-400 */
+    --accent: #1e293b;
+    --accent-foreground: #f8fafc;
+    --border: #334155;           /* slate-700 */
+    --input: #334155;
+    --success: #34d399;          /* emerald-400 */
+    --warning: #ffc966;
+    --pe-brand: #7fb3e0;
+    --pe-brand-light: #9cc5ea;
+    --pe-green: #a3b88a;
+    --pe-tint-brand: #16324a;
+    --pe-tint-green: #1f2a16;
+    --pe-tint-yellow: #3a2a0a;
+    --pe-tint-red: #3a1a1a;
+    --primary: #7fb3e0;
+    --primary-foreground: #0b1220;
+    --chart-1: #7fb3e0;
+    --chart-2: #f87171;
+    --chart-3: #ffc966;
+    --chart-4: #a3b88a;
+    --chart-5: #9cc5ea;
+    --chart-grid: #1e293b;       /* slate-800 */
+    --chart-axis: #94a3b8;       /* slate-400 */
+  }
+}
+
+@layer base {
+  /* Native controls (the filter <select> lists) follow the theme, so dark mode does not draw light text on white. */
+  :root {
+    color-scheme: light;
+  }
+  .dark {
+    color-scheme: dark;
+  }
+  select option {
+    background-color: var(--popover);
+    color: var(--popover-foreground);
+  }
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground font-sans;
+    -webkit-font-smoothing: antialiased;
+  }
+  button:not(:disabled), [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+}
+
+/* Header band, as in the Travel Expense Dashboard: navy gradient with diagonal stripes and a red rule. */
+.pe-hero {
+  background:
+    repeating-linear-gradient(115deg, rgba(255, 255, 255, 0.035) 0 60px, rgba(0, 0, 0, 0.06) 60px 130px),
+    linear-gradient(110deg, #1b2d4a 0%, #21395b 35%, #234a7f 55%, #1e3350 100%);
+  border-bottom: 3px solid var(--pe-red);
+  color: #fff;
+}
+.pe-tabs {
+  background: #1b2d4a;
+}
+.pe-head {
+  font-family: var(--font-head);
+  font-weight: 400;
+  letter-spacing: 0.02em;
+}
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  .pe-hero, .pe-tabs {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}

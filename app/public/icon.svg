@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Weekly P&amp;L">
+  <rect x="2" y="2" width="60" height="60" rx="14" fill="#1A2B37"/>
+  <rect x="2" y="52" width="60" height="4" fill="#E11F20"/>
+  <rect x="13" y="14" width="38" height="5" rx="2.5" fill="#FFFFFF" opacity="0.9"/>
+  <rect x="13" y="25" width="26" height="4" rx="2" fill="#9CC5EA"/>
+  <rect x="13" y="33" width="22" height="4" rx="2" fill="#9CC5EA"/>
+  <rect x="13" y="41" width="28" height="4" rx="2" fill="#9CC5EA"/>
+  <circle cx="48" cy="27" r="3.5" fill="#7FA35B"/>
+  <circle cx="48" cy="35" r="3.5" fill="#FF9D00"/>
+  <circle cx="48" cy="43" r="3.5" fill="#E11F20"/>
+</svg>
