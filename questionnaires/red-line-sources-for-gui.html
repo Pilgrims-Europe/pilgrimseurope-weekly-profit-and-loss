@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="snowflake-source" content="cortex-agent-authored" />
+<title>Sources for the Red weekly P&amp;L lines &ndash; questionnaire</title>
+<!--
+  Pilgrim's Europe questionnaire. Built from questionnaires/line-sources-for-gui.html (static template).
+  The page is static HTML. Do not edit the first script at the end. It reads the page for autosave and the .md export.
+  The second script is the OPTIONAL forwarding helper ("Send questions to a colleague"), from the template.
+-->
+<script type="application/json" id="snowflake-report-metadata">
+{
+  "generated": "2026-11-17",
+  "intent": "Short questionnaire to Gui for tickets #31, #34 and #37. Answers decide where 9 Red lines in the Weekly P&L app get their value in v1, and who owns each source.",
+  "dataSources": [
+    { "type": "file", "path": "research/headcount-labour.md" },
+    { "type": "file", "path": "sql/02_wpl_line.sql (line sources and reasons)" },
+    { "type": "query", "sql": "SELECT * FROM DEV_ANALYTICS.FINANCE_PL_WEEKLY.WPL_LINE WHERE RAG IN ('Amber','Red') ORDER BY RAG, 1" }
+  ],
+  "sections": [
+    { "id": "sales-adjustments", "title": "Sales adjustments", "dataSources": [], "producerNotes": "Ticket #31. Sources from WPL_LINE." },
+    { "id": "stock-price", "title": "Stock and price", "dataSources": [], "producerNotes": "Ticket #34. Sources from WPL_LINE." },
+    { "id": "headcount", "title": "Headcount", "dataSources": [], "producerNotes": "Ticket #37. Facts from research/headcount-labour.md." },
+    { "id": "forward", "title": "Send questions to a colleague", "dataSources": [], "producerNotes": "Helper. Not part of the answers export." }
+  ]
+}
+</script>
+<style>
+  :root {
+    color-scheme: light dark;
+    --brand: light-dark(#00406E, #7FB3E0);
+    --brand-navy: #1A2B37;
+    --red: #E11F20;
+    --red-dark: #CB1011;
+    --yellow: #FF9D00;
+    --text: light-dark(#374151, #E5E7EB);
+    --muted: light-dark(#6B7280, #9CA3AF);
+    --line: light-dark(#E5E7EB, #374151);
+    --page: light-dark(#F9FAFB, #111827);
+    --card: light-dark(#FFFFFF, #1F2937);
+    --field: light-dark(#FFFFFF, #111827);
+    --tint-brand: light-dark(#EEF4FA, #16324A);
+    --tint-yellow: light-dark(#FFF7E6, #3A2A0A);
+    --tint-red: light-dark(#FDECEC, #3A1A1A);
+    --head: 'Fjalla One', 'Arial Narrow', 'Segoe UI', sans-serif;
+    --body: Montserrat, 'Segoe UI', -apple-system, system-ui, sans-serif;
+    --serif: moret, Georgia, 'Times New Roman', serif;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--page); color: var(--text); font-family: var(--body); font-size: 15px; line-height: 1.6; }
+  .hero { background: var(--brand-navy); color: #fff; border-bottom: 6px solid var(--red); }
+  .wrap { max-width: 880px; width: 100%; margin: 0 auto; padding: clamp(16px, 4vw, 32px); }
+  .eyebrow { font-family: var(--head); letter-spacing: .08em; text-transform: uppercase; color: var(--yellow); font-size: 14px; margin: 0 0 6px; }
+  h1 { font-family: var(--serif); font-weight: 400; font-size: clamp(28px, 5vw, 42px); line-height: 1.15; margin: 0 0 14px; }
+  .meta { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px 24px; margin: 0; font-size: 14px; }
+  .meta dt { font-family: var(--head); text-transform: uppercase; letter-spacing: .06em; color: #9CC5EA; font-size: 12px; }
+  .meta dd { margin: 0; }
+  h2 { font-family: var(--head); font-weight: 400; color: var(--brand); font-size: 26px; line-height: 1.2; margin: 40px 0 12px; }
+  h3 { font-family: var(--head); font-weight: 400; color: var(--brand); font-size: 20px; line-height: 1.3; margin: 0 0 8px; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 1.25rem; padding: clamp(16px, 3vw, 24px); margin: 0 0 18px; }
+  .card > :last-child { margin-bottom: 0; }
+  .q { border-left: 6px solid var(--brand); }
+  .qnum { display: inline-block; min-width: 30px; height: 30px; line-height: 30px; text-align: center; border-radius: 9999px; background: var(--red); color: #fff; font-family: var(--head); margin-right: 8px; }
+  .tkt { font-family: var(--head); letter-spacing: .05em; text-transform: uppercase; font-size: 12px; color: var(--muted); margin: 0 0 4px; }
+  .why { font-style: italic; color: var(--muted); margin: 6px 0 12px; }
+  .opts { display: grid; gap: 8px; margin: 12px 0; }
+  .opts label { display: flex; gap: 10px; align-items: flex-start; padding: 10px 14px; border: 1px solid var(--line); border-radius: .5rem; cursor: pointer; background: var(--field); }
+  .opts label:has(input:checked) { border-color: var(--brand); box-shadow: 0 0 0 1px var(--brand); }
+  .opts input { margin-top: 5px; accent-color: var(--brand); }
+  .fld { display: block; margin: 12px 0 0; }
+  .fld span { display: block; font-weight: 700; font-size: 13px; color: var(--muted); margin-bottom: 4px; }
+  textarea, input[type=text] { width: 100%; font: inherit; color: var(--text); background: var(--field); border: 1px solid light-dark(#D1D5DB, #4B5563); border-radius: .5rem; padding: 10px 12px; }
+  textarea { min-height: 80px; resize: vertical; }
+  textarea:focus, input[type=text]:focus { outline: 2px solid var(--brand); outline-offset: 1px; }
+  .table-wrap { overflow-x: auto; margin: 12px 0; border: 1px solid var(--line); border-radius: .5rem; }
+  table { border-collapse: collapse; width: 100%; font-size: 13px; }
+  th, td { padding: 7px 10px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
+  th { background: var(--brand); color: #fff; font-family: var(--head); font-weight: 400; letter-spacing: .03em; white-space: nowrap; }
+  td.n, th.n { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  tr:has(input:checked) td { background: var(--tint-brand); }
+  td input { accent-color: var(--brand); width: 18px; height: 18px; }
+  .callout { border-radius: .5rem; padding: 10px 14px; margin: 10px 0; border-left: 4px solid var(--brand); background: var(--tint-brand); }
+  .callout.warn { border-color: var(--yellow); background: var(--tint-yellow); }
+  ol.steps { margin: 6px 0 0; padding-left: 20px; }
+  #fwd-block { display: none; }
+  .js #fwd-block { display: block; }
+  .fwd-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 14px; }
+  .bar { position: sticky; bottom: 0; background: var(--card); border-top: 4px solid var(--red); box-shadow: 0 -4px 16px rgba(0,0,0,.08); }
+  .bar-in { max-width: 880px; margin: 0 auto; padding: 12px clamp(16px, 4vw, 32px); display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+  .btn { font-family: var(--head); letter-spacing: .05em; text-transform: uppercase; font-size: 14px; border: 2px solid var(--red); background: var(--red); color: #fff; border-radius: 9999px; padding: 9px 20px; cursor: pointer; text-decoration: none; display: inline-block; }
+  .btn:hover { background: var(--red-dark); border-color: var(--red-dark); }
+  .btn.alt { background: transparent; color: var(--brand); border-color: var(--brand); }
+  .btn.alt:hover { background: var(--brand); color: #fff; }
+  .btn:focus-visible { outline: 3px solid var(--yellow); outline-offset: 2px; }
+  .status { font-size: 13px; color: var(--muted); flex: 1 1 200px; }
+  @media print { .bar, #fwd-block { display: none; } }
+  .js .noscript-warn { display: none; }
+</style>
+<script>document.documentElement.className += ' js';</script>
+</head>
+<body data-slug="red-line-sources-for-gui" data-from="Chris McCann">
+
+<header class="hero">
+  <div class="wrap">
+    <p class="eyebrow">Weekly P&amp;L &middot; Discovery questionnaire</p>
+    <h1>Sources for the Red weekly P&amp;L lines</h1>
+    <dl class="meta">
+      <div><dt>From</dt><dd>Chris McCann</dd></div>
+      <div><dt>To</dt><dd data-to="">Guilherme De Marchi (Gui)</dd></div>
+      <div><dt>Deadline</dt><dd>As soon as possible</dd></div>
+    </dl>
+  </div>
+</header>
+
+<main class="wrap" id="main">
+  <div class="card" id="intro">
+    <p class="purpose"><strong>Purpose:</strong> The Weekly P&amp;L app shows 13 Red lines for Redruth and Bromborough. Red means the data is not in Snowflake. Your answers decide where 9 of these lines get their value in v1.</p>
+    <p><strong>How your answers will be used:</strong> Chris adds each answer to its ticket. The answers also decide which lines go on the site entry screen. This is a short form. More short forms will follow.</p>
+  </div>
+
+  <h2 id="context">Context</h2>
+  <div class="card">
+    <p>Each line in this form has no source in Snowflake today. For each line, you choose one of 3 ways:</p>
+    <ul>
+      <li><strong>Load into Snowflake:</strong> the team loads the file or system each week. The value is automatic.</li>
+      <li><strong>Site entry screen:</strong> site finance types the value each week in a Snowflake screen.</li>
+      <li><strong>Not in v1:</strong> the line stays empty in v1.</li>
+    </ul>
+    <p>For each line, please also tell us who owns the file or system today. The team then asks that person for the data.</p>
+  </div>
+
+  <h2 id="how-to-answer">How to answer</h2>
+  <div class="card">
+    <ol class="steps">
+      <li>Type your name below.</li>
+      <li>Answer each question. &quot;Don't know&quot; is a useful answer.</li>
+      <li class="fwd-step">To send a question to a colleague, use &quot;Send questions to a colleague&quot; at the end of the form.</li>
+      <li>Click Download answers (.md) and send the file to Chris McCann by email or Teams. Or click Copy answers and paste them into a message.</li>
+    </ol>
+    <p>Time: about 10 minutes. Partial answers are useful.</p>
+    <div class="callout warn noscript-warn">Open this file in Edge or Chrome to save and send your answers. If you see it in Teams, Outlook or SharePoint, download it first.</div>
+    <label class="fld"><span>Your name</span><input type="text" id="who" data-save="who" autocomplete="name" /></label>
+  </div>
+
+  <h2 class="theme" id="sales-adjustments">Sales adjustments</h2>
+
+  <section class="card q" data-q="1" data-title="Where does Credit Note Adj get its value?" data-type="choice">
+    <p class="tkt">Ticket #31</p>
+    <h3><span class="qnum">1</span>Where does Credit Note Adj get its value?</h3>
+    <p>Today central finance sends an Excel file by email.</p>
+    <div class="opts" role="radiogroup" aria-label="Question 1">
+      <label><input type="radio" name="q1" value="Load into Snowflake" /> Load into Snowflake</label>
+      <label><input type="radio" name="q1" value="Site entry screen" /> Site entry screen</label>
+      <label><input type="radio" name="q1" value="Not in v1" /> Not in v1</label>
+      <label><input type="radio" name="q1" value="Don't know" /> Don't know</label>
+    </div>
+    <label class="fld"><span>Who owns the file today?</span><input type="text" data-field="Who owns the file today" /></label>
+    <label class="fld"><span>Comments</span><textarea data-field="Comments"></textarea></label>
+  </section>
+
+  <section class="card q" data-q="2" data-title="Where does Price Corrections get its value?" data-type="choice">
+    <p class="tkt">Ticket #31</p>
+    <h3><span class="qnum">2</span>Where does Price Corrections get its value?</h3>
+    <p>Today an Excel file comes by email. The sender is Unknown.</p>
+    <div class="opts" role="radiogroup" aria-label="Question 2">
+      <label><input type="radio" name="q2" value="Load into Snowflake" /> Load into Snowflake</label>
+      <label><input type="radio" name="q2" value="Site entry screen" /> Site entry screen</label>
+      <label><input type="radio" name="q2" value="Not in v1" /> Not in v1</label>
+      <label><input type="radio" name="q2" value="Don't know" /> Don't know</label>
+    </div>
+    <label class="fld"><span>Who owns the file today?</span><input type="text" data-field="Who owns the file today" /></label>
+    <label class="fld"><span>Comments</span><textarea data-field="Comments"></textarea></label>
+  </section>
+
+  <section class="card q" data-q="3" data-title="Where does Overrider Adj get its value?" data-type="choice">
+    <p class="tkt">Ticket #31</p>
+    <h3><span class="qnum">3</span>Where does Overrider Adj get its value?</h3>
+    <p>Sites make manual overrider adjustments to net revenue. The source is Unknown.</p>
+    <div class="opts" role="radiogroup" aria-label="Question 3">
+      <label><input type="radio" name="q3" value="Load into Snowflake" /> Load into Snowflake</label>
+      <label><input type="radio" name="q3" value="Site entry screen" /> Site entry screen</label>
+      <label><input type="radio" name="q3" value="Not in v1" /> Not in v1</label>
+      <label><input type="radio" name="q3" value="Don't know" /> Don't know</label>
+    </div>
+    <label class="fld"><span>Where does the value come from today, and who owns it?</span><input type="text" data-field="Source and owner today" /></label>
+    <label class="fld"><span>Comments</span><textarea data-field="Comments"></textarea></label>
+  </section>
+
+  <section class="card q" data-q="4" data-title="Where does Promotional Adj get its value?" data-type="choice">
+    <p class="tkt">Ticket #31</p>
+    <h3><span class="qnum">4</span>Where does Promotional Adj get its value?</h3>
+    <p>Today the value comes from Excel promotion workbooks.</p>
+    <div class="opts" role="radiogroup" aria-label="Question 4">
+      <label><input type="radio" name="q4" value="Load into Snowflake" /> Load into Snowflake</label>
+      <label><input type="radio" name="q4" value="Site entry screen" /> Site entry screen</label>
+      <label><input type="radio" name="q4" value="Not in v1" /> Not in v1</label>
+      <label><input type="radio" name="q4" value="Don't know" /> Don't know</label>
+    </div>
+    <label class="fld"><span>Who owns the workbooks today?</span><input type="text" data-field="Who owns the workbooks today" /></label>
+    <label class="fld"><span>Comments</span><textarea data-field="Comments"></textarea></label>
+  </section>
+
+  <h2 class="theme" id="stock-price">Stock and price</h2>
+
+  <section class="card q" data-q="5" data-title="Where does WIP (OCI) get its value?" data-type="choice">
+    <p class="tkt">Ticket #34</p>
+    <h3><span class="qnum">5</span>Where does WIP (OCI) get its value?</h3>
+    <p>Your sheets give no source for this line.</p>
+    <div class="opts" role="radiogroup" aria-label="Question 5">
+      <label><input type="radio" name="q5" value="Load into Snowflake" /> Load into Snowflake</label>
+      <label><input type="radio" name="q5" value="Site entry screen" /> Site entry screen</label>
+      <label><input type="radio" name="q5" value="Not in v1" /> Not in v1</label>
+      <label><input type="radio" name="q5" value="Don't know" /> Don't know</label>
+    </div>
+    <label class="fld"><span>Where does the value come from today, and who owns it?</span><input type="text" data-field="Source and owner today" /></label>
+    <label class="fld"><span>Comments</span><textarea data-field="Comments"></textarea></label>
+  </section>
+
+  <section class="card q" data-q="6" data-title="Where does F.Goods (OCI) get its value?" data-type="choice">
+    <p class="tkt">Ticket #34</p>
+    <h3><span class="qnum">6</span>Where does F.Goods (OCI) get its value?</h3>
+    <p>Today the value comes from an Excel file.</p>
+    <div class="opts" role="radiogroup" aria-label="Question 6">
+      <label><input type="radio" name="q6" value="Load into Snowflake" /> Load into Snowflake</label>
+      <label><input type="radio" name="q6" value="Site entry screen" /> Site entry screen</label>
+      <label><input type="radio" name="q6" value="Not in v1" /> Not in v1</label>
+      <label><input type="radio" name="q6" value="Don't know" /> Don't know</label>
+    </div>
+    <label class="fld"><span>Who owns the file today?</span><input type="text" data-field="Who owns the file today" /></label>
+    <label class="fld"><span>Comments</span><textarea data-field="Comments"></textarea></label>
+  </section>
+
+  <section class="card q" data-q="7" data-title="Is Agriculture Standard Cost Variance (PPV) in v1?" data-type="choice">
+    <p class="tkt">Ticket #34</p>
+    <h3><span class="qnum">7</span>Is Agriculture Standard Cost Variance (PPV) in v1?</h3>
+    <p>Today the value comes from Airsoft and the plan Excel. Redruth and Bromborough do not use this line.</p>
+    <div class="opts" role="radiogroup" aria-label="Question 7">
+      <label><input type="radio" name="q7" value="Load into Snowflake" /> Load into Snowflake</label>
+      <label><input type="radio" name="q7" value="Site entry screen" /> Site entry screen</label>
+      <label><input type="radio" name="q7" value="Not in v1" /> Not in v1</label>
+      <label><input type="radio" name="q7" value="Don't know" /> Don't know</label>
+    </div>
+    <label class="fld"><span>Who owns Airsoft and the plan Excel today?</span><input type="text" data-field="Who owns Airsoft and the plan Excel today" /></label>
+    <label class="fld"><span>Comments</span><textarea data-field="Comments"></textarea></label>
+  </section>
+
+  <h2 class="theme" id="headcount">Headcount</h2>
+
+  <section class="card q" data-q="8" data-title="Where does weekly employed FTE come from?" data-type="choice">
+    <p class="tkt">Ticket #37</p>
+    <h3><span class="qnum">8</span>Where does weekly employed FTE come from?</h3>
+    <p>Snowflake has employed FTE once for each fiscal period, from Vanessa's headcount workbook. It has no weekly FTE. Kronos data is not ready for the pilot sites.</p>
+    <p class="why">Why this matters: This sets Direct Employed FTE and Indirect Employed FTE.</p>
+    <div class="opts" role="radiogroup" aria-label="Question 8">
+      <label><input type="radio" name="q8" value="Spread the period FTE across the weeks of the period" /> Spread the period FTE across the weeks of the period</label>
+      <label><input type="radio" name="q8" value="Site entry screen" /> Site entry screen</label>
+      <label><input type="radio" name="q8" value="Not in v1" /> Not in v1</label>
+      <label><input type="radio" name="q8" value="Don't know" /> Don't know</label>
+    </div>
+    <label class="fld"><span>How does site finance get weekly employed FTE today?</span><textarea data-field="How site finance gets weekly employed FTE today"></textarea></label>
+    <label class="fld"><span>Comments</span><textarea data-field="Comments"></textarea></label>
+  </section>
+
+  <section class="card q" data-q="9" data-title="Where does weekly agency FTE come from?" data-type="choice">
+    <p class="tkt">Ticket #37</p>
+    <h3><span class="qnum">9</span>Where does weekly agency FTE come from?</h3>
+    <p>Gustavo sends a weekly agency sheet. Snowflake has one agency file, &quot;PUK Agency wk35 Aug2026.xlsx&quot;, loaded once. It is Unknown if this is Gustavo's sheet.</p>
+    <p class="why">Why this matters: This sets Direct Agency FTE, Indirect Agency FTE and Labour Efficiency.</p>
+    <div class="opts" role="radiogroup" aria-label="Question 9">
+      <label><input type="radio" name="q9" value="Load Gustavo's weekly agency sheet into Snowflake" /> Load Gustavo's weekly agency sheet into Snowflake</label>
+      <label><input type="radio" name="q9" value="Site entry screen" /> Site entry screen</label>
+      <label><input type="radio" name="q9" value="Not in v1" /> Not in v1</label>
+      <label><input type="radio" name="q9" value="Don't know" /> Don't know</label>
+    </div>
+    <label class="fld"><span>Where is the agency sheet saved, and who sends it?</span><input type="text" data-field="Where the agency sheet is saved, and who sends it" /></label>
+    <label class="fld"><span>Comments</span><textarea data-field="Comments"></textarea></label>
+  </section>
+
+  <h2 class="theme" id="anything-else">Anything else?</h2>
+
+  <section class="card q" data-q="10" data-title="Anything else?" data-type="text" data-plain="true">
+    <p>Is there something that we did not ask, but should know?</p>
+    <label class="fld"><span>Your answer</span><textarea data-field="Answer"></textarea></label>
+  </section>
+
+  <!-- OPTIONAL: forwarding. Ask the user if they want it. If not, delete from here to END OPTIONAL,
+       the li.fwd-step line in "How to answer", and the second script at the end of the file. -->
+  <div id="fwd-block">
+    <h2 id="forward">Send questions to a colleague</h2>
+    <div class="card" id="fwd">
+      <p>Is someone else better able to answer a question? Tick the questions and type their name. Then download a short form for them. Their answers go to Chris McCann.</p>
+      <div class="opts" id="fwd-list"></div>
+      <label class="fld"><span>Colleague's name</span><input type="text" id="fwd-name" /></label>
+      <div class="fwd-actions">
+        <button type="button" class="btn" id="fwd-dl">Download form for colleague</button>
+        <button type="button" class="btn alt" id="fwd-cp">Copy questions as text</button>
+      </div>
+      <p class="status" id="fwd-status" role="status" aria-live="polite"></p>
+    </div>
+  </div>
+  <!-- END OPTIONAL -->
+</main>
+
+<div class="bar">
+  <div class="bar-in">
+    <button type="button" class="btn" id="dl">Download answers (.md)</button>
+    <button type="button" class="btn alt" id="cp">Copy answers</button>
+    <button type="button" class="btn alt" id="clr">Clear</button>
+    <span class="status" id="status" role="status" aria-live="polite"></span>
+  </div>
+</div>
+<script>
+/* Questionnaire script. Do not edit it for a new questionnaire.
+   It reads the static page: body data-slug and data-from, the .purpose paragraph,
+   h2.theme headings, and section.q blocks (data-q, data-title, data-type, data-tick-label).
+   Tick boxes carry data-label and data-group. Answer fields carry data-field (the export label). */
+(function () {
+  var body = document.body;
+  var SLUG = body.dataset.slug || 'questionnaire';
+  var FROM = body.dataset.from || 'Unknown';
+  var main = document.getElementById('main');
+  var whoIn = document.getElementById('who');
+  var questions = main.querySelectorAll('section.q');
+
+  // Give every answer field a stable key, for autosave.
+  questions.forEach(function (s) {
+    s.querySelectorAll('[data-field]').forEach(function (e) { e.dataset.save = 'q' + s.dataset.q + ':' + e.dataset.field; });
+  });
+
+  // Autosave: works in a normal browser; skipped where storage is blocked (Snowflake sandbox).
+  var KEY = 'pe-questionnaire-' + SLUG;
+  var store = null;
+  try { store = window.localStorage; store.setItem(KEY + ':t', '1'); store.removeItem(KEY + ':t'); } catch (e) { store = null; }
+  function save() {
+    if (!store) return;
+    var d = {};
+    document.querySelectorAll('[data-save]').forEach(function (e) { d[e.dataset.save] = e.value; });
+    document.querySelectorAll('input[type=radio]:checked').forEach(function (e) { d['r:' + e.name] = e.value; });
+    d.ticks = Array.prototype.map.call(document.querySelectorAll('input[data-label]:checked'), function (e) { return e.id; });
+    try { store.setItem(KEY, JSON.stringify(d)); } catch (e) {}
+  }
+  (function load() {
+    if (!store) return;
+    var d; try { d = JSON.parse(store.getItem(KEY) || 'null'); } catch (e) { d = null; }
+    if (!d) return;
+    document.querySelectorAll('[data-save]').forEach(function (e) { if (d[e.dataset.save] != null) e.value = d[e.dataset.save]; });
+    document.querySelectorAll('input[type=radio]').forEach(function (e) { if (d['r:' + e.name] === e.value) e.checked = true; });
+    (d.ticks || []).forEach(function (id) { var e = document.getElementById(id); if (e) e.checked = true; });
+  })();
+  document.addEventListener('input', save);
+  document.addEventListener('change', save);
+
+  // Markdown export, in the to-questionnaire template shape.
+  var quote = function (t) { t = (t || '').trim(); return t ? t.split(/\r?\n/).map(function (l) { return '> ' + l; }).join('\n') : '> (no answer)'; };
+  var cell = function (t) { return String(t || '').replace(/\|/g, '\\|'); };
+  function buildMarkdown() {
+    var name = whoIn.value.trim() || 'Unknown';
+    var title = document.querySelector('h1').textContent.trim();
+    var purpose = (document.querySelector('.purpose') || { textContent: '' }).textContent.trim().replace(/\s+/g, ' ');
+    var out = ['# ' + title + ': answers', '', '**From:** ' + name + ', **To:** ' + FROM + ', **Date:** ' + new Date().toISOString().slice(0, 10), '', purpose];
+    Array.prototype.forEach.call(main.children, function (el) {
+      if (el.tagName === 'H2' && el.classList.contains('theme')) out.push('', '## ' + el.textContent.trim());
+      if (!el.matches('section.q')) return;
+      if (el.dataset.plain !== 'true') out.push('', '### ' + el.dataset.q + '. ' + el.dataset.title);
+      if (el.dataset.type === 'choice') {
+        var r = el.querySelector('input[type=radio]:checked');
+        out.push('', '**Answer:**', quote(r ? r.value : ''));
+      }
+      if (el.dataset.type === 'ticks') {
+        var boxes = Array.prototype.slice.call(el.querySelectorAll('input[data-label]'));
+        var ticked = boxes.filter(function (e) { return e.checked; });
+        out.push('', '**' + (el.dataset.tickLabel || 'Ticked') + ' (' + ticked.length + ' of ' + boxes.length + '):**', '');
+        if (ticked.length) {
+          var gcol = boxes.some(function (e) { return e.dataset.group; });
+          var head = el.querySelector('thead th:nth-child(2)');
+          out.push('| ' + (head ? head.textContent.trim() : 'Item') + (gcol ? ' | Group' : '') + ' |', '| --- |' + (gcol ? ' --- |' : ''));
+          ticked.forEach(function (e) { out.push('| ' + cell(e.dataset.label) + (gcol ? ' | ' + cell(e.dataset.group) : '') + ' |'); });
+        } else out.push('> (none ticked)');
+      }
+      el.querySelectorAll('[data-field]').forEach(function (f) { out.push('', '**' + f.dataset.field + ':**', quote(f.value)); });
+    });
+    out.push('');
+    return out.join('\n');
+  }
+
+  var status = document.getElementById('status');
+  document.getElementById('dl').addEventListener('click', function () {
+    var nm = (whoIn.value.trim() || 'unknown').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+    var blob = new Blob([buildMarkdown()], { type: 'text/markdown;charset=utf-8' });
+    var a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = SLUG + '-answers-' + (nm || 'unknown') + '.md';
+    document.body.appendChild(a); a.click(); a.remove(); setTimeout(function () { URL.revokeObjectURL(a.href); }, 1000);
+    status.textContent = 'File downloaded. Attach it to an email or a Teams message to ' + FROM + '.';
+  });
+  document.getElementById('cp').addEventListener('click', function () {
+    var declined = function () { status.textContent = 'Answers were not copied. Use Download answers (.md) instead.'; };
+    status.textContent = 'Copying\u2026';
+    try { navigator.clipboard.writeText(buildMarkdown()).then(function () { status.textContent = 'Answers copied. Paste them into an email or a Teams message.'; }, declined); }
+    catch (e) { declined(); }
+  });
+  document.getElementById('clr').addEventListener('click', function () {
+    if (!window.confirm('Clear all answers? You cannot undo this.')) return;
+    document.querySelectorAll('textarea, input[type=text]').forEach(function (e) { e.value = ''; });
+    document.querySelectorAll('input[type=radio], input[type=checkbox]').forEach(function (e) { e.checked = false; });
+    save(); status.textContent = 'All answers cleared.';
+  });
+})();
+</script>
+<script>
+/* OPTIONAL forwarding script. Do not edit it. Delete it with the #fwd-block section if forwarding is not wanted.
+   It lists every question, then builds a copy of this form with only the ticked questions, or a plain-text message.
+   The copy keeps the answers script, so the colleague can download and send their answers to the From person. */
+(function () {
+  var block = document.getElementById('fwd-block');
+  if (!block) return;
+  var list = document.getElementById('fwd-list');
+  var nameIn = document.getElementById('fwd-name');
+  var st = document.getElementById('fwd-status');
+  var FROM = document.body.dataset.from || 'Unknown';
+  var toEl = document.querySelector('[data-to]');
+  var TO = toEl ? toEl.textContent.trim() : '';
+  var sender = function () { var w = document.getElementById('who'); return (w && w.value.trim()) || TO || 'A colleague'; };
+  var slugify = function (t) { return t.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'colleague'; };
+
+  // One tick box for each question (not "Anything else?").
+  document.querySelectorAll('#main section.q').forEach(function (s) {
+    if (s.dataset.plain === 'true') return;
+    var l = document.createElement('label');
+    var cb = document.createElement('input'); cb.type = 'checkbox'; cb.dataset.fwd = s.dataset.q;
+    l.appendChild(cb); l.appendChild(document.createTextNode(' ' + s.dataset.q + '. ' + s.dataset.title));
+    list.appendChild(l);
+  });
+
+  var check = function () {
+    if (!nameIn.value.trim()) { st.textContent = "Type the colleague's name first."; return null; }
+    var qs = Array.prototype.map.call(list.querySelectorAll('input:checked'), function (e) { return e.dataset.fwd; });
+    if (!qs.length) { st.textContent = 'Tick one or more questions first.'; return null; }
+    return qs;
+  };
+
+  document.getElementById('fwd-dl').addEventListener('click', function () {
+    var qs = check(); if (!qs) return;
+    var name = nameIn.value.trim();
+    var doc = document.documentElement.cloneNode(true);
+    doc.className = doc.className.replace(/\bjs\b/g, '').trim();
+    doc.querySelectorAll('section.q').forEach(function (s) {
+      if (s.dataset.plain !== 'true' && qs.indexOf(s.dataset.q) < 0) s.remove();
+    });
+    doc.querySelectorAll('h2.theme').forEach(function (h) {
+      var n = h.nextElementSibling;
+      if (!n || !n.matches('section.q')) h.remove();
+    });
+    doc.querySelectorAll('#fwd-block, .fwd-step').forEach(function (e) { e.remove(); });
+    var to = doc.querySelector('[data-to]'); if (to) to.textContent = name;
+    var b = doc.querySelector('body'); b.dataset.slug = b.dataset.slug + '-' + slugify(name);
+    var intro = doc.querySelector('#main > .card');
+    if (intro) {
+      var note = document.createElement('div');
+      note.className = 'callout';
+      note.textContent = sender() + ' sent you ' + (qs.length === 1 ? 'this question' : 'these ' + qs.length + ' questions') +
+        ' from a longer form. Please answer them and send your answers to ' + FROM + '.';
+      intro.insertBefore(note, intro.firstChild);
+    }
+    var blob = new Blob(['<!DOCTYPE html>\n' + doc.outerHTML], { type: 'text/html;charset=utf-8' });
+    var a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+    a.download = document.body.dataset.slug + '-for-' + slugify(name) + '.html';
+    document.body.appendChild(a); a.click(); a.remove(); setTimeout(function () { URL.revokeObjectURL(a.href); }, 1000);
+    st.textContent = 'Form downloaded. Attach it to an email or a Teams message to ' + name + '.';
+  });
+
+  document.getElementById('fwd-cp').addEventListener('click', function () {
+    var qs = check(); if (!qs) return;
+    var name = nameIn.value.trim();
+    var out = ['Hi ' + name + ',', '', 'Please can you answer ' + (qs.length === 1 ? 'this question' : 'these questions') +
+      '? Send your answers to ' + FROM + '.'];
+    qs.forEach(function (n) {
+      var s = document.querySelector('#main section.q[data-q="' + n + '"]');
+      if (!s) return;
+      out.push('', n + '. ' + s.dataset.title);
+      s.querySelectorAll('p:not(.tkt):not(.why)').forEach(function (p) { out.push(p.textContent.trim().replace(/\s+/g, ' ')); });
+      var opts = s.querySelectorAll('input[type=radio]');
+      if (opts.length) out.push('Options: ' + Array.prototype.map.call(opts, function (o) { return o.value; }).join(' / '));
+    });
+    out.push('', 'Thanks,', sender());
+    var declined = function () { st.textContent = 'Not copied. Use Download form for colleague instead.'; };
+    st.textContent = 'Copying\u2026';
+    try { navigator.clipboard.writeText(out.join('\n')).then(function () { st.textContent = 'Questions copied. Paste them into an email or a Teams message to ' + name + '.'; }, declined); }
+    catch (e) { declined(); }
+  });
+})();
+</script>
+</body>
+</html>

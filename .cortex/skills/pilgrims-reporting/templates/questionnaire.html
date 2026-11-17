@@ -15,6 +15,8 @@
   - Answer fields need data-field: the label in the export ("Comments", "Who knows", "Answer").
   - Theme headings are <h2 class="theme">. Set data-slug and data-from on <body>.
   Do not edit the script at the end. It reads the page for autosave and the .md export.
+  OPTIONAL forwarding ("Send questions to a colleague"): the #fwd-block section, the li.fwd-step line and the second script.
+  Ask the user if they want it, unless they asked for it. If not, delete all three parts.
 -->
 <script type="application/json" id="snowflake-report-metadata">
 {
@@ -83,6 +85,10 @@
   .callout { border-radius: .5rem; padding: 10px 14px; margin: 10px 0; border-left: 4px solid var(--brand); background: var(--tint-brand); }
   .callout.warn { border-color: var(--yellow); background: var(--tint-yellow); }
   ol.steps { margin: 6px 0 0; padding-left: 20px; }
+  /* OPTIONAL forwarding: shown only when scripts run. */
+  #fwd-block { display: none; }
+  .js #fwd-block { display: block; }
+  .fwd-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 14px; }
   .bar { position: sticky; bottom: 0; background: var(--card); border-top: 4px solid var(--red); box-shadow: 0 -4px 16px rgba(0,0,0,.08); }
   .bar-in { max-width: 880px; margin: 0 auto; padding: 12px clamp(16px, 4vw, 32px); display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
   .btn { font-family: var(--head); letter-spacing: .05em; text-transform: uppercase; font-size: 14px; border: 2px solid var(--red); background: var(--red); color: #fff; border-radius: 9999px; padding: 9px 20px; cursor: pointer; }
@@ -91,7 +97,7 @@
   .btn.alt:hover { background: var(--brand); color: #fff; }
   .btn:focus-visible { outline: 3px solid var(--yellow); outline-offset: 2px; }
   .status { font-size: 13px; color: var(--muted); flex: 1 1 200px; }
-  @media print { .bar { display: none; } }
+  @media print { .bar, #fwd-block { display: none; } }
   .js .noscript-warn { display: none; }
 </style>
 <script>document.documentElement.className += ' js';</script>
@@ -104,7 +110,7 @@
     <h1>{{TITLE}}</h1>
     <dl class="meta">
       <div><dt>From</dt><dd>{{FROM}}</dd></div>
-      <div><dt>To</dt><dd>{{TO}}</dd></div>
+      <div><dt>To</dt><dd data-to="">{{TO}}</dd></div>
       <div><dt>Deadline</dt><dd>Unknown</dd></div>
     </dl>
   </div>
@@ -128,6 +134,7 @@
       <li>Type your name below.</li>
       <li>Answer each question. &quot;Don't know&quot; is a useful answer.</li>
       <li>If you do not know an answer, write the name of a person who knows.</li>
+      <li class="fwd-step">To send a question to a colleague, use &quot;Send questions to a colleague&quot; at the end of the form.</li>
       <li>Click Download answers (.md) and send the file to {{FROM}} by email or Teams. Or click Copy answers and paste them into a message.</li>
     </ol>
     <p>Time: about {{N}} minutes. Partial answers are useful.</p>
@@ -180,6 +187,22 @@
     <p>Is there something that we did not ask, but should know?</p>
     <label class="fld"><span>Your answer</span><textarea data-field="Answer"></textarea></label>
   </section>
+  <!-- OPTIONAL: forwarding. Ask the user if they want it. If not, delete from here to END OPTIONAL,
+       the li.fwd-step line in "How to answer", and the second script at the end of the file. -->
+  <div id="fwd-block">
+    <h2 id="forward">Send questions to a colleague</h2>
+    <div class="card" id="fwd">
+      <p>Is someone else better able to answer a question? Tick the questions and type their name. Then download a short form for them. Their answers go to {{FROM}}.</p>
+      <div class="opts" id="fwd-list"></div>
+      <label class="fld"><span>Colleague's name</span><input type="text" id="fwd-name" /></label>
+      <div class="fwd-actions">
+        <button type="button" class="btn" id="fwd-dl">Download form for colleague</button>
+        <button type="button" class="btn alt" id="fwd-cp">Copy questions as text</button>
+      </div>
+      <p class="status" id="fwd-status" role="status" aria-live="polite"></p>
+    </div>
+  </div>
+  <!-- END OPTIONAL -->
 </main>
 
 <div class="bar">
@@ -283,6 +306,89 @@
     document.querySelectorAll('textarea, input[type=text]').forEach(function (e) { e.value = ''; });
     document.querySelectorAll('input[type=radio], input[type=checkbox]').forEach(function (e) { e.checked = false; });
     save(); status.textContent = 'All answers cleared.';
+  });
+})();
+</script>
+<script>
+/* OPTIONAL forwarding script. Do not edit it. Delete it with the #fwd-block section if forwarding is not wanted.
+   It lists every question, then builds a copy of this form with only the ticked questions, or a plain-text message.
+   The copy keeps the answers script, so the colleague can download and send their answers to the From person. */
+(function () {
+  var block = document.getElementById('fwd-block');
+  if (!block) return;
+  var list = document.getElementById('fwd-list');
+  var nameIn = document.getElementById('fwd-name');
+  var st = document.getElementById('fwd-status');
+  var FROM = document.body.dataset.from || 'Unknown';
+  var toEl = document.querySelector('[data-to]');
+  var TO = toEl ? toEl.textContent.trim() : '';
+  var sender = function () { var w = document.getElementById('who'); return (w && w.value.trim()) || TO || 'A colleague'; };
+  var slugify = function (t) { return t.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'colleague'; };
+
+  // One tick box for each question (not "Anything else?").
+  document.querySelectorAll('#main section.q').forEach(function (s) {
+    if (s.dataset.plain === 'true') return;
+    var l = document.createElement('label');
+    var cb = document.createElement('input'); cb.type = 'checkbox'; cb.dataset.fwd = s.dataset.q;
+    l.appendChild(cb); l.appendChild(document.createTextNode(' ' + s.dataset.q + '. ' + s.dataset.title));
+    list.appendChild(l);
+  });
+
+  var check = function () {
+    if (!nameIn.value.trim()) { st.textContent = "Type the colleague's name first."; return null; }
+    var qs = Array.prototype.map.call(list.querySelectorAll('input:checked'), function (e) { return e.dataset.fwd; });
+    if (!qs.length) { st.textContent = 'Tick one or more questions first.'; return null; }
+    return qs;
+  };
+
+  document.getElementById('fwd-dl').addEventListener('click', function () {
+    var qs = check(); if (!qs) return;
+    var name = nameIn.value.trim();
+    var doc = document.documentElement.cloneNode(true);
+    doc.className = doc.className.replace(/\bjs\b/g, '').trim();
+    doc.querySelectorAll('section.q').forEach(function (s) {
+      if (s.dataset.plain !== 'true' && qs.indexOf(s.dataset.q) < 0) s.remove();
+    });
+    doc.querySelectorAll('h2.theme').forEach(function (h) {
+      var n = h.nextElementSibling;
+      if (!n || !n.matches('section.q')) h.remove();
+    });
+    doc.querySelectorAll('#fwd-block, .fwd-step').forEach(function (e) { e.remove(); });
+    var to = doc.querySelector('[data-to]'); if (to) to.textContent = name;
+    var b = doc.querySelector('body'); b.dataset.slug = b.dataset.slug + '-' + slugify(name);
+    var intro = doc.querySelector('#main > .card');
+    if (intro) {
+      var note = document.createElement('div');
+      note.className = 'callout';
+      note.textContent = sender() + ' sent you ' + (qs.length === 1 ? 'this question' : 'these ' + qs.length + ' questions') +
+        ' from a longer form. Please answer them and send your answers to ' + FROM + '.';
+      intro.insertBefore(note, intro.firstChild);
+    }
+    var blob = new Blob(['<!DOCTYPE html>\n' + doc.outerHTML], { type: 'text/html;charset=utf-8' });
+    var a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+    a.download = document.body.dataset.slug + '-for-' + slugify(name) + '.html';
+    document.body.appendChild(a); a.click(); a.remove(); setTimeout(function () { URL.revokeObjectURL(a.href); }, 1000);
+    st.textContent = 'Form downloaded. Attach it to an email or a Teams message to ' + name + '.';
+  });
+
+  document.getElementById('fwd-cp').addEventListener('click', function () {
+    var qs = check(); if (!qs) return;
+    var name = nameIn.value.trim();
+    var out = ['Hi ' + name + ',', '', 'Please can you answer ' + (qs.length === 1 ? 'this question' : 'these questions') +
+      '? Send your answers to ' + FROM + '.'];
+    qs.forEach(function (n) {
+      var s = document.querySelector('#main section.q[data-q="' + n + '"]');
+      if (!s) return;
+      out.push('', n + '. ' + s.dataset.title);
+      s.querySelectorAll('p:not(.tkt):not(.why)').forEach(function (p) { out.push(p.textContent.trim().replace(/\s+/g, ' ')); });
+      var opts = s.querySelectorAll('input[type=radio]');
+      if (opts.length) out.push('Options: ' + Array.prototype.map.call(opts, function (o) { return o.value; }).join(' / '));
+    });
+    out.push('', 'Thanks,', sender());
+    var declined = function () { st.textContent = 'Not copied. Use Download form for colleague instead.'; };
+    st.textContent = 'Copying\u2026';
+    try { navigator.clipboard.writeText(out.join('\n')).then(function () { st.textContent = 'Questions copied. Paste them into an email or a Teams message to ' + name + '.'; }, declined); }
+    catch (e) { declined(); }
   });
 })();
 </script>
