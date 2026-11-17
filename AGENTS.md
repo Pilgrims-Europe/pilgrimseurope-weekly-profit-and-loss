@@ -19,6 +19,16 @@ All reports use one house style, from pilgrimseurope.com. This includes HTML rep
 
 Apply the `/wait-what` rules above to all report text.
 
+## Data flow diagram
+
+The README diagram shows the flow of data to the Weekly P&L app. Its source is `docs/data-flow/flow.yml`.
+
+- If a change adds, removes or moves a source, a Snowflake object or a consumer of the app, change `flow.yml` in the same pull request.
+- Add one line to the table in `docs/data-flow/CHANGELOG.md`, with status `pending`.
+- Run `python scripts/render_flow.py --check`. Fix all errors. To look at the result, use `--preview`. Do not run the script without a flag: that marks the pending lines as rendered.
+- Do not edit `flow.svg` or `index.html`, and do not commit a render. A GitHub Action renders the diagram once a day and opens a pull request.
+- `flow.yml` shows what is in Snowflake now. Do not add planned objects as `live`.
+
 ## Agent skills
 
 ### Issue tracker

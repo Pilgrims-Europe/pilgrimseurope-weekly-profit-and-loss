@@ -1,0 +1,50 @@
+# Renders the data flow diagram once a day, if docs/data-flow/CHANGELOG.md has pending changes.
+# It opens (or updates) one pull request from the branch data-flow/daily-render. Chris reviews and merges it.
+name: Data flow diagram (daily render)
+
+on:
+  schedule:
+    - cron: "0 6 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: data-flow-render
+  cancel-in-progress: false
+
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - run: pip install pyyaml==6.0.2
+
+      - id: render
+        run: python scripts/render_flow.py --if-pending
+
+      - if: steps.render.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BRANCH: data-flow/daily-render
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git switch -C "$BRANCH"
+          git add docs/data-flow
+          git commit -m "Render the data flow diagram for $(date -u +%F)"
+          git push --force origin "$BRANCH"
+          if [ -z "$(gh pr list --head "$BRANCH" --state open --json number --jq '.[].number')" ]; then
+            gh pr create --head "$BRANCH" --base main \
+              --title "Render the data flow diagram" \
+              --body "This pull request updates the data flow diagram in the README. The daily render found pending lines in \`docs/data-flow/CHANGELOG.md\`.
+
+          Check the new \`docs/data-flow/flow.svg\`, then merge. If the next daily run finds more pending lines before you merge, it updates this pull request."
+          fi

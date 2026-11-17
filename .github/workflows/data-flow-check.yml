@@ -1,0 +1,41 @@
+# Checks pull requests for the data flow diagram.
+# - Fails if docs/data-flow/flow.yml or CHANGELOG.md is not valid.
+# - Warns (does not fail) if SQL or app data access changes but the flow files do not.
+name: Data flow check
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - run: pip install pyyaml==6.0.2
+
+      - name: Check flow.yml and the change log
+        run: python scripts/render_flow.py --check
+
+      - name: Warn if the data flow may have changed
+        env:
+          BASE: ${{ github.event.pull_request.base.sha }}
+        run: |
+          changed=$(git diff --name-only "$BASE"...HEAD)
+          code=$(echo "$changed" | grep -E '^(sql/|app/lib/wpl\.ts$)' || true)
+          flow=$(echo "$changed" | grep -E '^docs/data-flow/(flow\.yml|CHANGELOG\.md)$' || true)
+          if [ -n "$code" ] && [ -z "$flow" ]; then
+            msg="This PR changes SQL or app data access, but not docs/data-flow/flow.yml. If the flow of data to the app changes, update flow.yml and add a pending line to docs/data-flow/CHANGELOG.md."
+            echo "::warning title=Data flow diagram::$msg"
+            { echo "### Data flow diagram"; echo; echo "$msg"; echo; echo "Files:"; echo "$code" | sed 's/^/- /'; } >> "$GITHUB_STEP_SUMMARY"
+          fi
