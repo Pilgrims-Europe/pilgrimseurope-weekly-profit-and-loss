@@ -88,6 +88,7 @@ Use this for every `/to-questionnaire` run.
 - If the answer is a choice from known values, use radio buttons or a tick-box table. Pull the values from Snowflake. Do not ask for free text.
 - The export has the recipient's name, a "Download answers (.md)" button, a "Copy answers" button, and autosave. Autosave uses `localStorage` inside `try/catch`, because the Snowflake sandbox blocks storage.
 - Deadline: write "Unknown" if the user does not give one.
+- Forwarding (optional): the template has a "Send questions to a colleague" section. The recipient ticks questions and types a name. The form then makes a short form with only those questions, or copies them as text. The colleague's answers go to the From person. If the user does not ask for forwarding, ask them if they want it. If they do not want it, delete the 3 parts marked OPTIONAL: the `#fwd-block` section, the `li.fwd-step` line and the second script.
 
 ## Streamlit
 
