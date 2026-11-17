@@ -1,5 +1,7 @@
 # GL line items for the weekly P&L
 
+> **Replaced.** Do not send this questionnaire. Its 3 questions are now in [`questionnaires/line-sources-for-gui.html`](https://github.com/Pilgrims-Europe/pilgrimseurope-weekly-profit-and-loss/blob/main/questionnaires/line-sources-for-gui.html) (questions 3 to 5, 9 and 10). This file is kept as a record of Peter's work on ticket #4.
+
 **Purpose:** Issue #4 checked which GL line item data is in Snowflake, compared with the SAP report FAGLL03H. Three decisions need your answer before we build.
 
 **From:** Peter Nwora, **To:** Gui, **How your answers will be used:** They go into issue #4 and into the spec for the weekly P&L.
