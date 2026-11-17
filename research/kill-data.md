@@ -139,9 +139,9 @@ These decisions give the kill rules for the weekly P&L. Reports must let the rea
 | Pork kill and TC'd pigs | A TC'd pig is not in kill. Kill = pigs over scale − TC'd pigs. | Chris McCann |
 | Pork condemnations | Two types. Show each one. `TC'd Producer Resp` = condemnation, 3rd party. `TC'd Factory Resp` = condemnation, 1st party. The "Pig Purchase Analysis" report has both, in kg and in head. | Chris McCann |
 | Pork measure | Use quantity (head). Do not use weight for now. | Chris McCann |
-| Poultry kill | Delivered − DOA − condemnations (all codes) | Chris McCann |
+| Poultry kill | Delivered − DOA. Changed 2026-11-17: condemnations are not taken off. The rule before was delivered − DOA − condemnations (all codes). | Chris McCann |
 | Birds delivered field | `PLANTHDCOUNT` | Chris McCann |
-| Poultry condemnation detail | Expand to all codes | Chris McCann |
+| Poultry condemnation detail | Show all codes as detail. They do not change kill. | Chris McCann |
 | Void loads | Exclude void loads (`VOIDFLAG`) from all figures | Chris McCann |
 | Poultry source | Mtech only. There is no Innova poultry system. | Chris McCann |
 | Site rules | Gui tells the sites that all sites use the Dungannon rule | Chris McCann |
@@ -185,7 +185,7 @@ Anwick matches exactly when loads are dated by plant weigh-in time, not kill dat
 
 ## Open questions
 
-1. Which Mtech condemnation codes are rejects for the weekly P&L? Answered 2026-11-16: use all codes, and expand to all codes.
+1. Which Mtech condemnation codes are rejects for the weekly P&L? Answered 2026-11-16: use all codes, and expand to all codes. Changed 2026-11-17: no codes are taken off kill. All codes are shown as detail.
 2. For birds delivered, use `FARMHDCOUNT` or `PLANTHDCOUNT`? Answered 2026-11-16: `PLANTHDCOUNT`.
 3. Is there a poultry Innova system that is not in Snowflake? Answered 2026-11-16: no. Mtech only.
 4. What is kill for pork? Answered 2026-11-16 (Gui): `"Killed Qty"` on the booking. A TC'd pig is not in kill: kill = pigs over scale − TC'd pigs. Open: is `"Killed Qty"` the same as pigs over scale, or pigs over scale − TC'd? Check when `"Killed Qty"` is final for 2026-11-13.
