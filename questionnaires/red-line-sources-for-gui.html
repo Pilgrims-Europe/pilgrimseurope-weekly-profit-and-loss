@@ -278,9 +278,25 @@
     <label class="fld"><span>Comments</span><textarea data-field="Comments"></textarea></label>
   </section>
 
+  <h2 class="theme" id="net-revenue">Sales adjustments and SAP net revenue</h2>
+
+  <section class="card q" data-q="10" data-title="Is each sales adjustment already in SAP net revenue?" data-type="ticks" data-tick-label="Already in SAP net revenue?">
+    <p class="tkt">Ticket #31</p>
+    <h3><span class="qnum">10</span>Is each sales adjustment already in SAP net revenue?</h3>
+    <p>The weekly P&amp;L takes net revenue from SAP COPA. COPA already has credit note billing types and a promotional discount column. We do not want to count the same amount twice. Tick each line whose Excel file holds amounts that SAP net revenue already includes. Leave a line unticked if the Excel file holds extra amounts, or if you do not know.</p>
+    <p class="why">Why this matters: If an amount is already in SAP net revenue, loading the Excel file would count it twice.</p>
+    <div class="opts">
+      <label><input type="checkbox" id="q10r0" data-label="Credit Note Adj" data-group="Sales adjustment lines" aria-label="Already in SAP net revenue? Credit Note Adj" /> Credit Note Adj</label>
+      <label><input type="checkbox" id="q10r1" data-label="Price Corrections" data-group="Sales adjustment lines" aria-label="Already in SAP net revenue? Price Corrections" /> Price Corrections</label>
+      <label><input type="checkbox" id="q10r2" data-label="Overrider Adj" data-group="Sales adjustment lines" aria-label="Already in SAP net revenue? Overrider Adj" /> Overrider Adj</label>
+      <label><input type="checkbox" id="q10r3" data-label="Promotional Adj" data-group="Sales adjustment lines" aria-label="Already in SAP net revenue? Promotional Adj" /> Promotional Adj</label>
+    </div>
+    <label class="fld"><span>What does each Excel file hold? If you don't know, who does?</span><textarea data-field="What each file holds, or who knows"></textarea></label>
+  </section>
+
   <h2 class="theme" id="anything-else">Anything else?</h2>
 
-  <section class="card q" data-q="10" data-title="Anything else?" data-type="text" data-plain="true">
+  <section class="card q" data-q="11" data-title="Anything else?" data-type="text" data-plain="true">
     <p>Is there something that we did not ask, but should know?</p>
     <label class="fld"><span>Your answer</span><textarea data-field="Answer"></textarea></label>
   </section>
