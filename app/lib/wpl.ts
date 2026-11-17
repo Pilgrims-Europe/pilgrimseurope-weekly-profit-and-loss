@@ -1,11 +1,15 @@
 /**
  * Server-side data access for the weekly P&L app. Owner's rights: the app reads the WPL_T_* tables
  * in DEV_ANALYTICS.FINANCE_PL_WEEKLY. WPL_REFRESH rebuilds them each day at 11:00 UTC from the WPL_* views.
+ * WPL_SCHEMA (local development only) points the app at a test copy of the schema.
  * Every user-supplied value goes in as a bind parameter. Server code only.
  */
 import { snowflake } from '@/lib/snowflake';
 
-const SCHEMA = 'DEV_ANALYTICS.FINANCE_PL_WEEKLY';
+const SCHEMA =
+  process.env.NODE_ENV === 'development' && /^[A-Z0-9_]+\.[A-Z0-9_]+$/.test(process.env.WPL_SCHEMA ?? '')
+    ? (process.env.WPL_SCHEMA as string)
+    : 'DEV_ANALYTICS.FINANCE_PL_WEEKLY';
 
 type Row = Record<string, string | null>;
 
@@ -123,11 +127,11 @@ export async function getLineDetail(site: string, weekStart: string, lineId: num
       [site, weekStart],
     );
     return {
-      note: 'Dungannon rule: birds delivered less dead on arrival less all Mtech condemnation codes. Void loads are out.',
+      note: 'Dungannon rule: birds delivered less dead on arrival. Condemnations are shown, but are not taken off. Void loads are out.',
       items: [
         head('Birds delivered', k?.D, `PLANTHDCOUNT, ${k?.L ?? 0} loads`),
         head('Less dead on arrival', k?.DOA === null || k?.DOA === undefined ? null : -Number(k.DOA), 'DOA'),
-        head('Less condemnations', k?.C === null || k?.C === undefined ? null : -Number(k.C), 'All codes, including croppings'),
+        head('Condemnations (not taken off)', k?.C, 'All codes, including croppings. Not in kill'),
       ],
     };
   }

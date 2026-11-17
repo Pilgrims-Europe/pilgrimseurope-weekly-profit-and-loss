@@ -13,7 +13,7 @@ The finance team at one site that builds and explains the weekly P&L.
 _Avoid_: Site accountants
 
 **Kill (poultry)**:
-Birds delivered, less dead on arrival, less condemnations, in head. Birds delivered is `PLANTHDCOUNT` in Mtech. Condemnations are all Mtech condemnation codes. Void loads are not included. All sites use the Dungannon rule.
+Birds delivered, less dead on arrival, in head. Birds delivered is `PLANTHDCOUNT` in Mtech. Condemnations are not taken off. Reports show them as detail, by Mtech condemnation code. Void loads are not included. All sites use the Dungannon rule.
 _Avoid_: Birds delivered, live weight, rejects
 
 **Kill (pork)**:

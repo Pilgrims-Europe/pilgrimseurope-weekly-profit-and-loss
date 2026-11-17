@@ -58,8 +58,8 @@ export default async function KillPage({ searchParams }: { searchParams: Promise
         <>
           <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
             <RagBadge rag="Green" />
-            Kill (poultry) = birds delivered (PLANTHDCOUNT) − DOA − all Mtech condemnation codes. Void loads are out. All
-            sites use the Dungannon rule.
+            Kill (poultry) = birds delivered (PLANTHDCOUNT) − DOA. Condemnations are shown, but are not taken off. Void
+            loads are out. All sites use the Dungannon rule.
           </div>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <KpiCard label="Kill (poultry)" value={n(sum(days, 'BIRDS_KILLED'))} note={`${days.length} kill days`} />
@@ -68,7 +68,7 @@ export default async function KillPage({ searchParams }: { searchParams: Promise
             <KpiCard
               label="Condemnations (all codes)"
               value={n(sum(days, 'CONDEMNED'))}
-              note="Includes part rejects such as croppings."
+              note="Not taken off kill. Includes part rejects such as croppings."
               tone="bad"
             />
           </div>
@@ -114,7 +114,7 @@ export default async function KillPage({ searchParams }: { searchParams: Promise
           </Card>
           <Card
             title="Condemnations by code"
-            note="The meaning of CALCULATIONCATEGORY 1 and 2 is Unknown. Some codes are part rejects, not whole birds."
+            note="Condemnations are not taken off kill. The meaning of CALCULATIONCATEGORY 1 and 2 is Unknown. Some codes are part rejects, not whole birds."
           >
             {codes.length === 0 ? (
               <EmptyState title="No condemnations this week" className="m-5" />

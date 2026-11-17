@@ -1,5 +1,6 @@
--- Kill (poultry), decided rule (research/kill-data.md, Decisions 2026-11-16):
--- birds delivered (PLANTHDCOUNT) less DOA less all Mtech condemnation codes. Void loads out. Dungannon rule for all sites.
+-- Kill (poultry), decided rule (research/kill-data.md, Decisions):
+-- birds delivered (PLANTHDCOUNT) less DOA. Void loads out. Dungannon rule for all sites.
+-- Condemnations (all Mtech codes) are shown as detail. They are not taken off kill (changed 2026-11-17).
 -- Delivered and DOA use the same source and filters as MTECH_BIRDKILL (broiler loads, by EVENTDATE).
 
 -- Condemnations by site, kill date and code (detail for the app).
@@ -25,7 +26,7 @@ GROUP BY ALL;
 
 -- Kill by site and kill date.
 CREATE OR REPLACE VIEW DEV_ANALYTICS.FINANCE_PL_WEEKLY.WPL_KILL_POULTRY
-COMMENT = 'Weekly P&L app: Kill (poultry) by kill site and kill date = PLANTHDCOUNT - DOA - all condemnation codes. Broiler loads, void loads out.'
+COMMENT = 'Weekly P&L app: Kill (poultry) by kill site and kill date = PLANTHDCOUNT - DOA. CONDEMNED (all codes) is detail only, not taken off. Broiler loads, void loads out.'
 AS
 WITH delivered AS (
     SELECT
@@ -55,7 +56,7 @@ SELECT
     d.BIRDS_DELIVERED,
     d.DOA,
     COALESCE(c.CONDEMNED, 0)                                AS CONDEMNED,
-    d.BIRDS_DELIVERED - d.DOA - COALESCE(c.CONDEMNED, 0)    AS BIRDS_KILLED
+    d.BIRDS_DELIVERED - d.DOA                               AS BIRDS_KILLED
 FROM delivered d
 JOIN DEV_ANALYTICS.FINANCE_PL_WEEKLY.WPL_WEEK w ON d.KILL_DATE BETWEEN w.WEEK_START AND w.WEEK_END
 LEFT JOIN condemned c ON c.SITE = d.SITE AND c.KILL_DATE = d.KILL_DATE;
