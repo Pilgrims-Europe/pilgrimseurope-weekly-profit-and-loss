@@ -294,9 +294,38 @@
     <label class="fld"><span>What does each Excel file hold? If you don't know, who does?</span><textarea data-field="What each file holds, or who knows"></textarea></label>
   </section>
 
+  <h2 class="theme" id="production-tonnage">Production tonnage</h2>
+
+  <section class="card q" data-q="11" data-title="Which quantity do Redruth and Bromborough report as production tonnage?" data-type="choice">
+    <p class="tkt">Ticket #35</p>
+    <h3><span class="qnum">11</span>Which quantity do Redruth and Bromborough report as production tonnage?</h3>
+    <p>SAP records each production stage as a receipt (movement type Z61). At Redruth, 84% of the Z61 tonnes are semi-finished goods that go to the next stage. So the total of all stages is about 5 to 7 times the finished goods output. Until you answer, the weekly P&amp;L shows finished goods only, tagged Amber.</p>
+    <p class="why">Why this matters: The two quantities differ a lot at Redruth. We need the one that site finance reports.</p>
+    <div class="opts" role="radiogroup" aria-label="Question 11">
+      <label><input type="radio" name="q11" value="Finished goods only" /> Finished goods only</label>
+      <label><input type="radio" name="q11" value="All stages added" /> All stages added</label>
+      <label><input type="radio" name="q11" value="Other. Write it in Comments." /> Other. Write it in Comments.</label>
+      <label><input type="radio" name="q11" value="Don't know" /> Don't know</label>
+    </div>
+    <label class="fld"><span>Who at Redruth and Bromborough site finance reports it today?</span><input type="text" data-field="Who reports it today" /></label>
+    <label class="fld"><span>Comments</span><textarea data-field="Comments"></textarea></label>
+  </section>
+
+  <section class="card q" data-q="12" data-title="Is material net weight the right weight for finished goods counted in cases?" data-type="choice">
+    <p class="tkt">Ticket #35</p>
+    <h3><span class="qnum">12</span>Is material net weight the right weight for finished goods counted in cases?</h3>
+    <p>Some finished goods are counted in cases (base unit CS). We convert cases to kg with the net weight in the material master. Without this, Bromborough loses about 10% to 14% of finished goods output each week.</p>
+    <div class="opts" role="radiogroup" aria-label="Question 12">
+      <label><input type="radio" name="q12" value="Yes, net weight" /> Yes, net weight</label>
+      <label><input type="radio" name="q12" value="No. Write the right weight in Comments." /> No. Write the right weight in Comments.</label>
+      <label><input type="radio" name="q12" value="Don't know" /> Don't know</label>
+    </div>
+    <label class="fld"><span>Comments</span><textarea data-field="Comments"></textarea></label>
+  </section>
+
   <h2 class="theme" id="anything-else">Anything else?</h2>
 
-  <section class="card q" data-q="11" data-title="Anything else?" data-type="text" data-plain="true">
+  <section class="card q" data-q="13" data-title="Anything else?" data-type="text" data-plain="true">
     <p>Is there something that we did not ask, but should know?</p>
     <label class="fld"><span>Your answer</span><textarea data-field="Answer"></textarea></label>
   </section>
