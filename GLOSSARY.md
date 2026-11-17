@@ -20,6 +20,10 @@ _Avoid_: Birds delivered, live weight, rejects
 Pigs over scale, less TC'd pigs, in head. The source field is `"Killed Qty"` on the Hellenic booking. Ticket #10 checks if `"Killed Qty"` already takes off TC'd pigs.
 _Avoid_: Pigs delivered, pigs over scale, pay weight
 
+**Kill (lamb)**:
+Lamb carcasses, in head, from HCS. The rule for condemned carcasses is Unknown. Ticket #36 decides it.
+_Avoid_: Sheep kill
+
 **Dungannon rule**:
 The poultry kill rule that Dungannon uses. Dungannon is the poultry master process. All sites use this rule.
 
@@ -27,7 +31,10 @@ The poultry kill rule that Dungannon uses. Dungannon is the poultry master proce
 Total Condemned. A TC'd pig is a whole pig that is condemned. A TC'd pig is not in kill.
 
 **Hellenic**:
-The pig processing system.
+The pig processing system. Snowflake also holds an old Hellenic sheep copy. The weekly P&L does not use it.
+
+**HCS**:
+The lamb production system. It gives lamb kill for Wales. Snowflake loads it every day into `PRODUCTION_HCS`.
 
 **Mtech**:
 The system that holds production transactions. Mtech and Anaplan can show different kill for the same site and week. This is expected. It is not an error.
