@@ -16,6 +16,7 @@ FROM VALUES
     ('Bromborough', 'PILOT',        'PBRO01', '2506', NULL,  NULL,  2),
     ('Anwick',      'POULTRY_KILL', NULL,     NULL,   'S11', NULL,  3),
     ('Ashbourne',   'POULTRY_KILL', NULL,     NULL,   'S10', NULL,  4),
-    ('Dungannon',   'POULTRY_KILL', NULL,     NULL,   'S01', NULL,  5),
-    ('Spalding',    'PORK_KILL',    NULL,     NULL,   NULL,  '001', 6),
-    ('Westerleigh', 'PORK_KILL',    NULL,     NULL,   NULL,  '003', 7);
+    ('Ballymena',   'POULTRY_KILL', NULL,     NULL,   'S40', NULL,  5),
+    ('Dungannon',   'POULTRY_KILL', NULL,     NULL,   'S01', NULL,  6),
+    ('Spalding',    'PORK_KILL',    NULL,     NULL,   NULL,  '001', 7),
+    ('Westerleigh', 'PORK_KILL',    NULL,     NULL,   NULL,  '003', 8);
