@@ -22,7 +22,7 @@ export interface FilterDef {
  * Filter bar under the tabs, styled as the Travel Expense Dashboard pills ("Site Redruth ⌄").
  * Each filter is a URL parameter, so Share copies the exact view.
  */
-export function FilterBar({ filters, note }: { filters: FilterDef[]; note?: ReactNode }) {
+export function FilterBar({ filters, note, children }: { filters: FilterDef[]; note?: ReactNode; children?: ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
   const params = useSearchParams();
@@ -61,6 +61,7 @@ export function FilterBar({ filters, note }: { filters: FilterDef[]; note?: Reac
             <ChevronDown className="pointer-events-none absolute right-2.5 h-4 w-4 text-muted-foreground" />
           </label>
         ))}
+        {children}
         {note && <div className="ml-auto text-sm text-muted-foreground">{note}</div>}
       </div>
     </div>

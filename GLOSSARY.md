@@ -57,3 +57,40 @@ _Avoid_: Posting week
 **Run rate**:
 The average weekly cost of a GL line over a selected period. Site finance can override it with a comment.
 _Avoid_: Default, baseline
+
+**Fiscal month**:
+A group of 4 or 5 fiscal weeks. The months of a quarter have 4, 5 and 4 weeks. A fiscal quarter has 13 weeks.
+_Avoid_: Period, calendar month
+
+**MTD, QTD, YTD**:
+Month, quarter or year to date. The fiscal weeks from the start of the fiscal month, quarter or year to the selected week.
+
+**Last 12 Months**:
+The 52 fiscal weeks up to and including the selected week.
+_Avoid_: Rolling year, L12M
+
+**Sales margin layout**:
+A short P&L that Gui asked for. It goes from Total KG and G.S.V. down to Contribution, with a price or cost per kg on most lines.
+
+**G.S.V.**:
+Gross Sales Value. The invoice value of sales before O.S.C.
+_Avoid_: Gross revenue, gross sales
+
+**O.S.C**:
+The promotional discount and overrider that are taken off G.S.V. to give N.S.V. Gui calls it Override Sales Commission. The FP&A draft manual calls the line Promo Discount (O.S.C). It does not include Overrider Adj, credit note adjustments or price corrections. Ticket #50 asks Gui to confirm this.
+_Avoid_: Overrider Adj, promotions
+
+**N.S.V.**:
+Net Sales Value. G.S.V. less O.S.C.
+_Avoid_: Net revenue, net sales
+
+**STD Cost of Goods**:
+The standard cost of the goods sold: meat, labour, ingredients, packaging and other. It does not include freight.
+_Avoid_: Cost of sales, COS
+
+**COGS**:
+Cost of goods sold, including freight. STD Cost of Goods plus freight.
+
+**Contribution**:
+N.S.V. less STD Cost of Goods less freight, in the Sales margin layout.
+_Avoid_: Margin, CM1

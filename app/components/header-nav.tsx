@@ -32,9 +32,8 @@ export function HeaderNav() {
   const page = current(pathname);
   const [copied, setCopied] = useState(false);
   const keep = new URLSearchParams();
-  for (const k of ['site', 'week']) {
-    const v = params.get(k);
-    if (v) keep.set(k, v);
+  for (const k of ['site', 'week', 'period', 'show', 'cust', 'cat', 'bu', 'mat']) {
+    for (const v of params.getAll(k)) keep.append(k, v);
   }
   const qs = keep.toString() ? `?${keep.toString()}` : '';
 

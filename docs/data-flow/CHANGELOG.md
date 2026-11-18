@@ -12,3 +12,4 @@ This log lists each change to the flow of data to the Weekly P&L app. The diagra
 | --- | --- | --- | --- |
 | 2026-11-17 | First version. Shows the current objects in `DEV_ANALYTICS.FINANCE_PL_WEEKLY`. | #43 | rendered 2026-11-17 |
 | 2026-11-18 | Add the material master as a source of `WPL_MOVEMENT_WEEK`. Production tonnage is now finished goods only. | #35 | pending |
+| 2026-11-18 | Add `WPL_SALES_DETAIL`, `WPL_T_SALES_DETAIL` and the material groupings as planned, for the Sales margin filters. Add `WPL_DQ_DATA_TO` and `WPL_T_DQ_DATA_TO` as planned, so freshness is built in two steps. They become live when the SQL is run in `DEV_ANALYTICS.FINANCE_PL_WEEKLY`. | None | pending |

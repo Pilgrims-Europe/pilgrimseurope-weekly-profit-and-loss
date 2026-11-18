@@ -90,7 +90,7 @@ nodes:
     layer: upstream
     medallion: gold
     object: PROD_ANALYTICS.FINANCE_MT.FACT_COPAPEUS4, DIM_CUSTOMERMASTER
-    description: COPA sales (kg, NSV, standard freight, edible flag) and the customer master for the intercompany rule.
+    description: COPA sales (kg, G.S.V., O.S.C, NSV, cost of sales, standard freight, edible flag) and the customer master for the intercompany rule and customer names.
   - id: calendar
     label: Finance calendar
     layer: upstream
@@ -109,6 +109,13 @@ nodes:
     medallion: gold
     object: PROD_ANALYTICS.FINANCE_MT.DIM_MATERIALMASTER
     description: Material net weight, used to change finished goods in cases to kg.
+  - id: material_groupings
+    label: Material groupings
+    layer: upstream
+    medallion: gold
+    status: planned
+    object: PROD_ANALYTICS.FINANCE_MT.DIM_MASTERMATERIALGROUPINGS
+    description: Planned. Material description and category heading, for the Sales margin filters.
   - id: yield
     label: "Arolink: yield"
     layer: upstream
@@ -149,7 +156,7 @@ nodes:
     layer: reference
     object: DEV_ANALYTICS.FINANCE_PL_WEEKLY.WPL_LINE
     sql: sql/02_wpl_line.sql
-    description: Line catalogue of the Anaplan weekly template, with RAG, source, rule and components.
+    description: Line catalogue of the Anaplan weekly template and the Sales margin layout, with RAG, source, rule and components.
   - id: wpl_gl_account_map
     label: WPL_GL_ACCOUNT_MAP
     layer: reference
@@ -187,6 +194,14 @@ nodes:
     sql: sql/07_wpl_kill_pork.sql
     description: Pork kill = Killed Qty less TC'd pigs, in head, by kill date.
     inputs: [hellenic, wpl_site, wpl_week]
+  - id: wpl_sales_detail
+    label: WPL_SALES_DETAIL
+    layer: rules
+    status: planned
+    object: DEV_ANALYTICS.FINANCE_PL_WEEKLY.WPL_SALES_DETAIL
+    sql: sql/08_wpl_sales_week.sql
+    description: Planned. COPA sales for the pilot plants by week, customer and material, with category and business unit.
+    inputs: [copa_gold, copa_silver, material_groupings, wpl_site, wpl_week]
   - id: wpl_sales_week
     label: WPL_SALES_WEEK
     layer: rules
@@ -215,6 +230,15 @@ nodes:
     sql: sql/13_wpl_dq.sql
     description: P&L accounts with FY2026 postings at the pilot sites that no template line uses.
     inputs: [sap_gl, wpl_site, pl_app_base, wpl_gl_account_map]
+  - id: wpl_dq_data_to
+    label: WPL_DQ_DATA_TO
+    layer: rules
+    status: planned
+    object: DEV_ANALYTICS.FINANCE_PL_WEEKLY.WPL_DQ_DATA_TO
+    sql: sql/13_wpl_dq.sql
+    description: Planned. Last data date for each source. WPL_DQ_FRESHNESS will read its table copy.
+    inputs: [wpl_gl_week, wpl_movement_week, copa_gold, copa_silver, wpl_kill_poultry, wpl_kill_pork, wpl_yield_week]
+    hide_inputs: true
   - id: wpl_dq_freshness
     label: WPL_DQ_FRESHNESS
     layer: rules
@@ -255,6 +279,14 @@ nodes:
     sql: sql/14_wpl_refresh.sql
     description: Table copy of WPL_GL_WEEK, for the GL account drill-down.
     inputs: [wpl_gl_week]
+  - id: wpl_t_sales_detail
+    label: WPL_T_SALES_DETAIL
+    layer: refresh
+    status: planned
+    object: DEV_ANALYTICS.FINANCE_PL_WEEKLY.WPL_T_SALES_DETAIL
+    sql: sql/14_wpl_refresh.sql
+    description: Planned. Table copy of WPL_SALES_DETAIL, for the Sales margin filters.
+    inputs: [wpl_sales_detail]
   - id: wpl_t_kill_poultry
     label: WPL_T_KILL_POULTRY
     layer: refresh
@@ -276,6 +308,14 @@ nodes:
     sql: sql/14_wpl_refresh.sql
     description: Table copy of WPL_KILL_PORK.
     inputs: [wpl_kill_pork]
+  - id: wpl_t_dq_data_to
+    label: WPL_T_DQ_DATA_TO
+    layer: refresh
+    status: planned
+    object: DEV_ANALYTICS.FINANCE_PL_WEEKLY.WPL_T_DQ_DATA_TO
+    sql: sql/14_wpl_refresh.sql
+    description: Planned. Table copy of WPL_DQ_DATA_TO, built before the freshness table.
+    inputs: [wpl_dq_data_to]
   - id: wpl_t_dq_freshness
     label: WPL_T_DQ_FRESHNESS
     layer: refresh
@@ -298,7 +338,7 @@ nodes:
     object: DEV_ANALYTICS.FINANCE_PL_WEEKLY.WEEKLY_PL
     sql: app/lib/wpl.ts
     description: Snowflake app (application service). Reads the refreshed tables and the site and line views.
-    inputs: [wpl_t_weekly_pl, wpl_t_gl_week, wpl_t_kill_poultry, wpl_t_kill_poultry_code, wpl_t_kill_pork, wpl_t_dq_freshness, wpl_t_dq_unmapped, wpl_site, wpl_line]
+    inputs: [wpl_t_weekly_pl, wpl_t_gl_week, wpl_t_kill_poultry, wpl_t_kill_poultry_code, wpl_t_kill_pork, wpl_t_dq_freshness, wpl_t_dq_unmapped, wpl_t_sales_detail, wpl_site, wpl_line, wpl_week]
   - id: qlik
     label: Qlik
     layer: consumers
