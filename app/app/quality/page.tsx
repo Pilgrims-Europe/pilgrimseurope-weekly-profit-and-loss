@@ -19,7 +19,7 @@ const KNOWN = [
   'Kill (poultry) does not take off condemnations. The condemnation codes include part rejects such as croppings, so their total is not a count of whole birds.',
   'Anwick reports delivered birds by plant weigh-in time. This app uses the Mtech kill date, so Anwick can differ by day.',
   'Production Material Yield is GL material consumption less production output credits. Gui\'s method compares actual with standard. The two can differ.',
-  'Production Tonnage counts all Z61 receipts, including semi-finished goods. It can be more than finished output.',
+  'Production Tonnage is finished goods only (Z61 less Z62 on GL 5000100, cases x net weight). Site finance has not confirmed this rule.',
   'STO is movement type 641 goods issue at the released standard cost. Internal NSV is at standard cost, so internal contribution is close to freight only.',
   'Substitution and Materials (OCI) are empty: no source field or GL account is known.',
 ];

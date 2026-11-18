@@ -103,6 +103,12 @@ nodes:
     medallion: gold
     object: PROD_ANALYTICS.FINANCE_MT.FACT_PRODUCT_COST_RELEASED
     description: Released cost estimates, used for STO at standard.
+  - id: material_master
+    label: Material master
+    layer: upstream
+    medallion: gold
+    object: PROD_ANALYTICS.FINANCE_MT.DIM_MATERIALMASTER
+    description: Material net weight, used to change finished goods in cases to kg.
   - id: yield
     label: "Arolink: yield"
     layer: upstream
@@ -193,8 +199,8 @@ nodes:
     layer: rules
     object: DEV_ANALYTICS.FINANCE_PL_WEEKLY.WPL_MOVEMENT_WEEK
     sql: sql/09_wpl_movement_week.sql
-    description: Goods movements for the pilot plants by week. STO (641 less 642) and production tonnage (Z61 less Z62).
-    inputs: [sap_gm, product_cost, wpl_site, wpl_week]
+    description: Goods movements for the pilot plants by week. STO (641 less 642) and production tonnage (finished goods, Z61 less Z62 on GL 5000100).
+    inputs: [sap_gm, product_cost, material_master, wpl_site, wpl_week]
   - id: wpl_yield_week
     label: WPL_YIELD_WEEK
     layer: rules

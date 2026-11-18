@@ -51,7 +51,7 @@ A SAP set of books. Ledgers 0L and 1L hold the same GL line items. The weekly P&
 _Avoid_: Book
 
 **Fiscal week**:
-The week of a GL line item, as the BW field FISCALYEARWEEK gives it. Opening balances (period 000) have no fiscal week and are not in the weekly P&L.
+A Monday to Sunday week of the finance calendar (DIM_CALENDARMASTER). A GL line item is in the fiscal week of its posting date. The BW field FISCALYEARWEEK gives the same week, but its year label is one year ahead (202746 is fiscal week 2026-46). Opening balances (period 000) have no fiscal week and are not in the weekly P&L.
 _Avoid_: Posting week
 
 **Run rate**:

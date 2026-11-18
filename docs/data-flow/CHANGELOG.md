@@ -11,3 +11,4 @@ This log lists each change to the flow of data to the Weekly P&L app. The diagra
 | Date | Change | Ticket or PR | Status |
 | --- | --- | --- | --- |
 | 2026-11-17 | First version. Shows the current objects in `DEV_ANALYTICS.FINANCE_PL_WEEKLY`. | #43 | rendered 2026-11-17 |
+| 2026-11-18 | Add the material master as a source of `WPL_MOVEMENT_WEEK`. Production tonnage is now finished goods only. | #35 | pending |
