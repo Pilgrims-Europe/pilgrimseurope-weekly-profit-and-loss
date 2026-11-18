@@ -99,6 +99,10 @@
   .btn.alt:hover { background: var(--brand); color: #fff; }
   .btn:focus-visible { outline: 3px solid var(--yellow); outline-offset: 2px; }
   .status { font-size: 13px; color: var(--muted); flex: 1 1 200px; }
+  .md-panel { max-width: 880px; margin: 0 auto; padding: 12px clamp(16px, 4vw, 32px) 0; }
+  .md-panel[hidden] { display: none; }
+  .md-panel p { margin: 0 0 6px; font-size: 13px; }
+  #md-out { min-height: 140px; max-height: 40vh; font-family: Consolas, 'Courier New', monospace; font-size: 12px; }
   @media print { .bar, #fwd-block { display: none; } }
   .js .noscript-warn { display: none; }
 </style>
@@ -310,10 +314,16 @@
 </main>
 
 <div class="bar">
+  <!-- Fallback text box: shows the answers as Markdown when the viewer blocks downloads or the clipboard. -->
+  <div class="md-panel" id="md-panel" hidden>
+    <p id="md-msg"></p>
+    <textarea id="md-out" readonly aria-label="Your answers as text"></textarea>
+  </div>
   <div class="bar-in">
     <button type="button" class="btn" id="dl">Download answers (.md)</button>
     <button type="button" class="btn alt" id="cp">Copy answers</button>
     <button type="button" class="btn alt" id="clr">Clear</button>
+    <button type="button" class="btn alt" id="md-hide" hidden>Hide text</button>
     <span class="status" id="status" role="status" aria-live="polite"></span>
   </div>
 </div>
@@ -391,25 +401,63 @@
     return out.join('\n');
   }
 
+  // Export helpers. Sandboxed viewers (Snowflake, Teams, Outlook, IDE previews) can block downloads,
+  // the Clipboard API and confirm() with no error. Copy uses only navigator.clipboard (the Snowflake viewer
+  // asks the reader to allow it). If it fails or the reader declines, the text shows selected in a text box
+  // for Ctrl+C. A blocked download cannot be detected, so the text box always shows after a download.
   var status = document.getElementById('status');
+  var panel = document.getElementById('md-panel');
+  var mdOut = document.getElementById('md-out');
+  var mdMsg = document.getElementById('md-msg');
+  var hideBtn = document.getElementById('md-hide');
+  function showText(text, msg) {
+    mdOut.value = text; mdMsg.textContent = msg; panel.hidden = false; hideBtn.hidden = false;
+    mdOut.focus(); mdOut.select(); mdOut.scrollTop = 0;
+  }
+  function hideText() { panel.hidden = true; hideBtn.hidden = true; mdOut.value = ''; }
+  function copyText(text, done) {
+    try { navigator.clipboard.writeText(text).then(function () { done(true); }, function () { done(false); }); }
+    catch (e) { done(false); }
+  }
+  function downloadText(text, filename, type) {
+    try {
+      var a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([text], { type: type })); a.download = filename;
+      document.body.appendChild(a); a.click(); a.remove(); setTimeout(function () { URL.revokeObjectURL(a.href); }, 1000);
+    } catch (e) {}
+  }
+  window.peExport = { copyText: copyText, downloadText: downloadText, showText: showText };
+  hideBtn.addEventListener('click', hideText);
+
   document.getElementById('dl').addEventListener('click', function () {
     var nm = (whoIn.value.trim() || 'unknown').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
-    var blob = new Blob([buildMarkdown()], { type: 'text/markdown;charset=utf-8' });
-    var a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = SLUG + '-answers-' + (nm || 'unknown') + '.md';
-    document.body.appendChild(a); a.click(); a.remove(); setTimeout(function () { URL.revokeObjectURL(a.href); }, 1000);
-    status.textContent = 'File downloaded. Attach it to an email or a Teams message to ' + FROM + '.';
+    var md = buildMarkdown();
+    downloadText(md, SLUG + '-answers-' + (nm || 'unknown') + '.md', 'text/markdown;charset=utf-8');
+    showText(md, 'Your answers are also in this box. If no .md file downloaded, this viewer blocks downloads: ' +
+      'press Ctrl+C to copy the selected text, or open the file in Edge or Chrome.');
+    status.textContent = 'Check your downloads for the .md file. Send it to ' + FROM + ' by email or Teams.';
   });
   document.getElementById('cp').addEventListener('click', function () {
-    var declined = function () { status.textContent = 'Answers were not copied. Use Download answers (.md) instead.'; };
-    status.textContent = 'Copying\u2026';
-    try { navigator.clipboard.writeText(buildMarkdown()).then(function () { status.textContent = 'Answers copied. Paste them into an email or a Teams message.'; }, declined); }
-    catch (e) { declined(); }
+    var md = buildMarkdown();
+    status.textContent = 'Copying. If a dialog opens, click Allow.';
+    copyText(md, function (ok) {
+      if (ok) { status.textContent = 'Answers copied. Paste them into an email or a Teams message to ' + FROM + '.'; return; }
+      showText(md, 'Your answers were not copied. They are selected in this box: press Ctrl+C, then paste them into an email or a Teams message to ' + FROM + '.');
+      status.textContent = 'Not copied automatically. Use the text box.';
+    });
   });
-  document.getElementById('clr').addEventListener('click', function () {
-    if (!window.confirm('Clear all answers? You cannot undo this.')) return;
+  // Clear needs a second click. confirm() is blocked in sandboxed viewers.
+  var clr = document.getElementById('clr'), armed = null;
+  clr.addEventListener('click', function () {
+    if (!armed) {
+      clr.textContent = 'Click again to clear';
+      status.textContent = 'This clears all answers. You cannot undo it.';
+      armed = setTimeout(function () { armed = null; clr.textContent = 'Clear'; status.textContent = ''; }, 5000);
+      return;
+    }
+    clearTimeout(armed); armed = null; clr.textContent = 'Clear';
     document.querySelectorAll('textarea, input[type=text]').forEach(function (e) { e.value = ''; });
     document.querySelectorAll('input[type=radio], input[type=checkbox]').forEach(function (e) { e.checked = false; });
-    save(); status.textContent = 'All answers cleared.';
+    hideText(); save(); status.textContent = 'All answers cleared.';
   });
 })();
 </script>
@@ -458,6 +506,8 @@
       if (!n || !n.matches('section.q')) h.remove();
     });
     doc.querySelectorAll('#fwd-block, .fwd-step').forEach(function (e) { e.remove(); });
+    doc.querySelectorAll('#md-panel, #md-hide').forEach(function (e) { e.hidden = true; });
+    var mo = doc.querySelector('#md-out'); if (mo) mo.textContent = '';
     var to = doc.querySelector('[data-to]'); if (to) to.textContent = name;
     var b = doc.querySelector('body'); b.dataset.slug = b.dataset.slug + '-' + slugify(name);
     var intro = doc.querySelector('#main > .card');
@@ -468,11 +518,9 @@
         ' from a longer form. Please answer them and send your answers to ' + FROM + '.';
       intro.insertBefore(note, intro.firstChild);
     }
-    var blob = new Blob(['<!DOCTYPE html>\n' + doc.outerHTML], { type: 'text/html;charset=utf-8' });
-    var a = document.createElement('a'); a.href = URL.createObjectURL(blob);
-    a.download = document.body.dataset.slug + '-for-' + slugify(name) + '.html';
-    document.body.appendChild(a); a.click(); a.remove(); setTimeout(function () { URL.revokeObjectURL(a.href); }, 1000);
-    st.textContent = 'Form downloaded. Attach it to an email or a Teams message to ' + name + '.';
+    window.peExport.downloadText('<!DOCTYPE html>\n' + doc.outerHTML, document.body.dataset.slug + '-for-' + slugify(name) + '.html', 'text/html;charset=utf-8');
+    st.textContent = 'Check your downloads for the form, and send it to ' + name + ' by email or Teams. ' +
+      'If no file downloaded, this viewer blocks downloads: use Copy questions as text.';
   });
 
   document.getElementById('fwd-cp').addEventListener('click', function () {
@@ -489,10 +537,13 @@
       if (opts.length) out.push('Options: ' + Array.prototype.map.call(opts, function (o) { return o.value; }).join(' / '));
     });
     out.push('', 'Thanks,', sender());
-    var declined = function () { st.textContent = 'Not copied. Use Download form for colleague instead.'; };
-    st.textContent = 'Copying\u2026';
-    try { navigator.clipboard.writeText(out.join('\n')).then(function () { st.textContent = 'Questions copied. Paste them into an email or a Teams message to ' + name + '.'; }, declined); }
-    catch (e) { declined(); }
+    var text = out.join('\n');
+    st.textContent = 'Copying. If a dialog opens, click Allow.';
+    window.peExport.copyText(text, function (ok) {
+      if (ok) { st.textContent = 'Questions copied. Paste them into an email or a Teams message to ' + name + '.'; return; }
+      window.peExport.showText(text, 'The questions were not copied. They are selected in this box: press Ctrl+C, then paste them into a message to ' + name + '.');
+      st.textContent = 'Not copied automatically. Use the text box at the bottom of the page.';
+    });
   });
 })();
 </script>
