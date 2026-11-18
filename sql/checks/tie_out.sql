@@ -1,0 +1,55 @@
+-- Tie-out checks for the weekly P&L tables. A check passes when it returns no rows.
+-- Run: scripts/check-tie-out.ps1 [-Schema FINANCE_PL_WEEKLY_WBW]. The script swaps the schema name.
+-- 1. All COPA sales (external + intercompany) in WPL_T_SALES_DETAIL: G.S.V. + O.S.C + cost of sales + freight = gold COPA CM1,
+--    by site and week. This checks the gold-silver join whatever the intercompany rule is.
+-- 2. Each Sales margin leaf line = the sum of WPL_T_SALES_DETAIL, by site and week.
+-- 3. N.S.V. = G.S.V. + O.S.C, by site and week.
+-- Tolerance: 1 GBP or 1 kg.
+WITH line AS (
+    SELECT SITE, WEEK_START, LINE_ID, VALUE
+    FROM DEV_ANALYTICS.FINANCE_PL_WEEKLY.WPL_T_WEEKLY_PL
+    WHERE LAYOUT = 'Sales margin' AND STATUS IN ('Built', 'Subtotal') AND VALUE IS NOT NULL
+),
+cm1 AS (
+    SELECT s.SITE, w.WEEK_START, SUM(c.CM1_GBP_CALC) AS VALUE
+    FROM PROD_ANALYTICS.FINANCE_MT.FACT_COPAPEUS4 c
+    JOIN DEV_ANALYTICS.FINANCE_PL_WEEKLY.WPL_SITE s ON s.PLANT = c.PLANT
+    JOIN DEV_ANALYTICS.FINANCE_PL_WEEKLY.WPL_WEEK w ON c.POSTING_DATE BETWEEN w.WEEK_START AND w.WEEK_END
+    WHERE c.RECORD_SOURCE = 'Actual' AND c.POSTING_DATE >= '2025-04-21'
+    GROUP BY ALL
+),
+detail_cm1 AS (
+    SELECT SITE, WEEK_START,
+        SUM(COALESCE(GSV, 0) + COALESCE(OSC, 0) + COALESCE(STD_COS, 0) + COALESCE(STD_FREIGHT, 0)) AS VALUE
+    FROM DEV_ANALYTICS.FINANCE_PL_WEEKLY.WPL_T_SALES_DETAIL
+    GROUP BY ALL
+),
+detail AS (
+    SELECT SITE, WEEK_START, LINE_KEY::NUMBER AS LINE_ID, VALUE
+    FROM (
+        SELECT SITE, WEEK_START,
+            SUM(EDIBLE_KG)::FLOAT AS "2010", SUM(GSV)::FLOAT AS "2020", SUM(OSC)::FLOAT AS "2040",
+            SUM(STD_MEAT)::FLOAT AS "2110", SUM(STD_LABOUR)::FLOAT AS "2120", SUM(STD_INGREDIENTS)::FLOAT AS "2130",
+            SUM(STD_PACKAGING)::FLOAT AS "2140", SUM(STD_FREIGHT)::FLOAT AS "2210"
+        FROM DEV_ANALYTICS.FINANCE_PL_WEEKLY.WPL_T_SALES_DETAIL
+        WHERE NOT IS_INTERCO
+        GROUP BY ALL
+    )
+    UNPIVOT (VALUE FOR LINE_KEY IN ("2010", "2020", "2040", "2110", "2120", "2130", "2140", "2210"))
+)
+SELECT 'All COPA sales = gold CM1' AS CHECK_NAME, c.SITE, c.WEEK_START, c.VALUE AS EXPECTED, COALESCE(d.VALUE, 0) AS ACTUAL
+FROM cm1 c
+LEFT JOIN detail_cm1 d ON d.SITE = c.SITE AND d.WEEK_START = c.WEEK_START
+WHERE ABS(c.VALUE - COALESCE(d.VALUE, 0)) > 1
+UNION ALL
+SELECT 'Line ' || l.LINE_ID || ' = sales detail', l.SITE, l.WEEK_START, COALESCE(d.VALUE, 0), l.VALUE
+FROM line l
+LEFT JOIN detail d ON d.SITE = l.SITE AND d.WEEK_START = l.WEEK_START AND d.LINE_ID = l.LINE_ID
+WHERE l.LINE_ID IN (2010, 2020, 2040, 2110, 2120, 2130, 2140, 2210) AND ABS(l.VALUE - COALESCE(d.VALUE, 0)) > 1
+UNION ALL
+SELECT 'N.S.V. = G.S.V. + O.S.C', n.SITE, n.WEEK_START, g.VALUE + o.VALUE, n.VALUE
+FROM line n
+JOIN line g ON g.SITE = n.SITE AND g.WEEK_START = n.WEEK_START AND g.LINE_ID = 2020
+JOIN line o ON o.SITE = n.SITE AND o.WEEK_START = n.WEEK_START AND o.LINE_ID = 2040
+WHERE n.LINE_ID = 2060 AND ABS(n.VALUE - (g.VALUE + o.VALUE)) > 1
+ORDER BY 1, 2, 3;
