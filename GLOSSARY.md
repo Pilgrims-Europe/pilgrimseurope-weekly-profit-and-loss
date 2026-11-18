@@ -20,6 +20,10 @@ _Avoid_: Birds delivered, live weight, rejects
 Pigs over scale, less TC'd pigs, in head. The source field is `"Killed Qty"` on the Hellenic booking. Ticket #10 checks if `"Killed Qty"` already takes off TC'd pigs.
 _Avoid_: Pigs delivered, pigs over scale, pay weight
 
+**Provenance (pork)**:
+The pig scheme a booking belongs to, for example Red Tractor, Outdoor Bred, Free Range or Organic. Held in Hellenic as the super category. Reports show kill by provenance as detail.
+_Avoid_: Pig type, super category, pig scheme
+
 **Kill (lamb)**:
 Lamb carcasses, in head, from HCS. The rule for condemned carcasses is Unknown. Ticket #36 decides it.
 _Avoid_: Sheep kill

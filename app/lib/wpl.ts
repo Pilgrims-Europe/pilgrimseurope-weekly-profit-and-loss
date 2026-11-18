@@ -250,6 +250,22 @@ export async function getPorkKill(site: string, weekStart: string) {
   );
 }
 
+/**
+ * Pork kill by provenance (the Hellenic super category) for one site and week.
+ * Detail only: WPL_KILL_PORK_TYPE does not floor kill at 0 for a day, so this can differ
+ * slightly from PIGS_KILLED on the kill line. WPL_T_KILL_PORK is the one source for kill.
+ */
+export async function getPorkTypes(site: string, weekStart: string) {
+  return rows(
+    `SELECT SUPER_CATEGORY, SUM(BOOKINGS) AS BOOKINGS, SUM(PIGS_DELIVERED) AS PIGS_DELIVERED,
+            SUM(KILLED_QTY) AS KILLED_QTY, SUM(TC_PRODUCER_RESP) AS TC_PRODUCER_RESP,
+            SUM(TC_FACTORY_RESP) AS TC_FACTORY_RESP, SUM(PIGS_KILLED) AS PIGS_KILLED
+     FROM ${SCHEMA}.WPL_T_KILL_PORK_TYPE WHERE SITE = ? AND WEEK_START = ?
+     GROUP BY ALL HAVING SUM(PIGS_KILLED) <> 0 ORDER BY PIGS_KILLED DESC`,
+    [site, weekStart],
+  );
+}
+
 export interface Freshness {
   SOURCE: string;
   OBJECT_NAME: string;
