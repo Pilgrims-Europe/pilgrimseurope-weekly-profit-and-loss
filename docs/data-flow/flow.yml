@@ -113,9 +113,8 @@ nodes:
     label: Material groupings
     layer: upstream
     medallion: gold
-    status: planned
     object: PROD_ANALYTICS.FINANCE_MT.DIM_MASTERMATERIALGROUPINGS
-    description: Planned. Material description and category heading, for the Sales margin filters.
+    description: Material description and category heading, for the Sales margin filters.
   - id: yield
     label: "Arolink: yield"
     layer: upstream
@@ -197,18 +196,17 @@ nodes:
   - id: wpl_sales_detail
     label: WPL_SALES_DETAIL
     layer: rules
-    status: planned
     object: DEV_ANALYTICS.FINANCE_PL_WEEKLY.WPL_SALES_DETAIL
     sql: sql/08_wpl_sales_week.sql
-    description: Planned. COPA sales for the pilot plants by week, customer and material, with category and business unit.
+    description: COPA sales for the pilot plants by week, customer and material, with category and business unit.
     inputs: [copa_gold, copa_silver, material_groupings, wpl_site, wpl_week]
   - id: wpl_sales_week
     label: WPL_SALES_WEEK
     layer: rules
     object: DEV_ANALYTICS.FINANCE_PL_WEEKLY.WPL_SALES_WEEK
     sql: sql/08_wpl_sales_week.sql
-    description: Sales at standard for the pilot plants by week. Gold COPA for sales, silver COPA for the cost split.
-    inputs: [copa_gold, copa_silver, wpl_site, wpl_week]
+    description: Sales at standard for the pilot plants by week. The total of WPL_SALES_DETAIL.
+    inputs: [wpl_sales_detail]
   - id: wpl_movement_week
     label: WPL_MOVEMENT_WEEK
     layer: rules
@@ -233,10 +231,9 @@ nodes:
   - id: wpl_dq_data_to
     label: WPL_DQ_DATA_TO
     layer: rules
-    status: planned
     object: DEV_ANALYTICS.FINANCE_PL_WEEKLY.WPL_DQ_DATA_TO
     sql: sql/13_wpl_dq.sql
-    description: Planned. Last data date for each source. WPL_DQ_FRESHNESS will read its table copy.
+    description: Last data date for each source. WPL_DQ_FRESHNESS reads its table copy.
     inputs: [wpl_gl_week, wpl_movement_week, copa_gold, copa_silver, wpl_kill_poultry, wpl_kill_pork, wpl_yield_week]
     hide_inputs: true
   - id: wpl_dq_freshness
@@ -282,10 +279,9 @@ nodes:
   - id: wpl_t_sales_detail
     label: WPL_T_SALES_DETAIL
     layer: refresh
-    status: planned
     object: DEV_ANALYTICS.FINANCE_PL_WEEKLY.WPL_T_SALES_DETAIL
     sql: sql/14_wpl_refresh.sql
-    description: Planned. Table copy of WPL_SALES_DETAIL, for the Sales margin filters.
+    description: Table copy of WPL_SALES_DETAIL, for the Sales margin filters.
     inputs: [wpl_sales_detail]
   - id: wpl_t_kill_poultry
     label: WPL_T_KILL_POULTRY
@@ -311,10 +307,9 @@ nodes:
   - id: wpl_t_dq_data_to
     label: WPL_T_DQ_DATA_TO
     layer: refresh
-    status: planned
     object: DEV_ANALYTICS.FINANCE_PL_WEEKLY.WPL_T_DQ_DATA_TO
     sql: sql/14_wpl_refresh.sql
-    description: Planned. Table copy of WPL_DQ_DATA_TO, built before the freshness table.
+    description: Table copy of WPL_DQ_DATA_TO, built before the freshness table.
     inputs: [wpl_dq_data_to]
   - id: wpl_t_dq_freshness
     label: WPL_T_DQ_FRESHNESS
