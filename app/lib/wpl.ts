@@ -27,7 +27,15 @@ export interface Week {
   WEEK_START: string;
   FISCAL_WEEK: string;
   FISCAL_YEAR: string;
+  /** Fiscal year and month, for example "2026011". */
+  FISCAL_YEAR_PERIOD: string;
+  FISCAL_MONTH_NAME: string;
+  /** "Q1" to "Q4". */
+  FISCAL_QUARTER: string;
 }
+
+/** The two line layouts in WPL_LINE. */
+export type Layout = 'Anaplan template' | 'Sales margin';
 
 export interface PlLine {
   SITE: string;
@@ -60,8 +68,11 @@ export async function getSites(): Promise<Site[]> {
 
 export async function getWeeks(): Promise<Week[]> {
   return rows<Week>(
-    `SELECT DISTINCT TO_VARCHAR(WEEK_START, 'YYYY-MM-DD') AS WEEK_START, FISCAL_WEEK, FISCAL_YEAR
-     FROM ${SCHEMA}.WPL_T_WEEKLY_PL ORDER BY WEEK_START DESC`,
+    `SELECT TO_VARCHAR(w.WEEK_START, 'YYYY-MM-DD') AS WEEK_START, w.FISCAL_WEEK, w.FISCAL_YEAR, w.FISCAL_YEAR_PERIOD,
+            w.FISCAL_MONTH_NAME, w.FISCAL_QUARTER
+     FROM ${SCHEMA}.WPL_WEEK w
+     WHERE w.WEEK_START IN (SELECT DISTINCT WEEK_START FROM ${SCHEMA}.WPL_T_WEEKLY_PL)
+     ORDER BY w.WEEK_START DESC`,
   );
 }
 
@@ -78,7 +89,7 @@ export async function resolveFilters(params: { site?: string; week?: string }, k
  * The template lines for each site and one week, with last week's value for comparison.
  * With no site, all sites (pilot and kill sites). Roll them up with `rollUp` in lib/wpl-rollup.ts.
  */
-export async function getPl(weekStart: string, site?: string): Promise<PlLine[]> {
+export async function getPl(weekStart: string, site?: string, layout: Layout = 'Anaplan template'): Promise<PlLine[]> {
   return rows<PlLine>(
     `SELECT c.SITE, c.SITE_KIND, c.LINE_ID, c.LINE_GROUP, c.LINE_NAME, c.SOURCE_TYPE, c.SOURCE_SYSTEM, c.RAG, c.REASON, c.RULE,
             c.UNIT, c.TICKET, c.STATUS, c.VALUE, c.ACTUAL_VALUE, p.VALUE AS PREV_VALUE, c.MISSING_COMPONENTS, c.COMPONENTS,
@@ -87,10 +98,46 @@ export async function getPl(weekStart: string, site?: string): Promise<PlLine[]>
      JOIN ${SCHEMA}.WPL_LINE l ON l.LINE_ID = c.LINE_ID
      LEFT JOIN ${SCHEMA}.WPL_T_WEEKLY_PL p
        ON p.SITE = c.SITE AND p.LINE_ID = c.LINE_ID AND p.WEEK_START = DATEADD(week, -1, c.WEEK_START)
-     WHERE c.WEEK_START = ? AND (? = '' OR c.SITE = ?)
+     WHERE c.WEEK_START = ? AND (? = '' OR c.SITE = ?) AND l.LAYOUT = ?
      ORDER BY c.LINE_ID, c.SITE_ORDER`,
-    [weekStart, site ?? '', site ?? ''],
+    [weekStart, site ?? '', site ?? '', layout],
   );
+}
+
+export interface PlWeekLine extends PlLine {
+  WEEK_START: string;
+}
+
+/**
+ * The lines of one layout for each site and each week from `fromWeek` to `toWeek` (both included).
+ * With no site, all sites. Pivot them with `pivot` in lib/wpl-pivot.ts.
+ * The values and the line text come in two queries: a year of weeks has about 9,000 rows, and the
+ * rule and reason text on each row made one query take 6 to 8 seconds.
+ */
+export async function getPlRange(fromWeek: string, toWeek: string, layout: Layout, site?: string): Promise<PlWeekLine[]> {
+  type Value = Pick<PlWeekLine, 'WEEK_START' | 'SITE' | 'SITE_KIND' | 'LINE_ID' | 'STATUS' | 'VALUE' | 'MISSING_COMPONENTS'>;
+  type Meta = Omit<PlLine, 'SITE' | 'SITE_KIND' | 'STATUS' | 'VALUE' | 'ACTUAL_VALUE' | 'PREV_VALUE' | 'MISSING_COMPONENTS'>;
+  const [values, meta] = await Promise.all([
+    rows<Value>(
+      `SELECT TO_VARCHAR(c.WEEK_START, 'YYYY-MM-DD') AS WEEK_START, c.SITE, c.SITE_KIND, c.LINE_ID, c.STATUS, c.VALUE,
+              c.MISSING_COMPONENTS
+       FROM ${SCHEMA}.WPL_T_WEEKLY_PL c
+       WHERE c.WEEK_START BETWEEN ?::DATE AND ?::DATE AND (? = '' OR c.SITE = ?) AND c.LAYOUT = ?
+       ORDER BY c.WEEK_START, c.LINE_ID, c.SITE_ORDER`,
+      [fromWeek, toWeek, site ?? '', site ?? '', layout],
+    ),
+    rows<Meta>(
+      `SELECT LINE_ID, LINE_GROUP, LINE_NAME, SOURCE_TYPE, SOURCE_SYSTEM, RAG, REASON, RULE, UNIT, TICKET, COMPONENTS,
+              RATIO_NUM, RATIO_DEN, RATIO_SCALE
+       FROM ${SCHEMA}.WPL_LINE WHERE LAYOUT = ?`,
+      [layout],
+    ),
+  ]);
+  const byId = new Map(meta.map((m) => [String(m.LINE_ID), m]));
+  return values.flatMap((v) => {
+    const m = byId.get(String(v.LINE_ID));
+    return m ? [{ ...m, ...v, LINE_ID: String(v.LINE_ID), ACTUAL_VALUE: null, PREV_VALUE: null }] : [];
+  });
 }
 
 export interface DetailItem {
@@ -197,7 +244,7 @@ export async function getRagCounts(): Promise<Record<string, number>> {
 
 export async function getLines() {
   return rows(
-    `SELECT LINE_ID, LINE_GROUP, LINE_NAME, SOURCE_TYPE, SOURCE_SYSTEM, RAG, REASON, RULE, UNIT, TICKET, COMPONENTS
+    `SELECT LINE_ID, LINE_GROUP, LINE_NAME, SOURCE_TYPE, SOURCE_SYSTEM, RAG, REASON, RULE, UNIT, TICKET, COMPONENTS, LAYOUT
      FROM ${SCHEMA}.WPL_LINE ORDER BY LINE_ID`,
   );
 }

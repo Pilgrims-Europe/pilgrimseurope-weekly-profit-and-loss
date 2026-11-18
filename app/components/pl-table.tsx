@@ -18,10 +18,11 @@ const slug = (s: string) => `group-${s.toLowerCase().replace(/[^a-z0-9]+/g, '-')
 const SITE_KIND: Record<string, string> = { PILOT: 'Pilot site', POULTRY_KILL: 'Poultry kill site', PORK_KILL: 'Pork kill site' };
 
 /** Status text under a value that is not a number. */
-function statusText(l: PlLine): string | null {
+export function statusText(l: Pick<PlLine, 'STATUS'>): string | null {
   if (l.STATUS === 'Not built') return 'Manual, not built';
   if (l.STATUS === 'Empty') return 'Rule Unknown, empty';
   if (l.STATUS === 'Not a kill site') return 'Pilot site does not kill';
+  if (l.STATUS === 'No data') return 'No data this week';
   return null;
 }
 
@@ -43,7 +44,7 @@ function hasDetail(l: PlLine): boolean {
 
 /** This week, last week and change cells. Last week and change are blank when `prev` is false. */
 function ValueCells({ l, prev = true }: { l: Pick<PlLine, 'VALUE' | 'PREV_VALUE' | 'UNIT' | 'STATUS'>; prev?: boolean }) {
-  const st = statusText(l as PlLine);
+  const st = statusText(l);
   const ch = prev ? change(l) : null;
   return (
     <>
@@ -392,7 +393,7 @@ interface Account {
   VALUE: string;
 }
 
-function LineSheet({ line, weekStart, onClose }: { line: PlLine | null; weekStart: string; onClose: () => void }) {
+export function LineSheet({ line, weekStart, onClose }: { line: PlLine | null; weekStart: string; onClose: () => void }) {
   // A rolled-up line (All sites) has no single site: its GL accounts are in the expanded rows.
   const site = line && line.SITE !== ALL_SITES ? line.SITE : null;
   const gl = !!line && isGl(line);

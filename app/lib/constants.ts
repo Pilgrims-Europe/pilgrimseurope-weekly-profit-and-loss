@@ -23,6 +23,16 @@ export const NAV_ITEMS: { label: string; href: string; description: string }[] =
     href: '/',
     description: 'The Anaplan weekly template for one pilot site and week, with the RAG and rule of each line',
   },
+  {
+    label: 'Week by week',
+    href: '/week-by-week',
+    description: 'The Anaplan weekly template week by week, for MTD, QTD, YTD or the Last 12 Months',
+  },
+  {
+    label: 'Sales margin',
+    href: '/sales-margin',
+    description: 'G.S.V. to Contribution, with price and cost per kg, week by week, with the RAG of each line',
+  },
   { label: 'Trend', href: '/trend', description: 'One line over the last 13 weeks' },
   {
     label: 'Kill',
