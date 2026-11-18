@@ -5,6 +5,7 @@
  * Every user-supplied value goes in as a bind parameter. Server code only.
  */
 import { snowflake } from '@/lib/snowflake';
+import type { LeafValue, SalesFilter, SalesFilterParam } from '@/lib/wpl-filter';
 
 const SCHEMA =
   process.env.NODE_ENV === 'development' && /^[A-Z0-9_]+\.[A-Z0-9_]+$/.test(process.env.WPL_SCHEMA ?? '')
@@ -138,6 +139,83 @@ export async function getPlRange(fromWeek: string, toWeek: string, layout: Layou
     const m = byId.get(String(v.LINE_ID));
     return m ? [{ ...m, ...v, LINE_ID: String(v.LINE_ID), ACTUAL_VALUE: null, PREV_VALUE: null }] : [];
   });
+}
+
+/** Column of WPL_T_SALES_DETAIL for each Sales margin filter. Fixed names, never from user input. */
+const FILTER_COLUMN: Record<SalesFilterParam, string> = {
+  cust: 'SOLD_TO',
+  cat: 'CATEGORY',
+  bu: 'BUSINESS_UNIT',
+  mat: 'MATERIAL_CODE',
+};
+
+/** WHERE text and binds for the Sales margin filters. Values go in as bind parameters. */
+function filterSql(f: SalesFilter): { sql: string; binds: string[] } {
+  const parts: string[] = [];
+  const binds: string[] = [];
+  for (const [param, column] of Object.entries(FILTER_COLUMN) as [SalesFilterParam, string][]) {
+    const values = f[param];
+    if (!values.length) continue;
+    parts.push(`${column} IN (${values.map(() => '?').join(', ')})`);
+    binds.push(...values);
+  }
+  return { sql: parts.map((p) => ` AND ${p}`).join(''), binds };
+}
+
+/**
+ * Sales margin leaf values from the COPA detail, for one site or all pilot sites, with the filters.
+ * External sales only. The same rules as WPL_LINE_VALUE (lines 2010 to 2210).
+ */
+export async function getSalesLeafValues(fromWeek: string, toWeek: string, filter: SalesFilter, site?: string): Promise<LeafValue[]> {
+  const f = filterSql(filter);
+  const sums = await rows<Record<string, string | null>>(
+    `SELECT SITE, TO_VARCHAR(WEEK_START, 'YYYY-MM-DD') AS WEEK_START,
+            SUM(EDIBLE_KG) AS "2010", SUM(GSV) AS "2020", SUM(OSC) AS "2040",
+            SUM(STD_MEAT) AS "2110", SUM(STD_LABOUR) AS "2120", SUM(STD_INGREDIENTS) AS "2130", SUM(STD_PACKAGING) AS "2140",
+            SUM(COALESCE(STD_COS, 0) - COALESCE(STD_MEAT, 0) - COALESCE(STD_LABOUR, 0) - COALESCE(STD_INGREDIENTS, 0)
+                - COALESCE(STD_PACKAGING, 0)) AS "2150",
+            SUM(STD_FREIGHT) AS "2210"
+     FROM ${SCHEMA}.WPL_T_SALES_DETAIL
+     WHERE NOT IS_INTERCO AND WEEK_START BETWEEN ?::DATE AND ?::DATE AND (? = '' OR SITE = ?)${f.sql}
+     GROUP BY ALL`,
+    [fromWeek, toWeek, site ?? '', site ?? '', ...f.binds],
+  );
+  const ids = ['2010', '2020', '2040', '2110', '2120', '2130', '2140', '2150', '2210'];
+  return sums.flatMap((s) => ids.map((id) => ({ SITE: s.SITE ?? '', WEEK_START: s.WEEK_START ?? '', LINE_ID: id, VALUE: s[id] })));
+}
+
+export interface FilterValue {
+  VALUE: string;
+  LABEL: string;
+}
+
+/**
+ * The values for each Sales margin filter: customers, categories, business units and materials with external
+ * sales at the site (or all pilot sites) in the weeks, largest N.S.V. first.
+ */
+export async function getSalesFilterOptions(
+  fromWeek: string,
+  toWeek: string,
+  site?: string,
+): Promise<Record<SalesFilterParam, FilterValue[]>> {
+  const r = await rows<{ DIM: SalesFilterParam; VALUE: string; LABEL: string }>(
+    `WITH d AS (
+       SELECT * FROM ${SCHEMA}.WPL_T_SALES_DETAIL
+       WHERE NOT IS_INTERCO AND WEEK_START BETWEEN ?::DATE AND ?::DATE AND (? = '' OR SITE = ?)
+     )
+     SELECT DIM, VALUE, LABEL FROM (
+       SELECT 'cust' AS DIM, SOLD_TO AS VALUE, MAX(CUSTOMER_NAME) || ' (' || LTRIM(SOLD_TO, '0') || ')' AS LABEL, SUM(NSV) AS N FROM d GROUP BY SOLD_TO
+       UNION ALL SELECT 'cat', CATEGORY, CATEGORY, SUM(NSV) FROM d GROUP BY CATEGORY
+       UNION ALL SELECT 'bu', BUSINESS_UNIT, BUSINESS_UNIT, SUM(NSV) FROM d GROUP BY BUSINESS_UNIT
+       UNION ALL SELECT 'mat', MATERIAL_CODE, MATERIAL_CODE || ' - ' || MAX(MATERIAL_DESC), SUM(NSV) FROM d GROUP BY MATERIAL_CODE
+     )
+     WHERE VALUE IS NOT NULL
+     ORDER BY DIM, N DESC NULLS LAST`,
+    [fromWeek, toWeek, site ?? '', site ?? ''],
+  );
+  const out: Record<SalesFilterParam, FilterValue[]> = { cust: [], cat: [], bu: [], mat: [] };
+  for (const x of r) out[x.DIM]?.push({ VALUE: x.VALUE, LABEL: x.LABEL });
+  return out;
 }
 
 export interface DetailItem {

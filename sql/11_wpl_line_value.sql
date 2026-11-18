@@ -1,6 +1,6 @@
 -- One value for each site, week and built line (leaf lines only, no subtotals).
 -- Sign: income positive, cost negative. Tonnage in tonnes, kill in head, Total KG in kg.
--- Sales margin lines (2010 to 2210) use all COPA sales of the site: external and intercompany, edible and inedible (#52).
+-- Sales margin lines (2010 to 2210) use external sales (intercompany out). Total KG is edible kg, the same as Sales Tonnage (#52).
 -- Overheads are a run rate: the average weekly GL value of the 13 weeks before the week.
 -- In the first weeks of FY2026 fewer than 13 weeks are in the data, so the average uses the weeks that exist.
 -- ACTUAL_VALUE holds the week's own GL value for overhead lines (for comparison in the app).
@@ -17,15 +17,15 @@ WITH sales AS (
         SUM(IFF(NOT IS_INTERCO, STD_LABOUR, 0))            AS EXT_LABOUR,
         SUM(IFF(NOT IS_INTERCO, STD_FREIGHT, 0))           AS EXT_FREIGHT,
         SUM(IFF(IS_INTERCO, STD_FREIGHT, 0))               AS INT_FREIGHT,
-        SUM(ALL_KG)                                        AS ALL_KG,
-        SUM(GSV)                                           AS ALL_GSV,
-        SUM(OSC)                                           AS ALL_OSC,
-        SUM(STD_MEAT)                                      AS ALL_MEAT,
-        SUM(STD_LABOUR)                                    AS ALL_LABOUR,
-        SUM(STD_INGREDIENTS)                               AS ALL_INGREDIENTS,
-        SUM(STD_PACKAGING)                                 AS ALL_PACKAGING,
-        SUM(STD_COS)                                       AS ALL_COS,
-        SUM(STD_FREIGHT)                                   AS ALL_FREIGHT
+        SUM(IFF(NOT IS_INTERCO, EDIBLE_KG, 0))             AS SM_KG,
+        SUM(IFF(NOT IS_INTERCO, GSV, 0))                   AS SM_GSV,
+        SUM(IFF(NOT IS_INTERCO, OSC, 0))                   AS SM_OSC,
+        SUM(IFF(NOT IS_INTERCO, STD_MEAT, 0))              AS SM_MEAT,
+        SUM(IFF(NOT IS_INTERCO, STD_LABOUR, 0))            AS SM_LABOUR,
+        SUM(IFF(NOT IS_INTERCO, STD_INGREDIENTS, 0))       AS SM_INGREDIENTS,
+        SUM(IFF(NOT IS_INTERCO, STD_PACKAGING, 0))         AS SM_PACKAGING,
+        SUM(IFF(NOT IS_INTERCO, STD_COS, 0))               AS SM_COS,
+        SUM(IFF(NOT IS_INTERCO, STD_FREIGHT, 0))           AS SM_FREIGHT
     FROM DEV_ANALYTICS.FINANCE_PL_WEEKLY.WPL_SALES_WEEK
     GROUP BY ALL
 ),
@@ -48,7 +48,7 @@ pilot_week AS (
 base AS (
     SELECT p.SITE, p.WEEK_START,
         sa.EXT_T, sa.INEDIBLE_T, sa.EXT_NSV, sa.EXT_MATERIAL, sa.EXT_PACKAGING, sa.EXT_LABOUR, sa.EXT_FREIGHT, sa.INT_FREIGHT,
-        sa.ALL_KG, sa.ALL_GSV, sa.ALL_OSC, sa.ALL_MEAT, sa.ALL_LABOUR, sa.ALL_INGREDIENTS, sa.ALL_PACKAGING, sa.ALL_COS, sa.ALL_FREIGHT,
+        sa.SM_KG, sa.SM_GSV, sa.SM_OSC, sa.SM_MEAT, sa.SM_LABOUR, sa.SM_INGREDIENTS, sa.SM_PACKAGING, sa.SM_COS, sa.SM_FREIGHT,
         m.STO_T, m.STO_NSV, m.STO_STD_MATERIAL, m.STO_STD_PACKAGING, m.STO_STD_LABOUR, m.PRODUCTION_T,
         COALESCE(g440.VALUE, 0) AS GL_PACKAGING,
         COALESCE(g810.VALUE, 0) AS GL_FREIGHT,
@@ -83,16 +83,16 @@ wide AS (
         (GL_PACKAGING - (COALESCE(EXT_PACKAGING, 0) + COALESCE(STO_STD_PACKAGING, 0)))::FLOAT AS "440",
         (GL_FREIGHT - COALESCE(EXT_FREIGHT, 0))::FLOAT      AS "810",
         (GL_DISTRIBUTION - COALESCE(INT_FREIGHT, 0))::FLOAT AS "820",
-        COALESCE(ALL_KG, 0)::FLOAT               AS "2010",
-        COALESCE(ALL_GSV, 0)::FLOAT              AS "2020",
-        COALESCE(ALL_OSC, 0)::FLOAT              AS "2040",
-        COALESCE(ALL_MEAT, 0)::FLOAT             AS "2110",
-        COALESCE(ALL_LABOUR, 0)::FLOAT           AS "2120",
-        COALESCE(ALL_INGREDIENTS, 0)::FLOAT      AS "2130",
-        COALESCE(ALL_PACKAGING, 0)::FLOAT        AS "2140",
+        COALESCE(SM_KG, 0)::FLOAT               AS "2010",
+        COALESCE(SM_GSV, 0)::FLOAT              AS "2020",
+        COALESCE(SM_OSC, 0)::FLOAT              AS "2040",
+        COALESCE(SM_MEAT, 0)::FLOAT             AS "2110",
+        COALESCE(SM_LABOUR, 0)::FLOAT           AS "2120",
+        COALESCE(SM_INGREDIENTS, 0)::FLOAT      AS "2130",
+        COALESCE(SM_PACKAGING, 0)::FLOAT        AS "2140",
         -- Other: gold cost of sales less the four silver components, so STD Cost of Goods ties to COPA (#51).
-        (COALESCE(ALL_COS, 0) - COALESCE(ALL_MEAT, 0) - COALESCE(ALL_LABOUR, 0) - COALESCE(ALL_INGREDIENTS, 0) - COALESCE(ALL_PACKAGING, 0))::FLOAT AS "2150",
-        COALESCE(ALL_FREIGHT, 0)::FLOAT          AS "2210"
+        (COALESCE(SM_COS, 0) - COALESCE(SM_MEAT, 0) - COALESCE(SM_LABOUR, 0) - COALESCE(SM_INGREDIENTS, 0) - COALESCE(SM_PACKAGING, 0))::FLOAT AS "2150",
+        COALESCE(SM_FREIGHT, 0)::FLOAT          AS "2210"
     FROM base
 ),
 calc AS (

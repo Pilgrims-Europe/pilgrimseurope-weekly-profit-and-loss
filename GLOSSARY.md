@@ -77,8 +77,8 @@ Gross Sales Value. The invoice value of sales before O.S.C.
 _Avoid_: Gross revenue, gross sales
 
 **O.S.C**:
-Override Sales Commission. The value that G.S.V. less O.S.C gives N.S.V. How it relates to the template line Overrider Adj is Unknown.
-_Avoid_: Overrider, promotions
+The promotional discount and overrider that are taken off G.S.V. to give N.S.V. Gui calls it Override Sales Commission. The FP&A draft manual calls the line Promo Discount (O.S.C). It does not include Overrider Adj, credit note adjustments or price corrections. Ticket #50 asks Gui to confirm this.
+_Avoid_: Overrider Adj, promotions
 
 **N.S.V.**:
 Net Sales Value. G.S.V. less O.S.C.

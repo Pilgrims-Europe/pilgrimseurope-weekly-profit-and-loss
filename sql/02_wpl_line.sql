@@ -122,7 +122,7 @@ FROM VALUES
 (1240, 'Headcount', 'Indirect Agency FTE', 'Manual', 'Agency sheet', 'Red', 'The agency sheet is manual.', NULL, 'FTE', 'NONE', NULL, NULL, NULL, NULL, NULL),
 (1250, 'Headcount', 'Total FTE', 'Subtotal', NULL, NULL, NULL, NULL, 'FTE', 'PILOT', '1210 1220 1230 1240', NULL, NULL, NULL, NULL)
 ),
--- Sales margin layout (Gui, 2026-11-18). All COPA sales of the site: external and intercompany, edible and inedible (#52).
+-- Sales margin layout (Gui, 2026-11-18). External sales only (intercompany out). Total KG is edible kg (#52).
 -- All leaf lines are Amber until Gui signs them off (#50, #51, #52, #21).
 margin AS (
 SELECT
@@ -130,21 +130,21 @@ SELECT
     column9::TEXT, column10::TEXT, column11::TEXT, column12::NUMBER, column13::NUMBER, column14::NUMBER, column15::TEXT,
     'Sales margin'
 FROM VALUES
-(2010, 'Sales margin', 'Total KG', 'System', 'COPA (FACT_COPAPEUS4)', 'Amber', 'Which kg is Total KG is not signed off.', 'Gold COPA actuals QUANTITY_IN_KG, all sales of the site (external and intercompany, edible and inedible).', 'kg', 'PILOT', NULL, NULL, NULL, NULL, '#52'),
-(2020, 'Sales margin', 'G.S.V.', 'System', 'COPA (FACT_COPAPEUS4)', 'Amber', 'The sales in the Sales margin layout are not signed off.', 'Gold COPA actuals GROSS_REVENUE_GBP_CALC, all sales of the site.', 'GBP', 'PILOT', NULL, NULL, NULL, NULL, '#52'),
+(2010, 'Sales margin', 'Total KG', 'System', 'COPA (FACT_COPAPEUS4)', 'Amber', 'Which kg is Total KG is not signed off.', 'Gold COPA actuals SALES_KG where EDIBLE_FLAG = Edible, INTERCO_FLAG not Interco. The same kg as Sales Tonnage.', 'kg', 'PILOT', NULL, NULL, NULL, NULL, '#52'),
+(2020, 'Sales margin', 'G.S.V.', 'System', 'COPA (FACT_COPAPEUS4)', 'Amber', 'The sales in the Sales margin layout are not signed off.', 'Gold COPA actuals GROSS_REVENUE_GBP_CALC, external sales (INTERCO_FLAG not Interco).', 'GBP', 'PILOT', NULL, NULL, NULL, NULL, '#52'),
 (2030, 'Sales margin', 'Gross Price/kg', 'Subtotal', NULL, NULL, NULL, 'G.S.V. / Total KG.', 'GBP/kg', 'PILOT', NULL, 2020, 2010, 1, NULL),
-(2040, 'Sales margin', 'O.S.C', 'System', 'COPA (FACT_COPAPEUS4)', 'Amber', 'What O.S.C is, is not signed off. Its relation to Overrider Adj is Unknown.', 'Gold COPA actuals TOTAL_OSC_GBP_CALC, all sales of the site. G.S.V. + O.S.C = N.S.V.', 'GBP', 'PILOT', NULL, NULL, NULL, NULL, '#50'),
+(2040, 'Sales margin', 'O.S.C', 'System', 'COPA (FACT_COPAPEUS4)', 'Amber', 'What O.S.C is, is not signed off. The FP&A draft manual says it is the promotional discount and overrider, without Overrider Adj.', 'Gold COPA actuals TOTAL_OSC_GBP_CALC, external sales (INTERCO_FLAG not Interco). G.S.V. + O.S.C = N.S.V.', 'GBP', 'PILOT', NULL, NULL, NULL, NULL, '#50'),
 (2050, 'Sales margin', '% O.S.C', 'Subtotal', NULL, NULL, NULL, 'O.S.C / G.S.V.', '%', 'PILOT', NULL, 2040, 2020, 1, NULL),
 (2060, 'Sales margin', 'N.S.V.', 'Subtotal', NULL, NULL, NULL, 'G.S.V. less O.S.C.', 'GBP', 'PILOT', '2020 2040', NULL, NULL, NULL, NULL),
 (2070, 'Sales margin', 'Net Price/kg', 'Subtotal', NULL, NULL, NULL, 'N.S.V. / Total KG.', 'GBP/kg', 'PILOT', NULL, 2060, 2010, 1, NULL),
-(2110, 'Sales margin', 'Meat', 'System', 'COPA silver table', 'Amber', 'The cost split is not signed off.', 'Silver COPA COST_COMPONENT_MEAT, all sales of the site.', 'GBP', 'PILOT', NULL, NULL, NULL, NULL, '#51'),
-(2120, 'Sales margin', 'Labour', 'System', 'COPA silver table', 'Amber', 'The cost split is not signed off. The labour cost components are not confirmed.', 'Silver COPA CC_COST005 + CC_COST009, all sales of the site.', 'GBP', 'PILOT', NULL, NULL, NULL, NULL, '#51'),
-(2130, 'Sales margin', 'Ingredients', 'System', 'COPA silver table', 'Amber', 'The cost split is not signed off.', 'Silver COPA COST_COMPONENT_INGREDIENTS, all sales of the site.', 'GBP', 'PILOT', NULL, NULL, NULL, NULL, '#51'),
-(2140, 'Sales margin', 'Packaging', 'System', 'COPA silver table', 'Amber', 'The cost split is not signed off.', 'Silver COPA COST_COMPONENT_PACKAGING, all sales of the site.', 'GBP', 'PILOT', NULL, NULL, NULL, NULL, '#51'),
+(2110, 'Sales margin', 'Meat', 'System', 'COPA silver table', 'Amber', 'The cost split is not signed off.', 'Silver COPA COST_COMPONENT_MEAT, external sales (INTERCO_FLAG not Interco).', 'GBP', 'PILOT', NULL, NULL, NULL, NULL, '#51'),
+(2120, 'Sales margin', 'Labour', 'System', 'COPA silver table', 'Amber', 'The cost split is not signed off. The labour cost components are not confirmed.', 'Silver COPA CC_COST005 + CC_COST009, external sales (INTERCO_FLAG not Interco).', 'GBP', 'PILOT', NULL, NULL, NULL, NULL, '#51'),
+(2130, 'Sales margin', 'Ingredients', 'System', 'COPA silver table', 'Amber', 'The cost split is not signed off.', 'Silver COPA COST_COMPONENT_INGREDIENTS, external sales (INTERCO_FLAG not Interco).', 'GBP', 'PILOT', NULL, NULL, NULL, NULL, '#51'),
+(2140, 'Sales margin', 'Packaging', 'System', 'COPA silver table', 'Amber', 'The cost split is not signed off.', 'Silver COPA COST_COMPONENT_PACKAGING, external sales (INTERCO_FLAG not Interco).', 'GBP', 'PILOT', NULL, NULL, NULL, NULL, '#51'),
 (2150, 'Sales margin', 'Other', 'Calculation', 'COPA (gold and silver)', 'Amber', 'What Other holds is not signed off.', 'Gold COPA COS_GBP_CALC less Meat, Labour, Ingredients and Packaging. So STD Cost of Goods = COPA cost of sales.', 'GBP', 'PILOT', NULL, NULL, NULL, NULL, '#51'),
 (2160, 'Sales margin', 'STD Cost of Goods', 'Subtotal', NULL, NULL, NULL, 'Meat + Labour + Ingredients + Packaging + Other. Freight is not in it.', 'GBP', 'PILOT', '2110 2120 2130 2140 2150', NULL, NULL, NULL, NULL),
 (2170, 'Sales margin', 'STD/kg', 'Subtotal', NULL, NULL, NULL, 'STD Cost of Goods / Total KG.', 'GBP/kg', 'PILOT', NULL, 2160, 2010, 1, NULL),
-(2210, 'Sales margin', 'Freight', 'System', 'COPA (FACT_COPAPEUS4)', 'Amber', 'The standard freight field is Unknown.', 'Gold COPA FREIGHT_STAT_GBP_CALC (-CC_FREIGHT_ZUF2), all sales of the site.', 'GBP', 'PILOT', NULL, NULL, NULL, NULL, '#21'),
+(2210, 'Sales margin', 'Freight', 'System', 'COPA (FACT_COPAPEUS4)', 'Amber', 'The standard freight field is Unknown.', 'Gold COPA FREIGHT_STAT_GBP_CALC (-CC_FREIGHT_ZUF2), external sales (INTERCO_FLAG not Interco).', 'GBP', 'PILOT', NULL, NULL, NULL, NULL, '#21'),
 (2220, 'Sales margin', 'Freight/kg', 'Subtotal', NULL, NULL, NULL, 'Freight / Total KG.', 'GBP/kg', 'PILOT', NULL, 2210, 2010, 1, NULL),
 (2230, 'Sales margin', 'Contribution', 'Subtotal', NULL, NULL, NULL, 'N.S.V. less STD Cost of Goods less Freight.', 'GBP', 'PILOT', '2020 2040 2110 2120 2130 2140 2150 2210', NULL, NULL, NULL, NULL),
 (2240, 'Sales margin', 'Contribution/kg', 'Subtotal', NULL, NULL, NULL, 'Contribution / Total KG.', 'GBP/kg', 'PILOT', NULL, 2230, 2010, 1, NULL),
