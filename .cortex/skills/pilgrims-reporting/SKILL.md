@@ -87,6 +87,7 @@ Use this for every `/to-questionnaire` run.
 - Each question has one idea, a "Why this matters" line if needed, a "Comments" field, and an "If you don't know, who does?" field when the recipient can pass it on.
 - If the answer is a choice from known values, use radio buttons or a tick-box table. Pull the values from Snowflake. Do not ask for free text.
 - The export has the recipient's name, a "Download answers (.md)" button, a "Copy answers" button, and autosave. Autosave uses `localStorage` inside `try/catch`, because the Snowflake sandbox blocks storage.
+- Sandboxed viewers (Snowflake, Teams, Outlook, IDE previews) can block downloads, the clipboard and `confirm()`, with no error. A blocked download cannot be detected. So the template shows the answers as Markdown in a selected text box after each download, and after a failed copy. Copy uses `navigator.clipboard.writeText` only. Clear needs two clicks. Do not change this script for a new questionnaire.
 - Deadline: write "Unknown" if the user does not give one.
 - Forwarding (optional): the template has a "Send questions to a colleague" section. The recipient ticks questions and types a name. The form then makes a short form with only those questions, or copies them as text. The colleague's answers go to the From person. If the user does not ask for forwarding, ask them if they want it. If they do not want it, delete the 3 parts marked OPTIONAL: the `#fwd-block` section, the `li.fwd-step` line and the second script.
 
