@@ -29,7 +29,7 @@ FROM VALUES
 (30,  'Volume', 'Kill Lamb', 'System', 'HCS', 'Red', 'HCS data is not researched.', NULL, 'head', 'NONE', NULL, NULL, NULL, NULL, NULL),
 (40,  'Volume', 'Sales Tonnage', 'System', 'COPA (FACT_COPAPEUS4)', 'Amber', 'The intercompany rule is Unknown. The two flags do not agree at Redruth.', 'Gold COPA actuals, edible kg, INTERCO_FLAG not Interco, by posting date.', 't', 'PILOT', NULL, NULL, NULL, NULL, '#20'),
 (50,  'Volume', 'Sales Tonnage (Inedible)', 'System', 'COPA', 'Amber', 'The rule that finds inedible sales is Unknown.', 'Gold COPA actuals, EDIBLE_FLAG = Inedible, INTERCO_FLAG not Interco.', 't', 'PILOT', NULL, NULL, NULL, NULL, NULL),
-(60,  'Volume', 'Production Tonnage', 'System', 'SAP goods movements', 'Amber', 'The pilot sites have no production orders. Movement type Z61 is Unknown.', 'Goods movements Z61 less Z62, base unit KG.', 't', 'PILOT', NULL, NULL, NULL, NULL, NULL),
+(60,  'Volume', 'Production Tonnage', 'System', 'SAP goods movements', 'Amber', 'Finished goods only. Site finance has not confirmed this rule.', 'Finished goods: SAP goods movements Z61 less Z62 on GL 5000100. Cases x material net weight.', 't', 'PILOT', NULL, NULL, NULL, NULL, '#35'),
 -- External sales at standard
 (110, 'External sales at standard', 'STD Ext NSV', 'System', 'COPA (NET_REVENUE)', 'Amber', 'The intercompany rule is Unknown.', 'Gold COPA NET_REVENUE_GBP_CALC, INTERCO_FLAG not Interco.', 'GBP', 'PILOT', NULL, NULL, NULL, NULL, '#20'),
 (120, 'External sales at standard', 'STD Ext Material Cost', 'System', 'COPA silver table', 'Amber', 'The cost split is only in the silver table.', 'Silver COPA COST_COMPONENT_MEAT + COST_COMPONENT_INGREDIENTS. Payer account group not Z100 or Z109.', 'GBP', 'PILOT', NULL, NULL, NULL, NULL, '#20'),
