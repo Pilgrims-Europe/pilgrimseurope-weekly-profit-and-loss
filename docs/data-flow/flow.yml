@@ -90,7 +90,7 @@ nodes:
     layer: upstream
     medallion: gold
     object: PROD_ANALYTICS.FINANCE_MT.FACT_COPAPEUS4, DIM_CUSTOMERMASTER
-    description: COPA sales (kg, G.S.V., O.S.C, NSV, cost of sales, standard freight, edible flag) and the customer master for the intercompany rule and customer names.
+    description: COPA sales (kg, G.S.V., O.S.C, NSV, cost of sales, standard freight, edible flag, sold-to and ship-to for the intercompany rule) and the customer master for customer names.
   - id: calendar
     label: Finance calendar
     layer: upstream

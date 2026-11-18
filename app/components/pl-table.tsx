@@ -6,7 +6,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { REPO_URL } from '@/lib/constants';
 import { cn } from '@/lib/utils';
 import type { LineDetail, PlLine } from '@/lib/wpl';
-import { formatUnit, ticketUrl, toNumber } from '@/lib/wpl-format';
+import { formatUnit, isRunRate, ticketUrl, toNumber } from '@/lib/wpl-format';
 import { ALL_SITES, components, type PlNode } from '@/lib/wpl-rollup';
 import { useQuery } from '@tanstack/react-query';
 import { ChevronRight, ExternalLink } from 'lucide-react';
@@ -409,7 +409,7 @@ export function LineSheet({ line, weekStart, onClose }: { line: PlLine | null; w
     },
   });
   const ticket = ticketUrl(REPO_URL, line?.TICKET);
-  const overhead = line?.LINE_GROUP === 'Overheads' && line.SOURCE_TYPE !== 'Subtotal';
+  const overhead = isRunRate(line);
 
   return (
     <Sheet open={!!line} onOpenChange={(o) => !o && onClose()}>

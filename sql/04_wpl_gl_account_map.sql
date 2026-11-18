@@ -1,5 +1,10 @@
 -- GL account to template line.
--- Variance lines: accounts from Gui's PHASE 1 sheet (see reports/anaplan-line-tags.html).
+-- Variance lines: accounts from Gui's PHASE 1 sheet (see reports/anaplan-line-tags.html),
+-- changed by Gui's answers to questionnaires/line-sources-for-gui.html (tickets #4, #22).
+-- STK lines also take physical inventory and production cost variance accounts: Raw and Ingredients to Materials,
+-- SF to WIP, FG to F.Goods. Gui did not give a line for Trading Goods and Other: they go to Materials (assumption).
+-- Stock revaluation accounts go to Revaluation (STK), not Traded Good (PPV).
+-- Consumables: the P&L group CONSUMABLES plus 5297000 and 5297100 (P&L group ENGINEERING COSTS; Gui puts them in Consumables).
 -- Production Material Yield also takes the production output credits (at standard), so actual less standard shows.
 -- Packaging Yield: all other accounts in P&L group PACKAGING (actual packaging consumption).
 -- Freight also takes the other carrier accounts (5010010 holds most of the freight cost).
@@ -16,15 +21,20 @@ WITH fixed (GLACCOUNT, LINE_ID) AS (
     -- PPV
     ('0005000800', 510), ('0005000810', 510), ('0005000820', 510), ('0005000895', 510),
     ('0005030025', 520),
-    ('0005000600', 530), ('0005000605', 530), ('0005000610', 530), ('0005000620', 530),
-    ('0005030050', 550), ('0005000700', 550), ('0005000705', 550), ('0005000710', 550), ('0005000805', 550),
+    ('0005000805', 510),
+    ('0005030050', 550), ('0005000700', 550), ('0005000705', 550), ('0005000710', 550),
     -- STK
-    ('0005001000', 610), ('0005001020', 610),
-    ('0005030070', 620), ('0005030075', 620),
-    ('0005001005', 630),
-    ('0005001010', 640),
+    ('0005001000', 610), ('0005001020', 610), ('0005000500', 610), ('0005000520', 610),
+    ('0005000900', 610), ('0005000915', 610), ('0005000995', 610),
+    ('0005030070', 620), ('0005030075', 620), ('0005030030', 620),
+    ('0005001005', 630), ('0005000505', 630), ('0005000905', 630),
+    ('0005001010', 640), ('0005000510', 640), ('0005000910', 640),
+    ('0005000600', 645), ('0005000605', 645), ('0005000610', 645), ('0005000615', 645), ('0005000620', 645),
+    ('0005030060', 645),
     -- OCI
-    ('0005005100', 720), ('0005900230', 720),
+    ('0005005100', 720), ('0005900230', 720), ('0007002990', 720),
+    -- Consumables (accounts from P&L group ENGINEERING COSTS)
+    ('0005297000', 1000), ('0005297100', 1000),
     -- Freight and distribution
     ('0005010000', 810), ('0005010010', 810), ('0005010020', 810), ('0005010050', 810),
     ('0005012000', 820)
@@ -57,7 +67,7 @@ overhead AS (
         END AS LINE_ID
     FROM pl_group
 )
-SELECT f.GLACCOUNT, f.LINE_ID, g.ACCOUNTNAME, g.GROUP_NAME, 'PHASE 1' AS MAP_SOURCE
+SELECT f.GLACCOUNT, f.LINE_ID, g.ACCOUNTNAME, g.GROUP_NAME, 'Fixed list (PHASE 1, Gui)' AS MAP_SOURCE
 FROM fixed f LEFT JOIN pl_group g ON g.GLACCOUNT = f.GLACCOUNT
 UNION ALL
 SELECT o.GLACCOUNT, o.LINE_ID, g.ACCOUNTNAME, g.GROUP_NAME,

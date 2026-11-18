@@ -1,11 +1,11 @@
 -- One value for each site, week and built line (leaf lines only, no subtotals).
 -- Sign: income positive, cost negative. Tonnage in tonnes, kill in head, Total KG in kg.
 -- Sales margin lines (2010 to 2210) use external sales (intercompany out). Total KG is edible kg, the same as Sales Tonnage (#52).
--- Overheads are a run rate: the average weekly GL value of the 13 weeks before the week.
+-- Overheads are a run rate: the average weekly GL value of the 13 weeks before the week. Consumables is the week's GL actual (ticket #22).
 -- In the first weeks of FY2026 fewer than 13 weeks are in the data, so the average uses the weeks that exist.
 -- ACTUAL_VALUE holds the week's own GL value for overhead lines (for comparison in the app).
 CREATE OR REPLACE VIEW DEV_ANALYTICS.FINANCE_PL_WEEKLY.WPL_LINE_VALUE
-COMMENT = 'Weekly P&L app: value of each built leaf line by site and week, from the WPL_* source views. Overheads = 13-week run rate; ACTUAL_VALUE = the week GL actual.'
+COMMENT = 'Weekly P&L app: value of each built leaf line by site and week, from the WPL_* source views. Overheads (not Consumables) = 13-week run rate; ACTUAL_VALUE = the week GL actual.'
 AS
 WITH sales AS (
     SELECT SITE, WEEK_START,
@@ -104,13 +104,13 @@ calc AS (
 gl_direct AS (
     SELECT SITE, WEEK_START, LINE_ID, VALUE
     FROM gl
-    WHERE LINE_ID IN (410, 510, 520, 530, 550, 610, 620, 630, 640, 720)
+    WHERE LINE_ID IN (410, 510, 520, 530, 550, 610, 620, 630, 640, 645, 720, 1000)
 ),
 overhead_week AS (
     -- Every pilot site, week and overhead line, with 0 when the week has no postings.
     SELECT p.SITE, p.WEEK_START, l.LINE_ID, COALESCE(g.VALUE, 0) AS VALUE
     FROM pilot_week p
-    CROSS JOIN (SELECT LINE_ID FROM DEV_ANALYTICS.FINANCE_PL_WEEKLY.WPL_LINE WHERE LINE_GROUP = 'Overheads' AND SOURCE_TYPE <> 'Subtotal') l
+    CROSS JOIN (SELECT LINE_ID FROM DEV_ANALYTICS.FINANCE_PL_WEEKLY.WPL_LINE WHERE RULE ILIKE 'Run rate%') l
     LEFT JOIN gl g ON g.SITE = p.SITE AND g.WEEK_START = p.WEEK_START AND g.LINE_ID = l.LINE_ID
 ),
 overhead AS (

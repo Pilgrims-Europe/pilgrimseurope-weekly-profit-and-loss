@@ -6,6 +6,7 @@
  */
 import { snowflake } from '@/lib/snowflake';
 import type { LeafValue, SalesFilter, SalesFilterParam } from '@/lib/wpl-filter';
+import { isRunRate } from '@/lib/wpl-format';
 
 const SCHEMA =
   process.env.NODE_ENV === 'development' && /^[A-Z0-9_]+\.[A-Z0-9_]+$/.test(process.env.WPL_SCHEMA ?? '')
@@ -285,8 +286,8 @@ export async function getLineDetail(site: string, weekStart: string, lineId: num
 
   const [accounts, [line]] = await Promise.all([
     getLineAccounts(site, weekStart, lineId),
-    rows<{ VALUE: string | null; LINE_GROUP: string; SOURCE_TYPE: string }>(
-      `SELECT VALUE, LINE_GROUP, SOURCE_TYPE FROM ${SCHEMA}.WPL_T_WEEKLY_PL WHERE SITE = ? AND WEEK_START = ? AND LINE_ID = ?`,
+    rows<{ VALUE: string | null; LINE_GROUP: string; SOURCE_TYPE: string; RULE: string | null }>(
+      `SELECT VALUE, LINE_GROUP, SOURCE_TYPE, RULE FROM ${SCHEMA}.WPL_T_WEEKLY_PL WHERE SITE = ? AND WEEK_START = ? AND LINE_ID = ?`,
       [site, weekStart, lineId],
     ),
   ]);
@@ -297,7 +298,7 @@ export async function getLineDetail(site: string, weekStart: string, lineId: num
     UNIT: 'GBP',
   }));
   const glTotal = items.reduce((s, i) => s + (i.VALUE ?? 0), 0);
-  if (line?.LINE_GROUP === 'Overheads') {
+  if (isRunRate(line)) {
     return {
       items,
       note: items.length
