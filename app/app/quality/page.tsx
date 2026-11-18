@@ -9,19 +9,19 @@ import type React from 'react';
 export const dynamic = 'force-dynamic';
 
 const OPEN_RULES = [
-  { ticket: 20, title: 'Intercompany rule', lines: 'Sales Tonnage, STD Ext NSV and cost lines, all STO lines' },
-  { ticket: 21, title: 'Standard freight field', lines: 'STD Ext Freight, STD Int Freight, Freight, Distribution' },
-  { ticket: 22, title: 'GL accounts for Consumables, OCI and Traded Good', lines: 'Consumables, Materials (OCI), Packaging (OCI), Traded Good (PPV)' },
+  { ticket: 20, title: 'STO lines and the intercompany rule', lines: 'All STO lines, STD Int Freight, Distribution' },
+  { ticket: 22, title: 'GL accounts for Materials (OCI), Traded Good and fuel gas', lines: 'Materials (OCI), Traded Good (PPV), Packaging (OCI)' },
 ];
 
 const KNOWN = [
-  'Overheads are a run rate: the average of the 13 weeks before. The first weeks of FY2026 use fewer weeks. The run rate period is not decided.',
+  'Overheads (not Consumables) are a run rate: the average of the 13 weeks before. The first weeks of FY2026 use fewer weeks. The run rate period is not decided.',
   'Kill (poultry) does not take off condemnations. The condemnation codes include part rejects such as croppings, so their total is not a count of whole birds.',
   'Anwick reports delivered birds by plant weigh-in time. This app uses the Mtech kill date, so Anwick can differ by day.',
   'Production Material Yield is GL material consumption less production output credits. Gui\'s method compares actual with standard. The two can differ.',
   'Production Tonnage is finished goods only (Z61 less Z62 on GL 5000100, cases x net weight). Site finance has not confirmed this rule.',
   'STO is movement type 641 goods issue at the released standard cost. Internal NSV is at standard cost, so internal contribution is close to freight only.',
-  'Substitution and Materials (OCI) are empty: no source field or GL account is known.',
+  'Substitution, Materials (OCI) and Traded Good (PPV) are empty: no source field or GL account is known.',
+  'Revaluation (STK) is a new line from Gui\'s PHASE 2 sheet. It is not on the Anaplan weekly template.',
 ];
 
 export default async function QualityPage() {

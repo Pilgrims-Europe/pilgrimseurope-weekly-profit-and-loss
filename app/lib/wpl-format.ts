@@ -91,6 +91,11 @@ export function weekLabel(fiscalWeek: unknown, weekStart: string): string {
   return `Week ${fiscalWeek ?? '?'} (${fmt(start, false)} to ${fmt(end, true)})`;
 }
 
+/** True for lines that show a 13-week run rate (overheads, not Consumables). WPL_LINE_VALUE uses the same test. */
+export function isRunRate(line: { RULE?: string | null } | null | undefined): boolean {
+  return !!line?.RULE?.startsWith('Run rate');
+}
+
 /** Ticket text such as "#20" to a GitHub issue URL. */
 export function ticketUrl(repoUrl: string, ticket: string | null | undefined): string | null {
   const m = ticket?.match(/#(\d+)/);

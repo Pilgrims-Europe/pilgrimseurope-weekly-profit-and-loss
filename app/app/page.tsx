@@ -55,7 +55,7 @@ export default async function WeeklyPlPage({
       <>
         <p className="text-sm text-muted-foreground">
           {siteLabel} · {weekLabel(week.FISCAL_WEEK, week.WEEK_START)} · {built.length} lines built from Snowflake.
-          Sales and variances are actual. Overheads are a run rate.
+          Sales and variances are actual. Overheads are a run rate, except Consumables.
           {one ? '' : ' Kill is from the kill sites. Click ▸ on a line to see each site and the items behind it.'}
         </p>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
