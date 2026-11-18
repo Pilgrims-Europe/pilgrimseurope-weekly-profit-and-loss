@@ -1,0 +1,307 @@
+# Data flow to the Weekly P&L app. This file is the source of the diagram in the README.
+#
+# When a change adds, removes or moves a source, object or consumer:
+#   1. Change this file in the same pull request.
+#   2. Add a line with status "pending" to docs/data-flow/CHANGELOG.md.
+# A GitHub Action renders the diagram once a day and opens a pull request.
+# Check your change: python scripts/render_flow.py --check
+# See the result without changing the repo: python scripts/render_flow.py --preview
+#
+# Layer fields: id, label, where (database or schema), kind (optional: view or table, shown on each node).
+# The diagram draws the layers left to right in this order. A node can read only from its own or an earlier layer.
+#
+# Node fields:
+#   id          unique, lower case
+#   label       name on the diagram
+#   layer       id of a layer below
+#   object      Snowflake object(s), fully qualified
+#   medallion   upstream only: bronze, silver, gold, other or manual
+#   status      live (default) or planned. Planned nodes and their edges are dashed.
+#   sql         file in this repo that makes the object
+#   description one or two short sentences
+#   inputs      ids of the nodes this node reads
+#   hide_edges  true: do not draw edges out of this node (used by almost all nodes). The details panel lists them.
+#   hide_inputs true: do not draw edges into this node. The details panel lists them.
+
+repo_url: https://github.com/Pilgrims-Europe/pilgrimseurope-weekly-profit-and-loss
+
+layers:
+  - id: upstream
+    label: Upstream sources
+    where: PROD_RAW, PROD_STAGING, PROD_ANALYTICS, FINANCE_STORE
+  - id: reference
+    label: Reference views
+    where: DEV_ANALYTICS.FINANCE_PL_WEEKLY
+    kind: view
+  - id: rules
+    label: Rule views
+    where: DEV_ANALYTICS.FINANCE_PL_WEEKLY
+    kind: view
+  - id: combine
+    label: Weekly P&L views
+    where: DEV_ANALYTICS.FINANCE_PL_WEEKLY
+    kind: view
+  - id: refresh
+    label: Refreshed tables
+    where: DEV_ANALYTICS.FINANCE_PL_WEEKLY (WPL_REFRESH_TASK, 11:00 UTC daily)
+    kind: table
+  - id: consumers
+    label: Consumers
+    where: Apps and feeds
+
+nodes:
+  # Upstream sources
+  - id: sap_gl
+    label: "SAP BW: GL line items"
+    layer: upstream
+    medallion: bronze
+    object: PROD_RAW.SAP."jbs_bw4_hana.edw.fmco.figl/C_ACTUALPLANGL"
+    description: GL line items from BW, loaded every day.
+  - id: sap_gm
+    label: "SAP BW: goods movements"
+    layer: upstream
+    medallion: bronze
+    object: PROD_RAW.SAP."jbs_bw4_hana.edw.scm.mmic/C_GOODSMOVEMENTDOCUMENTS"
+    description: Goods movement documents from BW, loaded every day.
+  - id: mtech
+    label: "Mtech: poultry kill"
+    layer: upstream
+    medallion: bronze
+    object: >-
+      PROD_RAW.MTECH.MVPMTSPROCRECVTRANSHOUSEDETAIL, PMTSCONDEMNTRANS, PMTSCONDEMNTRANSDETAILS,
+      PMTSCONDEMNATIONS, PROTEINFACILITYPLANTS
+    description: Bird loads, DOA and condemnations for the poultry kill sites.
+  - id: hellenic
+    label: "Hellenic: pork kill"
+    layer: upstream
+    medallion: bronze
+    object: >-
+      PROD_RAW.HELLENIC."STG_PIG_BOOKING DETAIL__live", "STG_PIG_LOT__live",
+      "STG_PIG_TRANSACTIONS__live", "STG_PIG_CONDEMNED PARTS__live"
+    description: Pig bookings, lots and condemned parts (CDC copies) for the pork kill sites.
+  - id: copa_silver
+    label: "COPA: cost split"
+    layer: upstream
+    medallion: silver
+    object: PROD_STAGING.FINANCE.C_PROFITABILITYANAL_COSTING_PEU_SAP_STG
+    description: COPA with the meat, packaging and labour standard cost split.
+  - id: copa_gold
+    label: "COPA: sales"
+    layer: upstream
+    medallion: gold
+    object: PROD_ANALYTICS.FINANCE_MT.FACT_COPAPEUS4, DIM_CUSTOMERMASTER
+    description: COPA sales (kg, NSV, standard freight, edible flag) and the customer master for the intercompany rule.
+  - id: calendar
+    label: Finance calendar
+    layer: upstream
+    medallion: gold
+    object: PROD_ANALYTICS.FINANCE_MT.DIM_CALENDARMASTER
+    description: Fiscal years, periods and weeks.
+  - id: product_cost
+    label: Released standard cost
+    layer: upstream
+    medallion: gold
+    object: PROD_ANALYTICS.FINANCE_MT.FACT_PRODUCT_COST_RELEASED
+    description: Released cost estimates, used for STO at standard.
+  - id: yield
+    label: "Arolink: yield"
+    layer: upstream
+    medallion: gold
+    object: PROD_ANALYTICS.OPERATIONS_MT.FACTS_YIELD
+    description: Arolink yield for the pilot plants.
+  - id: pl_app_base
+    label: "P&L app: GL groups"
+    layer: upstream
+    medallion: other
+    object: FINANCE_STORE.P_AND_L.PL_APP_FACT_BASE
+    description: P&L group (GROUP_NAME) of each GL account, from the monthly P&L app.
+  - id: site_entry
+    label: Site entry app
+    layer: upstream
+    medallion: manual
+    status: planned
+    description: Planned. Sites enter the manual lines, for example overheads, freight and agency.
+
+  # Reference views
+  - id: wpl_week
+    label: WPL_WEEK
+    layer: reference
+    object: DEV_ANALYTICS.FINANCE_PL_WEEKLY.WPL_WEEK
+    sql: sql/01_wpl_week.sql
+    description: Fiscal weeks (Monday to Sunday) from the finance calendar. Complete weeks only.
+    inputs: [calendar]
+    hide_edges: true
+  - id: wpl_site
+    label: WPL_SITE
+    layer: reference
+    object: DEV_ANALYTICS.FINANCE_PL_WEEKLY.WPL_SITE
+    sql: sql/03_wpl_site.sql
+    description: Sites in the app. Pilot sites get the P&L lines. Kill sites get the kill lines only.
+    hide_edges: true
+  - id: wpl_line
+    label: WPL_LINE
+    layer: reference
+    object: DEV_ANALYTICS.FINANCE_PL_WEEKLY.WPL_LINE
+    sql: sql/02_wpl_line.sql
+    description: Line catalogue of the Anaplan weekly template, with RAG, source, rule and components.
+  - id: wpl_gl_account_map
+    label: WPL_GL_ACCOUNT_MAP
+    layer: reference
+    object: DEV_ANALYTICS.FINANCE_PL_WEEKLY.WPL_GL_ACCOUNT_MAP
+    sql: sql/04_wpl_gl_account_map.sql
+    description: GL account to template line.
+    inputs: [pl_app_base]
+
+  # Rule views
+  - id: wpl_gl_week
+    label: WPL_GL_WEEK
+    layer: rules
+    object: DEV_ANALYTICS.FINANCE_PL_WEEKLY.WPL_GL_WEEK
+    sql: sql/05_wpl_gl_week.sql
+    description: GL line items for the pilot sites by site, fiscal week and account. Company code 125, ledger 1L.
+    inputs: [sap_gl, wpl_site, wpl_gl_account_map, wpl_week]
+  - id: wpl_kill_poultry_code
+    label: WPL_KILL_POULTRY_CODE
+    layer: rules
+    object: DEV_ANALYTICS.FINANCE_PL_WEEKLY.WPL_KILL_POULTRY_CODE
+    sql: sql/06_wpl_kill_poultry.sql
+    description: Condemnations by site, kill date and Mtech code.
+    inputs: [mtech, wpl_site, wpl_week]
+  - id: wpl_kill_poultry
+    label: WPL_KILL_POULTRY
+    layer: rules
+    object: DEV_ANALYTICS.FINANCE_PL_WEEKLY.WPL_KILL_POULTRY
+    sql: sql/06_wpl_kill_poultry.sql
+    description: Poultry kill = birds delivered less DOA. Void loads out. Condemnations are shown, not taken off.
+    inputs: [mtech, wpl_site, wpl_kill_poultry_code, wpl_week]
+  - id: wpl_kill_pork
+    label: WPL_KILL_PORK
+    layer: rules
+    object: DEV_ANALYTICS.FINANCE_PL_WEEKLY.WPL_KILL_PORK
+    sql: sql/07_wpl_kill_pork.sql
+    description: Pork kill = Killed Qty less TC'd pigs, in head, by kill date.
+    inputs: [hellenic, wpl_site, wpl_week]
+  - id: wpl_sales_week
+    label: WPL_SALES_WEEK
+    layer: rules
+    object: DEV_ANALYTICS.FINANCE_PL_WEEKLY.WPL_SALES_WEEK
+    sql: sql/08_wpl_sales_week.sql
+    description: Sales at standard for the pilot plants by week. Gold COPA for sales, silver COPA for the cost split.
+    inputs: [copa_gold, copa_silver, wpl_site, wpl_week]
+  - id: wpl_movement_week
+    label: WPL_MOVEMENT_WEEK
+    layer: rules
+    object: DEV_ANALYTICS.FINANCE_PL_WEEKLY.WPL_MOVEMENT_WEEK
+    sql: sql/09_wpl_movement_week.sql
+    description: Goods movements for the pilot plants by week. STO (641 less 642) and production tonnage (Z61 less Z62).
+    inputs: [sap_gm, product_cost, wpl_site, wpl_week]
+  - id: wpl_yield_week
+    label: WPL_YIELD_WEEK
+    layer: rules
+    object: DEV_ANALYTICS.FINANCE_PL_WEEKLY.WPL_YIELD_WEEK
+    sql: sql/10_wpl_yield_week.sql
+    description: Arolink yield for the pilot plants by week. A yield loss is a cost.
+    inputs: [yield, wpl_site, wpl_week]
+  - id: wpl_dq_unmapped
+    label: WPL_DQ_UNMAPPED
+    layer: rules
+    object: DEV_ANALYTICS.FINANCE_PL_WEEKLY.WPL_DQ_UNMAPPED
+    sql: sql/13_wpl_dq.sql
+    description: P&L accounts with FY2026 postings at the pilot sites that no template line uses.
+    inputs: [sap_gl, wpl_site, pl_app_base, wpl_gl_account_map]
+  - id: wpl_dq_freshness
+    label: WPL_DQ_FRESHNESS
+    layer: rules
+    object: DEV_ANALYTICS.FINANCE_PL_WEEKLY.WPL_DQ_FRESHNESS
+    sql: sql/13_wpl_dq.sql
+    description: Last data date and last load time for each source.
+    inputs: [wpl_gl_week, wpl_movement_week, copa_gold, copa_silver, wpl_kill_poultry, wpl_kill_pork, wpl_yield_week]
+    hide_inputs: true
+
+  # Weekly P&L views
+  - id: wpl_line_value
+    label: WPL_LINE_VALUE
+    layer: combine
+    object: DEV_ANALYTICS.FINANCE_PL_WEEKLY.WPL_LINE_VALUE
+    sql: sql/11_wpl_line_value.sql
+    description: One value for each site, week and built leaf line. Overheads are a 13-week run rate.
+    inputs: [wpl_sales_week, wpl_movement_week, wpl_gl_week, wpl_yield_week, wpl_kill_poultry, wpl_kill_pork, wpl_line, wpl_site, wpl_week]
+  - id: wpl_weekly_pl
+    label: WPL_WEEKLY_PL
+    layer: combine
+    object: DEV_ANALYTICS.FINANCE_PL_WEEKLY.WPL_WEEKLY_PL
+    sql: sql/12_wpl_weekly_pl.sql
+    description: The weekly P&L. One row for each site, week and template line, with value, RAG and rule.
+    inputs: [wpl_line_value, wpl_line, wpl_site, wpl_week]
+
+  # Refreshed tables
+  - id: wpl_t_weekly_pl
+    label: WPL_T_WEEKLY_PL
+    layer: refresh
+    object: DEV_ANALYTICS.FINANCE_PL_WEEKLY.WPL_T_WEEKLY_PL
+    sql: sql/14_wpl_refresh.sql
+    description: Table copy of WPL_WEEKLY_PL, rebuilt each day by WPL_REFRESH.
+    inputs: [wpl_weekly_pl]
+  - id: wpl_t_gl_week
+    label: WPL_T_GL_WEEK
+    layer: refresh
+    object: DEV_ANALYTICS.FINANCE_PL_WEEKLY.WPL_T_GL_WEEK
+    sql: sql/14_wpl_refresh.sql
+    description: Table copy of WPL_GL_WEEK, for the GL account drill-down.
+    inputs: [wpl_gl_week]
+  - id: wpl_t_kill_poultry
+    label: WPL_T_KILL_POULTRY
+    layer: refresh
+    object: DEV_ANALYTICS.FINANCE_PL_WEEKLY.WPL_T_KILL_POULTRY
+    sql: sql/14_wpl_refresh.sql
+    description: Table copy of WPL_KILL_POULTRY.
+    inputs: [wpl_kill_poultry]
+  - id: wpl_t_kill_poultry_code
+    label: WPL_T_KILL_POULTRY_CODE
+    layer: refresh
+    object: DEV_ANALYTICS.FINANCE_PL_WEEKLY.WPL_T_KILL_POULTRY_CODE
+    sql: sql/14_wpl_refresh.sql
+    description: Table copy of WPL_KILL_POULTRY_CODE.
+    inputs: [wpl_kill_poultry_code]
+  - id: wpl_t_kill_pork
+    label: WPL_T_KILL_PORK
+    layer: refresh
+    object: DEV_ANALYTICS.FINANCE_PL_WEEKLY.WPL_T_KILL_PORK
+    sql: sql/14_wpl_refresh.sql
+    description: Table copy of WPL_KILL_PORK.
+    inputs: [wpl_kill_pork]
+  - id: wpl_t_dq_freshness
+    label: WPL_T_DQ_FRESHNESS
+    layer: refresh
+    object: DEV_ANALYTICS.FINANCE_PL_WEEKLY.WPL_T_DQ_FRESHNESS
+    sql: sql/14_wpl_refresh.sql
+    description: Table copy of WPL_DQ_FRESHNESS, for the Quality page.
+    inputs: [wpl_dq_freshness]
+  - id: wpl_t_dq_unmapped
+    label: WPL_T_DQ_UNMAPPED
+    layer: refresh
+    object: DEV_ANALYTICS.FINANCE_PL_WEEKLY.WPL_T_DQ_UNMAPPED
+    sql: sql/14_wpl_refresh.sql
+    description: Table copy of WPL_DQ_UNMAPPED, for the Quality page.
+    inputs: [wpl_dq_unmapped]
+
+  # Consumers
+  - id: weekly_pl_app
+    label: Weekly P&L app
+    layer: consumers
+    object: DEV_ANALYTICS.FINANCE_PL_WEEKLY.WEEKLY_PL
+    sql: app/lib/wpl.ts
+    description: Snowflake app (application service). Reads the refreshed tables and the site and line views.
+    inputs: [wpl_t_weekly_pl, wpl_t_gl_week, wpl_t_kill_poultry, wpl_t_kill_poultry_code, wpl_t_kill_pork, wpl_t_dq_freshness, wpl_t_dq_unmapped, wpl_site, wpl_line]
+  - id: qlik
+    label: Qlik
+    layer: consumers
+    status: planned
+    description: Planned. Drill-down and checks.
+    inputs: [wpl_t_weekly_pl]
+  - id: anaplan
+    label: Anaplan feed
+    layer: consumers
+    status: planned
+    description: Planned. One weekly P&L view in PROD_ANALYTICS.FINANCE_MT for Anaplan (ticket #7).
+    inputs: [wpl_t_weekly_pl]

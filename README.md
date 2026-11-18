@@ -42,25 +42,18 @@ Words like *weekly P&L*, *kill* and *run rate* have exact meanings. See [`GLOSSA
 
 ## How the data flows
 
-```mermaid
-flowchart LR
-    subgraph Sources
-        SAP[SAP via BW<br/>GL lines, stock, BOM]
-        QLIK_SRC[COPA / Qlik<br/>sales, standard margin]
-        KILL[Arolink, Innova, Mtech<br/>kill]
-        MANUAL[Site entry app<br/>overheads, freight, agency]
-    end
+The diagram shows each source, each Snowflake object and each consumer of the Weekly P&L app.
 
-    SF[(Snowflake<br/>all P&L logic)]
+[![Data flow to the Weekly P&L app](docs/data-flow/flow.svg)](docs/data-flow/flow.svg)
 
-    SAP --> SF
-    QLIK_SRC --> SF
-    KILL --> SF
-    MANUAL --> SF
+**Interactive version.** Open `docs/data-flow/index.html` from your local copy of the repo, in a browser. Select an object to see what it reads and what reads it. GitHub shows the file as code, so open it from your laptop.
 
-    SF --> QLIK[Qlik<br/>drill-down and checks]
-    SF --> ANAPLAN[Anaplan<br/>final reporting]
-```
+**When the flow changes.** If your change adds, removes or moves a source, object or consumer, do these steps in the same pull request:
+
+1. Change [`docs/data-flow/flow.yml`](docs/data-flow/flow.yml).
+2. Add a line with status `pending` to [`docs/data-flow/CHANGELOG.md`](docs/data-flow/CHANGELOG.md).
+
+Do not change the diagram files. A GitHub Action renders them once a day and opens a pull request. To see your change before that, run `python scripts/render_flow.py --preview` (first run `pip install pyyaml`). It writes a copy to a temporary folder and does not change the repo.
 
 ---
 
@@ -180,7 +173,10 @@ git push -u origin emma/2-kill-data
 ├── README.md        ← you are here
 ├── GLOSSARY.md      ← exact meaning of project words
 ├── AGENTS.md        ← rules for the AI agents
-└── docs/agents/     ← how agents use GitHub issues
+├── docs/agents/     ← how agents use GitHub issues
+├── docs/data-flow/  ← data flow diagram: flow.yml (source), CHANGELOG.md, flow.svg, index.html
+├── scripts/         ← render_flow.py makes the data flow diagram
+└── .github/         ← pull request template and GitHub Actions
 ```
 
 When you add work, use these folders. Make the folder if it does not exist.
