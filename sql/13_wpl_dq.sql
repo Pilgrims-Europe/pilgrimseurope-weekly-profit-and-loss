@@ -38,7 +38,7 @@ FROM t LEFT JOIN DEV_ANALYTICS.FINANCE_PL_WEEKLY.WPL_T_DQ_DATA_TO d ON d.SOURCE 
 -- P&L accounts (4xxx to 7xxx) with postings at the pilot sites in FY2026 that no template line uses.
 -- Sales, cost of sales and direct wages are expected here: COPA and the standard cost lines carry them.
 CREATE OR REPLACE VIEW DEV_ANALYTICS.FINANCE_PL_WEEKLY.WPL_DQ_UNMAPPED
-COMMENT = 'Weekly P&L app: P&L GL accounts with FY2026 postings at Redruth or Bromborough (ledger 1L) that no template line uses, with P&L group and value.'
+COMMENT = 'Weekly P&L app: P&L GL accounts with FY2026 postings at Redruth or Bromborough (ledger 1L, actual rows only) that no template line uses, with P&L group and value.'
 AS
 SELECT
     s.SITE,
@@ -56,6 +56,7 @@ LEFT JOIN (
 ) p ON p.ACCOUNT = g.GLACCOUNT
 WHERE g.COMPANYCODE = '125'
   AND g.LEDGER = '1L'
+  AND g.ACTUALPLANCODE = 'A'
   AND g.POSTINGDATE >= '20251229'
   AND g.POSTINGDATE <> '00000000'
   AND g.GLACCOUNT BETWEEN '0004000000' AND '0007999999'
