@@ -182,9 +182,10 @@
   <section class="card q" data-q="3" data-title="Which production stages are in production tonnage?" data-type="choice">
     <p class="tkt">Ticket #35</p>
     <h3><span class="qnum">3</span>Which production stages are in production tonnage?</h3>
-    <p>Redruth and Bromborough record production with SAP movement type Z61. Z61 records each stage, for example sliced bacon and then packed bacon. The app adds all stages.</p>
-    <p>In week 45 at Redruth, the app shows 2,495 t of production and 253 t of sales. 84% of the Redruth Z61 tonnes are semi-finished goods. All stages together match Arolink total output within about 2%.</p>
-    <p class="why">Why this matters: The app value for Redruth is about 5 to 7 times finished goods output.</p>
+    <p>Redruth and Bromborough record production with SAP movement type Z61. Z61 records each stage, for example sliced bacon and then packed bacon.</p>
+    <p>In week 45 at Redruth, all stages give 2,495 t of production. Finished goods only give 460 t. Sales are 253 t. All stages together match Arolink total output within about 2%.</p>
+    <p>Until you answer, the app shows finished goods only (GL account 5000100), tagged Amber.</p>
+    <p class="why">Why this matters: At Redruth, all stages give about 5 to 7 times finished goods output. We need the quantity that site finance reports.</p>
     <div class="opts" role="radiogroup" aria-label="Question 3">
       <label><input type="radio" name="q3" value="All stages (matches Arolink total output)" /> All stages (matches Arolink total output)</label>
       <label><input type="radio" name="q3" value="Finished goods only (GL account 5000100)" /> Finished goods only (GL account 5000100)</label>
@@ -198,7 +199,7 @@
   <section class="card q" data-q="4" data-title="Does production tonnage include finished goods that SAP counts in cases?" data-type="choice">
     <p class="tkt">Ticket #35</p>
     <h3><span class="qnum">4</span>Does production tonnage include finished goods that SAP counts in cases?</h3>
-    <p>The app counts kg only. Some finished goods are in cases, not kg. At Bromborough, cases are 10% to 14% of finished goods output. The material net weight can change cases to kg.</p>
+    <p>Some finished goods are in cases, not kg. At Bromborough, cases are 10% to 14% of finished goods output. Until you answer, the app changes cases to kg with the material net weight.</p>
     <div class="opts" role="radiogroup" aria-label="Question 4">
       <label><input type="radio" name="q4" value="Yes. Change cases to kg with the material net weight." /> Yes. Change cases to kg with the material net weight.</label>
       <label><input type="radio" name="q4" value="Yes, with a different weight. Write it in Comments." /> Yes, with a different weight. Write it in Comments.</label>
