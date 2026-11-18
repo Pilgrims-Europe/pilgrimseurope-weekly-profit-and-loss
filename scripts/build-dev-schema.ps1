@@ -15,3 +15,4 @@ foreach ($f in Get-ChildItem (Join-Path $root 'sql') -Filter '*.sql' | Sort-Obje
 $parts += "CALL DEV_ANALYTICS.$Schema.WPL_REFRESH();"
 [IO.File]::WriteAllText($out, ($parts -join "`n"))
 snow sql -f $out --enable-templating NONE
+powershell -NoProfile -File (Join-Path $PSScriptRoot 'check-tie-out.ps1') -Schema $Schema
