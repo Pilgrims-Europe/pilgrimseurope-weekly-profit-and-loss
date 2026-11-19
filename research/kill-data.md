@@ -47,6 +47,54 @@ Since 2025-01-01, Spalding has 2,333,923 pigs delivered and a `Killed Qty` of 2,
 
 `PROD_RAW.HELLENIC` also has `PIG_*` and `SHP_*` tables, for example `PIG_ANIMAL`. These are copies from 2026-09-07 and do not update. Use the `STG_PIG_*__live` tables.
 
+### Poultry kill by provenance
+
+Gui asked for the pork split by provenance on 2026-11-18. Emma checked poultry at the same time. Poultry has provenance too, with names in Mtech. Research date: 2026-11-18.
+
+`PRODUCTNO` on the load row holds the provenance. Delivered and DOA are on the same row, so kill splits exactly. No second join is needed.
+
+| Item | Value |
+| --- | --- |
+| Provenance field | `PRODUCTNO` on `PROD_RAW.MTECH.MVPMTSPROCRECVTRANSHOUSEDETAIL` |
+| Names | `DESCRIPTION` on `PROD_RAW.MTECH.PROTEINPRODUCTS`. One row for each code. |
+| View | `WPL_KILL_POULTRY_TYPE` in `sql/06_wpl_kill_poultry.sql` |
+| How checked | Summed the split and compared with `WPL_KILL_POULTRY` for all sites and weeks. Both give 472,128,487 delivered, 335,098 DOA and 471,793,389 kill. |
+
+`SPECIESTYPE`, `BIRDTYPE` and `FARMTYPE` are not provenance. Each holds one value at all four sites.
+
+The nine codes used from 2024-12-30 to 2026-11-18:
+
+| Code | Name | Sites | Birds delivered | Last kill |
+| --- | --- | --- | --- | --- |
+| SWP | Broiler Bird SWP | 4 | 337,801,798 | 2026-11-15 |
+| BCC | Better Chicken Commitment | 2 | 62,573,213 | 2026-11-15 |
+| HWF30 | BIRD HIGHER WELFARE 30 EUR | 2 | 46,243,343 | 2025-09-04 |
+| STP38 | STANDARD PLUS 38 EUR | 3 | 13,297,952 | 2026-08-04 |
+| FRD | FREEDOM FOOD FREE RNG DAY OLD-DEATH EUR | 2 | 6,399,405 | 2026-11-13 |
+| ORG | BIRD ORGANIC FINISHING EUR | 1 | 3,558,587 | 2026-11-13 |
+| CFRD | CORN FED FREE RANGE DAY OLD-DEATH EUR | 1 | 1,901,582 | 2026-11-12 |
+| ROI | Republic of Ireland Birds | 1 | 317,436 | 2025-12-12 |
+| FRS | FREEDOM FOOD FREE RNG FINSHING EUR | 1 | 35,171 | 2026-11-06 |
+
+Two codes stopped. `HWF30` ends on 2025-09-04, and `BCC` starts on 2025-01-14. So `BCC` probably replaced `HWF30`. This is not confirmed.
+
+`ROI` is an origin, not a welfare scheme. So `PRODUCTNO` holds both kinds of provenance.
+
+Seven codes are in use in the last year. Ballymena uses six. Anwick uses one. Every load has a code. None is unset.
+
+`BREEDNO` agrees with the code. The slower growing breeds go with the higher welfare schemes.
+
+| Breed code | Name | Used with |
+| --- | --- | --- |
+| RS308 | Ross 308 | SWP, BCC |
+| CB500 | Cobb 500 | SWP |
+| RedBro | RedBro | BCC, SWP |
+| HB | Hubbard | FRD, ORG, CFRD, FRS |
+
+Breed is not one for one with the code, so the view groups by code only.
+
+Condemnations are not in the view. `PMTSCONDEMNTRANS` has no product, so they cannot be split by provenance. This does not change kill, because condemnations are not taken off kill.
+
 ### Pork kill by provenance
 
 Gui asked for the pork kill split by provenance on 2026-11-18: "RT, ODB, Free Range, GOS, Organic. etc". This section holds the answer. Research date: 2026-11-18.

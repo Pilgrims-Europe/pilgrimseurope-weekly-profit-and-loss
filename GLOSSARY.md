@@ -37,9 +37,11 @@ _Avoid_: Birds delivered, live weight, rejects
 Pigs over scale, less TC'd pigs, in head. It is Unknown if the Hellenic kill quantity already takes off TC'd pigs.
 _Avoid_: Pigs delivered, pigs over scale, pay weight
 
-**Provenance (pork)**:
-The pig scheme a booking belongs to, for example Red Tractor, Outdoor Bred, Free Range or Organic. Held in Hellenic as the super category. Reports show kill by provenance as detail.
-_Avoid_: Pig type, super category, pig scheme
+**Provenance**:
+The welfare scheme or origin an animal belongs to. Reports show kill by provenance as detail.
+For pork, it is the Hellenic super category on the booking, for example Red Tractor, Outdoor Bred, Free Range or Organic.
+For poultry, it is the Mtech product code on the load, for example Better Chicken Commitment, Free Range, Organic or Republic of Ireland Birds.
+_Avoid_: Pig type, super category, pig scheme, product code, bird type
 
 **Kill (lamb)**:
 Lamb carcasses, in head, from HCS. The rule for condemned carcasses is Unknown.

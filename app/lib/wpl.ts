@@ -367,6 +367,21 @@ export async function getPoultryCodes(site: string, weekStart: string) {
   );
 }
 
+/**
+ * Poultry kill by provenance (Mtech PRODUCTNO) for one site and week.
+ * Condemnations are not here: PMTSCONDEMNTRANS has no product, so they cannot be split.
+ * That does not change kill, because condemnations are not taken off kill.
+ */
+export async function getPoultryTypes(site: string, weekStart: string) {
+  return rows(
+    `SELECT PRODUCT_CODE, PRODUCT_NAME, SUM(LOADS) AS LOADS, SUM(BIRDS_DELIVERED) AS BIRDS_DELIVERED,
+            SUM(DOA) AS DOA, SUM(BIRDS_KILLED) AS BIRDS_KILLED
+     FROM ${SCHEMA}.WPL_T_KILL_POULTRY_TYPE WHERE SITE = ? AND WEEK_START = ?
+     GROUP BY ALL HAVING SUM(BIRDS_KILLED) <> 0 ORDER BY BIRDS_KILLED DESC`,
+    [site, weekStart],
+  );
+}
+
 export async function getPorkKill(site: string, weekStart: string) {
   return rows(
     `SELECT TO_VARCHAR(KILL_DATE, 'YYYY-MM-DD') AS KILL_DATE, BOOKINGS, PIGS_DELIVERED, DOA, DIP, CASUALTY,
