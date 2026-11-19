@@ -9,6 +9,25 @@ Before you write text to Git or GitHub (issue, comment, wayfinder map, commit me
 5. Read it again as a reader who was not in this session. If it is not clear on one read, write it again.
 6. Do not add facts to make text clearer. If something is unknown (an owner, a date, a definition), write "Unknown" or ask.
 
+## Pull requests
+
+Start each pull request title with one type word and a colon, for example `Fix: plan rows in the GL lines`.
+
+| Type | Use it when |
+| --- | --- |
+| `Add` | The pull request adds a new line, tab, view, report or check. |
+| `Fix` | A number or a behaviour was wrong. |
+| `Change` | A decided rule moves a number. The old number was not wrong. |
+| `Research` | The pull request adds notes only. |
+| `Docs` | The pull request changes the glossary, README, reports or questionnaires. |
+| `Tooling` | The pull request changes CI, scripts or upgrades. |
+
+- Use one type for each pull request. If you find a fix during other work, open a new pull request for it.
+- For `Fix` and `Change`, show each number that moves, before and after.
+- Fill in the sections of `.github/pull_request_template.md`.
+- The workflow `.github/workflows/pr-type.yml` checks the title and adds the label `type: <word>`.
+- The repo uses squash merge only. The title becomes the commit on `main`. Branch names do not need a type.
+
 ## Reporting
 
 All reports use one house style, from pilgrimseurope.com. This includes HTML reports, questionnaires, dashboards and Streamlit apps. Before you make or change a report, read `.cortex/skills/pilgrims-reporting/SKILL.md`. Start from a template in that folder.

@@ -153,6 +153,19 @@ git push -u origin emma/2-kill-data
 
 **6. Ask for a review (pull request).** Git shows a link after the push. Open it, then click **Create pull request**. In the description, write `Closes #2` (use your ticket number). Chris reviews it and merges it into `main`.
 
+**Pull request title.** Start the title with one type word and a colon. Then the reader knows what the pull request does before they open it.
+
+| Type | Use it when | Example |
+| --- | --- | --- |
+| `Add` | You add a new line, tab, view, report or check. | `Add: pork kill by provenance` |
+| `Fix` | A number or a behaviour was wrong. | `Fix: plan rows in the GL lines` |
+| `Change` | A decided rule moves a number. The old number was not wrong. | `Change: count finished goods only in Production Tonnage` |
+| `Research` | You add notes only. | `Research: finished goods write-offs` |
+| `Docs` | You change the glossary, README, reports or questionnaires. | `Docs: status report for 2026-11-17` |
+| `Tooling` | You change CI, scripts or upgrades. | `Tooling: upgrade Next.js to 16.4.6` |
+
+A check on the pull request fails if the type word is missing. To fix it, edit the title. GitHub then adds a coloured `type:` label. Use one type for each pull request.
+
 ### If something goes wrong
 
 | Problem | What to do |
