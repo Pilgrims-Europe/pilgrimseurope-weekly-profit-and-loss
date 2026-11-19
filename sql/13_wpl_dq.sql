@@ -72,6 +72,10 @@ stock AS (
       -- Goods received from other plants (641 S, reversal 642 H) are not production: leave them out.
       AND NOT (COALESCE(g.ISCROSSPLANTTRANSFER, '') = 'X' AND ((g.GOODSMOVEMENTTYPE = '641' AND g.DEBITCREDITCODE = 'S')
                                               OR (g.GOODSMOVEMENTTYPE = '642' AND g.DEBITCREDITCODE = 'H')))
+      -- Some finished goods materials also run through a semi-finished stage: Z61 on another GL, then consumed with 201/202.
+      -- Production Tonnage counts GL 5000100 only, so leave that stage loop out of the stock movement.
+      AND NOT (g.GOODSMOVEMENTTYPE IN ('Z61', 'Z62') AND g.GLACCOUNT <> '0005000100')
+      AND g.GOODSMOVEMENTTYPE NOT IN ('201', '202')
     QUALIFY ROW_NUMBER() OVER (
         PARTITION BY g.MATERIALDOCUMENTYEAR, g.MATERIALDOCUMENT, g.MATERIALDOCUMENTITEM, g.MATERIALDOCUMENTRECORDTYPE
         ORDER BY g.MATERIALDOCUMENT) = 1
