@@ -227,8 +227,8 @@ nodes:
     status: planned
     object: DEV_ANALYTICS.FINANCE_PL_WEEKLY.WPL_DQ_PRODUCTION_TONNAGE
     sql: sql/13_wpl_dq.sql
-    description: Production tonnage check for the pilot sites. Production less sales, internal sales and finished goods stock movement.
-    inputs: [wpl_weekly_pl, sap_gm, material_master, wpl_site, wpl_week]
+    description: Production tonnage check for the pilot sites. Production less sales, STO, COPA intercompany sales and finished goods stock movement.
+    inputs: [wpl_weekly_pl, wpl_sales_week, sap_gm, material_master, wpl_site, wpl_week]
   - id: wpl_dq_unmapped
     label: WPL_DQ_UNMAPPED
     layer: rules

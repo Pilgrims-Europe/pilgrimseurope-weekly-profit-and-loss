@@ -400,6 +400,7 @@ export interface ProductionTonnageCheck {
   SALES_T: number | null;
   SALES_INEDIBLE_T: number | null;
   INTERNAL_SALES_T: number | null;
+  INTERCO_COPA_T: number | null;
   FG_STOCK_T: number | null;
   DIFFERENCE_T: number | null;
   DIFFERENCE_PCT: number | null;
@@ -409,7 +410,7 @@ export interface ProductionTonnageCheck {
 export async function getProductionTonnageCheck(): Promise<ProductionTonnageCheck[]> {
   const out = await rows<Record<string, string | null>>(
     `SELECT SITE, TO_VARCHAR(WEEK_START, 'YYYY-MM-DD') AS WEEK_START, FISCAL_WEEK, PRODUCTION_T, SALES_T, SALES_INEDIBLE_T,
-            INTERNAL_SALES_T, FG_STOCK_T, DIFFERENCE_T, DIFFERENCE_PCT
+            INTERNAL_SALES_T, INTERCO_COPA_T, FG_STOCK_T, DIFFERENCE_T, DIFFERENCE_PCT
      FROM ${SCHEMA}.WPL_T_DQ_PRODUCTION_TONNAGE
      QUALIFY ROW_NUMBER() OVER (PARTITION BY SITE ORDER BY WEEK_START DESC) <= 8
      ORDER BY SITE, WEEK_START DESC`,
@@ -423,6 +424,7 @@ export async function getProductionTonnageCheck(): Promise<ProductionTonnageChec
     SALES_T: num(r.SALES_T),
     SALES_INEDIBLE_T: num(r.SALES_INEDIBLE_T),
     INTERNAL_SALES_T: num(r.INTERNAL_SALES_T),
+    INTERCO_COPA_T: num(r.INTERCO_COPA_T),
     FG_STOCK_T: num(r.FG_STOCK_T),
     DIFFERENCE_T: num(r.DIFFERENCE_T),
     DIFFERENCE_PCT: num(r.DIFFERENCE_PCT),

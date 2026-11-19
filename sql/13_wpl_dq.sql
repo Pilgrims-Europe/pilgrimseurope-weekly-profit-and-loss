@@ -42,7 +42,7 @@ FROM t LEFT JOIN DEV_ANALYTICS.FINANCE_PL_WEEKLY.WPL_T_DQ_DATA_TO d ON d.SOURCE 
 -- Cases x material net weight, as for Production Tonnage. Same duplicate rule as sql/09.
 -- The difference has no tolerance and no RAG: the tolerance is Unknown.
 CREATE OR REPLACE VIEW DEV_ANALYTICS.FINANCE_PL_WEEKLY.WPL_DQ_PRODUCTION_TONNAGE
-COMMENT = 'Weekly P&L app: production tonnage check for Redruth and Bromborough by week. Production less (sales + inedible sales + internal sales + finished goods stock movement), in tonnes. No tolerance.'
+COMMENT = 'Weekly P&L app: production tonnage check for Redruth and Bromborough by week. Production less (sales + inedible sales + internal sales (STO) + COPA intercompany sales + finished goods stock movement), in tonnes. No tolerance.'
 AS
 WITH fg AS (
     SELECT DISTINCT PLANT, MATERIAL
@@ -96,17 +96,26 @@ pl AS (
     WHERE SITE_KIND = 'PILOT' AND LINE_ID IN (40, 50, 60, 210) AND STATUS = 'Built' AND WEEK_END < CURRENT_DATE
     GROUP BY ALL
 ),
+-- COPA intercompany sales (edible kg, sold-to or ship-to on Gui's internal-site list, #20). Invoiced sales to internal customers.
+-- They are in neither Sales Tonnage (external) nor Internal Sales Tonnage (STO): STO has no invoice.
+interco AS (
+    SELECT SITE, WEEK_START, SUM(EDIBLE_KG) / 1000 AS INTERCO_COPA_T
+    FROM DEV_ANALYTICS.FINANCE_PL_WEEKLY.WPL_SALES_WEEK
+    WHERE IS_INTERCO
+    GROUP BY ALL
+),
 joined AS (
-    SELECT pl.*, sw.FG_STOCK_T,
-        pl.PRODUCTION_T - (pl.SALES_T + pl.SALES_INEDIBLE_T + pl.INTERNAL_SALES_T + sw.FG_STOCK_T) AS DIFFERENCE_T
+    SELECT pl.*, COALESCE(ic.INTERCO_COPA_T, 0) AS INTERCO_COPA_T, sw.FG_STOCK_T,
+        pl.PRODUCTION_T - (pl.SALES_T + pl.SALES_INEDIBLE_T + pl.INTERNAL_SALES_T + COALESCE(ic.INTERCO_COPA_T, 0) + sw.FG_STOCK_T) AS DIFFERENCE_T
     FROM pl
+    LEFT JOIN interco ic ON ic.SITE = pl.SITE AND ic.WEEK_START = pl.WEEK_START
     LEFT JOIN stock_week sw ON sw.SITE = pl.SITE AND sw.WEEK_START = pl.WEEK_START
 )
 -- A week with no stock rows has FG_STOCK_T, DIFFERENCE_T and DIFFERENCE_PCT null (Unknown), not 0.
 -- DIFFERENCE_PCT is null when Production Tonnage is 0.
 SELECT
     SITE, WEEK_START, WEEK_END, FISCAL_YEAR, FISCAL_WEEK,
-    PRODUCTION_T, SALES_T, SALES_INEDIBLE_T, INTERNAL_SALES_T, FG_STOCK_T, DIFFERENCE_T,
+    PRODUCTION_T, SALES_T, SALES_INEDIBLE_T, INTERNAL_SALES_T, INTERCO_COPA_T, FG_STOCK_T, DIFFERENCE_T,
     DIFFERENCE_T / NULLIF(PRODUCTION_T, 0) AS DIFFERENCE_PCT
 FROM joined;
 

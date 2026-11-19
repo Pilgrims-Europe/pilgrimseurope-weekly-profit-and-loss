@@ -198,7 +198,7 @@ describe('wpl.ts SQL contract', () => {
     );
     expect(await columns('getUnmapped')).toEqual(['ACCOUNTNAME', 'GLACCOUNT', 'GROUP_NAME', 'LINE_ITEMS', 'SITE', 'VALUE']);
     expect(await columns('getProductionTonnageCheck')).toEqual(
-      ['DIFFERENCE_PCT', 'DIFFERENCE_T', 'FG_STOCK_T', 'FISCAL_WEEK', 'INTERNAL_SALES_T', 'PRODUCTION_T', 'SALES_INEDIBLE_T', 'SALES_T', 'SITE', 'WEEK_START'],
+      ['DIFFERENCE_PCT', 'DIFFERENCE_T', 'FG_STOCK_T', 'FISCAL_WEEK', 'INTERCO_COPA_T', 'INTERNAL_SALES_T', 'PRODUCTION_T', 'SALES_INEDIBLE_T', 'SALES_T', 'SITE', 'WEEK_START'],
     );
   });
 

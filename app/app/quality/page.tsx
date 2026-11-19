@@ -91,8 +91,8 @@ export default async function QualityPage() {
           <div className="px-5 pt-5 pb-3">
             <h2 className="text-base font-semibold">Production tonnage check (last 8 complete weeks)</h2>
             <p className="text-sm text-muted-foreground">
-              Difference = Production Tonnage less (Sales Tonnage + Sales Tonnage (Inedible) + Internal Sales Tonnage (STO) + finished goods
-              stock movement). Tonnes. The tolerance is Unknown, so the table has no RAG.{' '}
+              Difference = Production Tonnage less (Sales Tonnage + Sales Tonnage (Inedible) + Internal Sales Tonnage (STO) + COPA
+              intercompany sales + finished goods stock movement). Tonnes. The tolerance is Unknown, so the table has no RAG.{' '}
               <a href={`${REPO_URL}/issues/55`} target="_blank" rel="noreferrer" className="font-semibold text-pe-brand hover:underline">
                 #55
               </a>
@@ -112,6 +112,7 @@ export default async function QualityPage() {
                       <TableHead numeric>Sales</TableHead>
                       <TableHead numeric>Sales (Inedible)</TableHead>
                       <TableHead numeric>Internal (STO)</TableHead>
+                      <TableHead numeric>Intercompany (COPA)</TableHead>
                       <TableHead numeric>FG stock movement</TableHead>
                       <TableHead numeric>Difference</TableHead>
                       <TableHead numeric>Difference %</TableHead>
@@ -129,6 +130,7 @@ export default async function QualityPage() {
                           <TableCell numeric>{t1(t.SALES_T)}</TableCell>
                           <TableCell numeric>{t1(t.SALES_INEDIBLE_T)}</TableCell>
                           <TableCell numeric>{t1(t.INTERNAL_SALES_T)}</TableCell>
+                          <TableCell numeric>{t1(t.INTERCO_COPA_T)}</TableCell>
                           <TableCell numeric>{t1(t.FG_STOCK_T)}</TableCell>
                           <TableCell numeric>{t1(t.DIFFERENCE_T)}</TableCell>
                           <TableCell numeric>{t.DIFFERENCE_PCT === null ? 'Unknown' : `${(t.DIFFERENCE_PCT * 100).toFixed(1)}%`}</TableCell>
