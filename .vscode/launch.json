@@ -1,0 +1,57 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      // Server-side breakpoints work in app/lib/wpl.ts and app/app/api/**/route.ts.
+      "name": "Next.js: debug server",
+      "type": "node-terminal",
+      "request": "launch",
+      "command": "npm run dev",
+      "cwd": "${workspaceFolder}/app"
+    },
+    {
+      // Build the copy first: scripts/build-dev-schema.ps1
+      "name": "Next.js: debug server on a test schema copy",
+      "type": "node-terminal",
+      "request": "launch",
+      "command": "npm run dev",
+      "cwd": "${workspaceFolder}/app",
+      "env": { "WPL_SCHEMA": "DEV_ANALYTICS.FINANCE_PL_WEEKLY_WBW" }
+    },
+    {
+      "name": "Vitest: current test file",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/app/node_modules/vitest/vitest.mjs",
+      "args": ["run", "${relativeFile}"],
+      "cwd": "${workspaceFolder}/app",
+      "autoAttachChildProcesses": true,
+      "skipFiles": ["<node_internals>/**", "**/node_modules/**"],
+      "console": "integratedTerminal"
+    },
+    {
+      // Start the dev server first.
+      "name": "smoke.ps1: local dev server",
+      "type": "PowerShell",
+      "request": "launch",
+      "script": "${workspaceFolder}/scripts/smoke.ps1",
+      "args": ["-Base", "http://localhost:3000"],
+      "cwd": "${workspaceFolder}"
+    },
+    {
+      "name": "check-tie-out.ps1: tie-out checks",
+      "type": "PowerShell",
+      "request": "launch",
+      "script": "${workspaceFolder}/scripts/check-tie-out.ps1",
+      "cwd": "${workspaceFolder}"
+    },
+    {
+      "name": "check-tie-out.ps1: app contract",
+      "type": "PowerShell",
+      "request": "launch",
+      "script": "${workspaceFolder}/scripts/check-tie-out.ps1",
+      "args": ["-Check", "app_contract"],
+      "cwd": "${workspaceFolder}"
+    }
+  ]
+}

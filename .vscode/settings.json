@@ -1,0 +1,5 @@
+{
+  // The Vitest extension runs the app tests from app/ (its own package.json and config).
+  "vitest.rootConfig": "app/vitest.config.ts",
+  "python.testing.pytestEnabled": false
+}

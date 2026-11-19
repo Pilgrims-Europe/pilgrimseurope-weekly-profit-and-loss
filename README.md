@@ -186,6 +186,8 @@ A check on the pull request fails if the type word is missing. To fix it, edit t
 ├── README.md        ← you are here
 ├── GLOSSARY.md      ← exact meaning of project words
 ├── AGENTS.md        ← rules for the AI agents
+├── docs/dev-setup.md ← set up your computer and Cortex Code Desktop
+├── .vscode/         ← shared Run and Debug configurations and recommended extensions
 ├── docs/agents/     ← how agents use GitHub issues
 ├── docs/data-flow/  ← data flow diagram: flow.yml (source), CHANGELOG.md, flow.svg, index.html
 ├── scripts/         ← render_flow.py makes the data flow diagram
