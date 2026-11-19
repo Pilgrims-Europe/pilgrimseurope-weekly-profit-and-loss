@@ -224,7 +224,7 @@ nodes:
   - id: wpl_dq_production_tonnage
     label: WPL_DQ_PRODUCTION_TONNAGE
     layer: combine
-    status: planned
+    status: live
     object: DEV_ANALYTICS.FINANCE_PL_WEEKLY.WPL_DQ_PRODUCTION_TONNAGE
     sql: sql/13_wpl_dq.sql
     description: Production tonnage check for the pilot sites. Production less sales, STO, COPA intercompany sales and finished goods stock movement.
@@ -329,7 +329,7 @@ nodes:
   - id: wpl_t_dq_production_tonnage
     label: WPL_T_DQ_PRODUCTION_TONNAGE
     layer: refresh
-    status: planned
+    status: live
     object: DEV_ANALYTICS.FINANCE_PL_WEEKLY.WPL_T_DQ_PRODUCTION_TONNAGE
     sql: sql/14_wpl_refresh.sql
     description: Table copy of WPL_DQ_PRODUCTION_TONNAGE, for the Quality page.
