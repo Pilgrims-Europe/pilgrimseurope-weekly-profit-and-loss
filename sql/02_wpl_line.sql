@@ -44,7 +44,7 @@ FROM VALUES
 (170, 'External sales at standard', 'STD Ext Contribution', 'Subtotal', NULL, NULL, NULL, NULL, 'GBP', 'PILOT', '110 120 130 140 160', NULL, NULL, NULL, NULL),
 (180, 'External sales at standard', 'Percentage Ext C/S', 'Subtotal', NULL, NULL, NULL, NULL, '%', 'PILOT', NULL, 170, 110, 1, NULL),
 -- Internal sales (STO)
-(210, 'Internal sales (STO)', 'Internal Sales Tonnage (STO)', 'System', 'SAP goods movements, COPA', 'Amber', 'Movement type 641 and the intercompany flag are in Snowflake. The STO rule is Unknown.', 'Goods movements 641 issue (credit) less 642, base unit KG.', 't', 'PILOT', NULL, NULL, NULL, NULL, '#20'),
+(210, 'Internal sales (STO)', 'Internal Sales Tonnage (STO)', 'System', 'SAP goods movements, COPA', 'Amber', 'Movement type 641 and the intercompany flag are in Snowflake. The STO rule is Unknown.', 'Cross-plant goods movements: 641 issue (credit) plus 642 reversal of an issue (debit S), base unit KG. Moves inside the plant are not STO (#86).', 't', 'PILOT', NULL, NULL, NULL, NULL, '#20'),
 (220, 'Internal sales (STO)', 'STD Internal NSV', 'Calculation', 'STO kg, released standard cost', 'Amber', 'Depends on the STO rule.', 'STO kg x released standard TOTAL_COST per kg (transfer at standard cost).', 'GBP', 'PILOT', NULL, NULL, NULL, NULL, '#20'),
 (230, 'Internal sales (STO)', 'STD Int Material Cost', 'Calculation', 'STO kg, released standard cost', 'Amber', 'Depends on the STO rule.', 'STO kg x released standard (MEAT + INGREDIENTS) per kg.', 'GBP', 'PILOT', NULL, NULL, NULL, NULL, '#20'),
 (240, 'Internal sales (STO)', 'STD Int Packaging', 'Calculation', 'STO kg, released standard cost', 'Amber', 'Depends on the STO rule.', 'STO kg x released standard PACKAGING per kg.', 'GBP', 'PILOT', NULL, NULL, NULL, NULL, '#20'),
