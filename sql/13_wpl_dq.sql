@@ -35,6 +35,90 @@ WITH t AS (
 SELECT t.SOURCE, t.OBJECT_NAME, t.LAST_ALTERED AS LAST_LOADED, d.DATA_TO
 FROM t LEFT JOIN DEV_ANALYTICS.FINANCE_PL_WEEKLY.WPL_T_DQ_DATA_TO d ON d.SOURCE = t.SOURCE;
 
+-- Production tonnage check (ticket #55). The FP&A draft manual (v0.1, section 5.1) says: sales tonnage + internal sales
+-- tonnage + finished goods stock movement should agree with production tonnage. One row for each pilot site and complete week.
+-- Finished goods stock movement (proposal, not decided): the stock change quantity (MATLSTKCHANGEQTYINBASEUNIT) of all goods
+-- movements of the finished goods materials, without goods received from other plants. A finished goods material has a Z61 or Z62 on GL 5000100 at the plant (the rule of #35).
+-- Cases x material net weight, as for Production Tonnage. Same duplicate rule as sql/09.
+-- The difference has no tolerance and no RAG: the tolerance is Unknown.
+CREATE OR REPLACE VIEW DEV_ANALYTICS.FINANCE_PL_WEEKLY.WPL_DQ_PRODUCTION_TONNAGE
+COMMENT = 'Weekly P&L app: production tonnage check for Redruth and Bromborough by week. Production less (sales + inedible sales + internal sales (STO) + COPA intercompany sales + finished goods stock movement), in tonnes. No tolerance.'
+AS
+WITH fg AS (
+    SELECT DISTINCT PLANT, MATERIAL
+    FROM PROD_RAW.SAP."jbs_bw4_hana.edw.scm.mmic/C_GOODSMOVEMENTDOCUMENTS"
+    WHERE POSTINGDATE >= '20241230'
+      AND GOODSMOVEMENTTYPE IN ('Z61', 'Z62')
+      AND GLACCOUNT = '0005000100'
+      AND PLANT IN (SELECT PLANT FROM DEV_ANALYTICS.FINANCE_PL_WEEKLY.WPL_SITE)
+),
+net_weight AS (
+    SELECT LTRIM(MATERIAL_NUMBER, '0') AS MATERIAL_KEY, MAX(NET_WEIGHT) AS NET_KG
+    FROM PROD_ANALYTICS.FINANCE_MT.DIM_MATERIALMASTER
+    WHERE WEIGHT_UNIT = 'KG'
+    GROUP BY 1
+),
+stock AS (
+    SELECT
+        s.SITE,
+        TRY_TO_DATE(g.POSTINGDATE, 'YYYYMMDD') AS POSTING_DATE,
+        IFF(g.MATERIALBASEUNIT = 'KG', g.MATLSTKCHANGEQTYINBASEUNIT, g.MATLSTKCHANGEQTYINBASEUNIT * nw.NET_KG) AS STOCK_KG
+    FROM PROD_RAW.SAP."jbs_bw4_hana.edw.scm.mmic/C_GOODSMOVEMENTDOCUMENTS" g
+    JOIN DEV_ANALYTICS.FINANCE_PL_WEEKLY.WPL_SITE s ON s.PLANT = g.PLANT
+    JOIN fg ON fg.PLANT = g.PLANT AND fg.MATERIAL = g.MATERIAL
+    LEFT JOIN net_weight nw ON nw.MATERIAL_KEY = LTRIM(g.MATERIAL, '0')
+    WHERE g.POSTINGDATE >= '20241230'
+      AND g.MATERIALBASEUNIT IN ('KG', 'CS')
+      -- Goods received from other plants (641 S, reversal 642 H) are not production: leave them out.
+      AND NOT (COALESCE(g.ISCROSSPLANTTRANSFER, '') = 'X' AND ((g.GOODSMOVEMENTTYPE = '641' AND g.DEBITCREDITCODE = 'S')
+                                              OR (g.GOODSMOVEMENTTYPE = '642' AND g.DEBITCREDITCODE = 'H')))
+      -- Some finished goods materials also run through a semi-finished stage: Z61 on another GL, then consumed with 201/202.
+      -- Production Tonnage counts GL 5000100 only, so leave that stage loop out of the stock movement.
+      AND NOT (g.GOODSMOVEMENTTYPE IN ('Z61', 'Z62') AND g.GLACCOUNT <> '0005000100')
+      AND g.GOODSMOVEMENTTYPE NOT IN ('201', '202')
+    QUALIFY ROW_NUMBER() OVER (
+        PARTITION BY g.MATERIALDOCUMENTYEAR, g.MATERIALDOCUMENT, g.MATERIALDOCUMENTITEM, g.MATERIALDOCUMENTRECORDTYPE
+        ORDER BY g.MATERIALDOCUMENT) = 1
+),
+stock_week AS (
+    SELECT st.SITE, w.WEEK_START, SUM(st.STOCK_KG) / 1000 AS FG_STOCK_T
+    FROM stock st
+    JOIN DEV_ANALYTICS.FINANCE_PL_WEEKLY.WPL_WEEK w ON st.POSTING_DATE BETWEEN w.WEEK_START AND w.WEEK_END
+    GROUP BY ALL
+),
+pl AS (
+    SELECT SITE, WEEK_START, WEEK_END, FISCAL_YEAR, FISCAL_WEEK,
+        SUM(IFF(LINE_ID = 60,  VALUE, 0)) AS PRODUCTION_T,
+        SUM(IFF(LINE_ID = 40,  VALUE, 0)) AS SALES_T,
+        SUM(IFF(LINE_ID = 50,  VALUE, 0)) AS SALES_INEDIBLE_T,
+        SUM(IFF(LINE_ID = 210, VALUE, 0)) AS INTERNAL_SALES_T
+    FROM DEV_ANALYTICS.FINANCE_PL_WEEKLY.WPL_WEEKLY_PL
+    WHERE SITE_KIND = 'PILOT' AND LINE_ID IN (40, 50, 60, 210) AND STATUS = 'Built' AND WEEK_END < CURRENT_DATE
+    GROUP BY ALL
+),
+-- COPA intercompany sales (edible kg, sold-to or ship-to on Gui's internal-site list, #20). Invoiced sales to internal customers.
+-- They are in neither Sales Tonnage (external) nor Internal Sales Tonnage (STO): STO has no invoice.
+interco AS (
+    SELECT SITE, WEEK_START, SUM(EDIBLE_KG) / 1000 AS INTERCO_COPA_T
+    FROM DEV_ANALYTICS.FINANCE_PL_WEEKLY.WPL_SALES_WEEK
+    WHERE IS_INTERCO
+    GROUP BY ALL
+),
+joined AS (
+    SELECT pl.*, COALESCE(ic.INTERCO_COPA_T, 0) AS INTERCO_COPA_T, sw.FG_STOCK_T,
+        pl.PRODUCTION_T - (pl.SALES_T + pl.SALES_INEDIBLE_T + pl.INTERNAL_SALES_T + COALESCE(ic.INTERCO_COPA_T, 0) + sw.FG_STOCK_T) AS DIFFERENCE_T
+    FROM pl
+    LEFT JOIN interco ic ON ic.SITE = pl.SITE AND ic.WEEK_START = pl.WEEK_START
+    LEFT JOIN stock_week sw ON sw.SITE = pl.SITE AND sw.WEEK_START = pl.WEEK_START
+)
+-- A week with no stock rows has FG_STOCK_T, DIFFERENCE_T and DIFFERENCE_PCT null (Unknown), not 0.
+-- DIFFERENCE_PCT is null when Production Tonnage is 0.
+SELECT
+    SITE, WEEK_START, WEEK_END, FISCAL_YEAR, FISCAL_WEEK,
+    PRODUCTION_T, SALES_T, SALES_INEDIBLE_T, INTERNAL_SALES_T, INTERCO_COPA_T, FG_STOCK_T, DIFFERENCE_T,
+    DIFFERENCE_T / NULLIF(PRODUCTION_T, 0) AS DIFFERENCE_PCT
+FROM joined;
+
 -- P&L accounts (4xxx to 7xxx) with postings at the pilot sites in FY2026 that no template line uses.
 -- Sales, cost of sales and direct wages are expected here: COPA and the standard cost lines carry them.
 CREATE OR REPLACE VIEW DEV_ANALYTICS.FINANCE_PL_WEEKLY.WPL_DQ_UNMAPPED
