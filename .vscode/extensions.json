@@ -1,0 +1,14 @@
+{
+  "recommendations": [
+    "vitest.explorer",
+    "dbaeumer.vscode-eslint",
+    "ms-vscode.powershell",
+    "github.vscode-github-actions",
+    "github.vscode-pull-request-github",
+    "davidanson.vscode-markdownlint",
+    "redhat.vscode-yaml",
+    "ms-python.python",
+    "charliermarsh.ruff",
+    "snowflake.snowflake-vsc"
+  ]
+}
