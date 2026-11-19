@@ -1,0 +1,1397 @@
+Guilherme De Marchi  0:03
+We need to talk about that one after the...
+And certain, because that that is a number that is quite tricky. OK, production tonnage. When we build with Peter the production tonnage volume from Sap, we have a list of GL accounts, which is the production output.
+
+Chris McCann  0:11
+Mhm.
+Mmh.
+
+Guilherme De Marchi  0:24
+And it should be like straightforward. You just go download the Sap data, is the production, you just select what is finished goods and you report.
+But then our master data behind is not clear what is finished goods, you know? So then decides to do some manual tweaks. So we're never going to have this number aligned, okay, completely, because the guys from poultry do something different and so on. So it's kind of a line that is...
+
+Chris McCann  0:40
+Mhm.
+Yeah.
+Okay.
+
+Guilherme De Marchi  0:56
+I will try to convince we exclude this line into the PNL, but it's an important Kpi. I'm going to give you guys one example. If you go to Annaplug and download last year everything that we sold.
+
+Chris McCann  1:01
+Mhm.
+OK.
+
+Guilherme De Marchi  1:15
+Doesn't matter the size for poultry, okay? And everything that we produce, you're going to have almost double production compared to what we sold, right? So it does make sense. We have double volume on stock. If you produce and you didn't sold,
+Means that you're holding the goods, right?
+The poultry sites is the challenging one, because...
+They have the same code; it can be shipped to the customer in one day, and then another day can be.
+use internally can be shipped to another site. So if they ship to another site in the same code, they consider that that code for that week as.
+sales, let's say, part of the production, right? That is, they count that number into the production. If they use internally as a whip stock, right, then they do not count as a whip stock. They count only the finished goods. So that is the tricky part here to just point into the system and say, give me everything is finished goods.
+
+Chris McCann  2:20
+Mhm.
+
+Guilherme De Marchi  2:30
+So that's a part that for now. What I would like to explore more in detail is this section here. Okay, this material yield and packaging yield and so on. So for example, this, I am in Bromborough, week 46.
+
+Chris McCann  2:36
+Mhm.
+Mm-hmm.
+
+Guilherme De Marchi  2:51
+This guy here.
+This less standard cost, OK?
+This 150.
+Kate.
+This should be only the packaging.
+IT.
+From the production output from Bromborough.
+So my question is, I know that we have the number here, but my question is, see the rule, where I can see the rule for this one.
+Because it will apply, it will apply for packaging material, and the concept is the same for labour.
+
+Chris McCann  3:27
+Um...
+
+Guilherme De Marchi  3:37
+So if we get this right, it should be straightforward.
+
+Chris McCann  3:37
+Yeah.
+If you click on packing yield on the header itself there, it should bring up the rule for you.
+
+Guilherme De Marchi  3:42
+But.
+Okay, that is consumption of packaging is fine, is fine, is fine, is fine, is fine. This is all the consumption. So GL packaging consumption, all P&L Group packaging accounts not used by another side. Less standard, this is the part.
+
+Chris McCann  3:57
+Mhm.
+
+Guilherme De Marchi  4:06
+This is the one I'm getting a little bit.
+Confuse on standard packaging of external and STO. Maybe Redruth will be easy for us to understand this Redruth.
+Let's do A1 test.
+Let me open.
+Annaplomb, so we can see what the sites reported quickly.
+
+Chris McCann  4:31
+Okay.
+
+Guilherme De Marchi  4:51
+Okay, sales tonage.
+Yeah, 213, they have 218, they have something they count as a sale. That's a manual, that's fine. 1617, 1673 is going to be very similar. But here,
+
+Chris McCann  5:04
+Mhm.
+
+Guilherme De Marchi  5:12
+On packaging youth, they are saying is only 2K negative this week.
+And we are saying is...
+Is seventy-four.
+So, what happened this?
+
+Chris McCann  5:42
+So, yeah, so what's good as well, Gui, is if you go to the lines and rules tab, that will give you...
+
+Guilherme De Marchi  5:43
+So.
+
+Chris McCann  5:55
+Um...
+The GL counts.
+It says there that the variance method is in the fog, so we're not completely clear on that. So it's still sort of an open question about some of that. Yeah.
+
+Guilherme De Marchi  6:07
+I know, yeah, yeah, yeah, and this is why we're talking about, this is why Zember, because if we got this correct, so basically what we need to do, we need to spend some time, but basically is this.
+
+Chris McCann  6:11
+Yeah.
+Mhm.
+
+Guilherme De Marchi  6:22
+I'm gonna go back a little bit on time. Peter will help me here. So we've built this production volume, okay, which is this here.
+
+Chris McCann  6:27
+Kemp.
+
+Guilherme De Marchi  6:35
+Production volume.
+Okay.
+Let me get here.
+
+Chris McCann  0:14
+Okay.
+
+Guilherme De Marchi  0:17
+Food.
+
+Chris McCann  0:18
+Mhm.
+
+Guilherme De Marchi  0:19
+Okay, this is a GL level extract from Sap, like Fagulo 3H. Peter developed this for us. Okay, Deborah will do the same. She will go into Sap, we'll run Fagulo 3H, we'll put these codes here. Let me open here.
+Automatic Weekly PNL, Redruth.
+Weekly PNL. I have an old version, but the concept is the same. Okay, it doesn't matter.
+What she gonna do? She's she will go here.
+We're talking about packaging variants.
+Here, packaging.
+Here, OK.
+the section here. So she will get everything that has been used.
+Consumption for the site for that.
+Week, which is the concept we have at the moment. Let me come back here.
+So this section here.
+is going to be correct. So 5030800 is going to be exactly what she had there.
+Yeah, one of one of this here, 503.
+005030800. So you see, so all this codes is going to give this 72K. This is week 23. So if we come back to that, we can select that week 23 here, I think it is. Let's go back week 23.
+
+Chris McCann  2:05
+Mmh.
+
+Guilherme De Marchi  2:16
+So, we we sum all this.
+And I just dig this into an Excel quickly to do a cheque.
+
+Chris McCann  2:26
+I'll add a there.
+
+Guilherme De Marchi  2:29
+Ah, that will be good.
+Yeah.
+
+Chris McCann  2:34
+Yeah.
+
+Guilherme De Marchi  2:34
+78, you see, 78, 943, pretty similar to what she reported.
+Okay, which is this 72 here. Maybe one or two GL, she's not considering as packaging consumption. We need to have a look because you have here packaging, create deposit, film boxes, label, maybe this crate rental.
+doesn't go. Oh, this one, packaging inventory gain or loss manual is this here. OK, you see? So that is there. Combo liners. So maybe.
+Well...
+It should match, and it's coming from Sap, right? This, so we can we can double cheque, but you see this 129 she has only 69.
+
+Chris McCann  3:21
+Mhm.
+Mhm.
+
+Guilherme De Marchi  3:29
+Okay, so how she build this 69? She go into flag load 3H, which is Sap download. Only these three accounts, which is the production output account, which is this from Peter here. So let me just select plant name, red roof.
+
+Peter Nwora  3:47
+The.
+
+Guilherme De Marchi  3:55
+It's really fast, huh, Peter?
+
+Peter Nwora  3:58
+That.
+
+Guilherme De Marchi  3:59
+So when was week 23? Let's just select week 23 here, see if he's gonna...
+
+Peter Nwora  4:05
+Just somewhere maybe on our shirt.
+Yes, well, just you know, I would say.
+
+Jason Taylor  4:09
+I guess just network issues are okay, that's all.
+
+Guilherme De Marchi  4:13
+Yeah.
+
+Chris McCann  4:16
+Mum.
+
+Guilherme De Marchi  4:16
+When we build this, Chris, was to get that.
+
+Chris McCann  4:19
+Mhm.
+
+Guilherme De Marchi  4:21
+recovery. What we call this credit back is when the site produce, okay, when you scan a production, you're sending that product to the stock. So you're debiting your stock and you're crediting your P&L against what you, against what you produce. You have as a consumption.
+
+Peter Nwora  4:32
+Say we.
+
+Chris McCann  4:33
+Mhm.
+Mhm.
+Mhm.
+
+Guilherme De Marchi  4:43
+So, if you took out of the stock this amount of packaging, the concept is very simple. Imagine you have in a stock, you take this amount of packaging out of the stock, so you're debiting your P&L because it's out of the stock. Okay, then you mix that packaging with something else, and then you produce a good, and then you put it.
+
+Chris McCann  4:43
+Mhm.
+Mmh.
+Mmh.
+Mhm.
+
+Peter Nwora  5:00
+Yeah, yeah, let's see.
+
+Chris McCann  5:01
+Mhm.
+
+Guilherme De Marchi  5:03
+back into the stock. The standard cost element of that packaging into the finished goods material will give you a value. So let's say the standard cost is wrong. It's 1 pound per kg recovery and everything that you use it is 1 pound 20.
+
+Chris McCann  5:04
+Mhm.
+
+Peter Nwora  5:05
+Yeah, thank you.
+
+Chris McCann  5:11
+Mhm.
+Mhm.
+
+Guilherme De Marchi  5:22
+So you're not recovering the one pound 20 that you use it from the stock. So then you have a variance. Okay. So that is the concept for meat, packaging, ingredient and also labour. Labour is the same. You have a standard labour recovery and at the end of the week you need to pay the labour
+
+Peter Nwora  5:25
+Go back.
+
+Chris McCann  5:29
+Yeah.
+Mm.
+
+Guilherme De Marchi  5:42
+to the employees. So if you're not recovering into the stock, you're paying more labour to the employees, you have a variance. Okay, so what she do, she go here, week 23, everything from that 3GL accounts, you see, this 3GL accounts, it is called production order output, production order output, da da da da.
+
+Chris McCann  5:56
+Mhm.
+
+Guilherme De Marchi  6:02
+She goes here, she downloads this from Sap. You see I have only volume here. And this is everything is whip stock, finished goods. You have a lot of double counting here. Okay, so she do this, she download this, sticking to the Excel.
+
+Peter Nwora  6:03
+I would have been.
+
+Chris McCann  6:16
+Mhm.
+
+Guilherme De Marchi  6:23
+Then she do Sap, and this is something that we don't have, and this is what we need to build. She go into Sap.
+
+Peter Nwora  6:31
+Sure, but just if we...
+
+Guilherme De Marchi  6:33
+There is 1 transaction on Sap called ZF528N.
+which is this one here.
+ZFI 28 N. Then what is my what is my list of sites? The red roof, I forgot, red roof, 504. So plan 2504, company code 125. Every site accounted do similar, okay, the PUK.
+
+Peter Nwora  7:02
+Can I just sign up to them?
+Capacity.
+
+Guilherme De Marchi  7:09
+Cost invariance Z125, cost structure P1.
+
+Peter Nwora  7:11
+Goes.
+
+Guilherme De Marchi  7:15
+Costings date, week 23.
+Week 23 was in June.
+Okay, so 1st of June 26th, 1st of June 2026, you see this button here, show costing on top level.
+
+Peter Nwora  7:35
+Could just be me.
+
+Guilherme De Marchi  7:36
+Okay, that is the key. The standard cost is not top level.
+that standard cost is bottom level. So when you see the sales, you see the standard cost. Let's say meat, that meat that you see, if it has a sub recipe, the labour on the sub recipe will go into the meat.
+
+Chris McCann  8:00
+Mhm.
+
+Guilherme De Marchi  8:01
+So this is why you need to generate this extra report, which is a top level. Then you have only the labour to that final stage, the top stage for each component on the BOM.
+So, she download this. I'm gonna do one example here, so see if she download this.
+Of course, they have their own files, right? Working files.
+And look, the source of the data, as it, as it is a production variance packaging, is not nothing to do with sales. OK, it is another source of data which is the production.
+
+Peter Nwora  8:42
+1.
+James.
+
+Chris McCann  8:46
+Mhm.
+
+Guilherme De Marchi  8:53
+Okay, then you have here.
+I have some layouts, they have their own layouts. So you probably, if you go here, you're going to see, you see here you have red roof. Okay, you see that you have a layout red roof, bottom level and top level.
+
+Chris McCann  9:08
+Mmh.
+
+Guilherme De Marchi  9:09
+She has their layout. It's the same of ZF5 other sites, but let's use the, it's just a summary. You see, this product has this cost. So what she do, she downloads this, sticking to an Excel.
+
+Peter Nwora  9:10
+Say, anyway.
+
+Guilherme De Marchi  9:47
+She downloads this from Sap.
+And she has the two sources of data.
+which is this, okay? This is production.
+I like to be busy with you guys and slowly on this in this part, because this is important, OK?
+
+Chris McCann  10:09
+Mhm.
+
+Guilherme De Marchi  10:13
+Reception.
+Ten.
+Top level. On Moy Park, they will not talk, they will not talk about top level, bottom level, because you just killed the chicken and you cut the chicken. So, the labour is the chicken is the final product. On an added value side, like the Shillelagh, you're going to have 23 super recipe in Windmill Lane, you're going to have 60 super recipe. So, if you don't...
+If you use the standard cost, you're never going to see the labour to be recovered. So you need to use this top level report. And since I'm aware, myself and Peter, we were discussing this, but we didn't move to automate into Qlik or something else. So we need to get this, probably this data for ZF5.
+into Snowflake. Okay. But you see this column here, this is the package. Okay. You see this labour here. This is the labour for each component here. You have finished goods, semi-finished goods, everything that is passing through the scale here. Okay.
+
+Chris McCann  11:04
+Mm-hmm.
+
+Guilherme De Marchi  11:22
+So what she's going to do, she's going to do here, do some formulas quickly.
+Is the what is the code?
+Is the material code?
+Okay, so then she has the volume and I'm going to put here packaging.
+
+Chris McCann  11:47
+But.
+
+Guilherme De Marchi  11:47
+Top Level.
+She's going to do a very simple VLOOKUP for that.
+Let me just put the material code. Where is the material code?
+And this one is fine.
+Look how time-consuming it is, right?
+
+Chris McCann  12:10
+Mm-hmm.
+
+Guilherme De Marchi  12:12
+Of course, they do this every week.
+Packaging.
+OK, and this one.
+Diplied by the volume, it's gonna give her a recovery.
+Right, in this example here, 70K, you see?
+
+Chris McCann  12:43
+Mm-hmm.
+
+Guilherme De Marchi  12:44
+70K.
+So that is the 70K, that is this number here.
+Here.
+Okay.
+
+Chris McCann  12:55
+Mhm.
+
+Guilherme De Marchi  12:57
+that if you sum everything that you use it as a consumption.
+Right? And then you have something here. This is your packaging cost out of the stock. And this is your packaging, let's say packaging cost included into the finished goods that you produce that you're putting back to the stock.
+
+Chris McCann  13:16
+Mhm.
+
+Guilherme De Marchi  13:17
+Nothing to do with sales, nothing to do with STO, nothing to do. So then the sum of this less debt recovery is 2.3. So then the question decides to do is, okay, but where is this 2.3?
+which product, which material. That is why this is why we need this is this is adding value to this project. It is not just calculate this and give the 2.3 K with a rule. We need to get this production volume that is already on Qlik.
+
+Chris McCann  13:36
+Mhm.
+Mhm.
+
+Guilherme De Marchi  13:52
+We need to apply here. Meet per kg.
+
+Chris McCann  13:53
+Mhm.
+
+Guilherme De Marchi  13:58
+Packaging per KG.
+Labour.
+per kg, only everything top level, right? Meat packaging and labour, then create this meat recovery.
+Packaging Recovery.
+And then...
+Eat packaging ingredients as well. OK, everything then.
+You can cross both and say that's your variance.
+Because that, because you produce finished goods, but you consume things from stock, so you, when, when, when, how is that guy that works with OPEX? You guys know better than me, the guy that developed, I forgot his name.
+
+Chris McCann  14:41
+Mhm.
+
+Guilherme De Marchi  14:57
+Ohh, my head is killing me.
+
+Jason Taylor  15:01
+David.
+
+Guilherme De Marchi  15:01
+Uh, David, David Nugget.
+
+Jason Taylor  15:03
+Yep.
+
+Emma Cutler  15:04
+Yeah.
+
+Guilherme De Marchi  15:05
+He built something with that concept for packaging when he was helping Eduardo to get the packaging variance to the standard and so on. So basically, he's saying consumption and recovery. So there is a dash that can be used as well as a
+
+Chris McCann  15:10
+Mhm.
+
+Guilherme De Marchi  15:26
+As a, you know, brainstorming.
+Let me see if I can get this packaging I have somewhere here.
+I remember saving somewhere here.
+See if I can get packaging.
+Dash validation.
+But he was doing something more complex at that time, okay? He was applying the bomb.
+Yeah, you see this packaging loss, OK?
+So he was saying, okay, well, if I go buy a GL, he has somewhere here the GLs.
+Yeah, he's on a GL Level.
+You see, packaging account, this is consumption of packaging.
+And he has all my standard consumption is this, my actual user is that, the difference to the price and to the standard cost is my variance. It's pretty similar to what that calculation do. Because if you take out, you have consumption, right? And the consumption goes into all these accounts here, okay?
+Boxes, fumes, labour is the data that you're bringing. Okay, how much is my standard? My standard is this. Okay, the difference to your standard, it is that. Okay.
+
+Chris McCann  17:05
+Mhm.
+Mm-hmm.
+
+Guilherme De Marchi  17:14
+So, and and how he calculates the standard, he calculates the standard based on the on the production.
+Okay, so basically this can be used as well, but that's the concept what we are showing here at the moment.
+In my opinion, this 129, it is the packaging.
+element of the standard cost, not top level.
+Okay.
+Base it on the sales, I think it is, I guess it says that this needs review, and this will apply.
+For here, as well, the meat as well.
+It is clear, or...
+
+Chris McCann  18:02
+It is clear. Yep. No, I understand that. Yeah, for sure.
+
+Guilherme De Marchi  18:04
+Yeah, so, so what I what I suggest, Chris, we need to create a button here somewhere saying production recovery. OK, then you use your that production that we know, because production is production when when Kim report here the week the the P&L.
+
+Chris McCann  18:13
+OK.
+Mhm.
+
+Guilherme De Marchi  18:23
+you build the P&L as well. You have that production output.
+
+Chris McCann  18:24
+Mhm.
+Scoop.
+Mhm.
+
+Guilherme De Marchi  18:30
+Right, when we go into into here.
+The weekly PNL and the PNL for the month, they talk to each other, okay? Who knows how it works. So that section on the PNL, markup slash variance, okay? They have two components basically there. One is market variances, like PPVs.
+
+Chris McCann  19:11
+Mhm.
+Mhm.
+Mhm.
+
+Guilherme De Marchi  19:25
+and the other is variances to the standard. That variance to the standard, it is what? Eat, packaging, ingredient, and labour. How they calculate that variance, the way I was explaining there. But because the GL account is not set up like this, you have, for an accounting point of view, you have
+
+Chris McCann  19:34
+Ingredients, yeah.
+
+Guilherme De Marchi  19:46
+One GL for consumption.
+and one GL for the full cost of that product recovery. So you have consumption of a box, but you have a recovery of a standard cost of a finished goods, that is meat, packaging, ingredients and labour altogether. So you cannot compare box against a finished goods, you know what I mean?
+
+Chris McCann  19:56
+Mhm.
+Mhm.
+
+Guilherme De Marchi  20:09
+So this is why I need to get the production output and break down how much is packaging, ingredients, labour, and then you can say, okay, this is my consumption, this is my recovery.
+
+Chris McCann  20:09
+Mhm.
+Gotcha. I'm with you.
+
+Guilherme De Marchi  20:22
+OK.
+Yeah, the P&L will, that section will be input, packaging, labour, and production output, like a very simple extract and the weekly P&L, because we asked the sites to do it. So give me your variances here, right? What is price variance and what is production variances plus stock variance and other cost and income plus, right?
+
+Chris McCann  20:42
+Mhm.
+
+Guilherme De Marchi  20:46
+This, this section of the weekly PNL is not so difficult to understand, right? If you, if you, if you just close everything, you should have standard contribution here.
+Right? You have your standard contribution, internal contribution, then you have sales adjustment, which is that overrider and credit note adjustments and everything. Then you have price variance, PPV, then you have stock variance, and then you have other cost and income.
+
+Chris McCann  21:12
+Mhm.
+
+Guilherme De Marchi  21:18
+Freight variance, and then overhead, and then job done.
+Okay, so that's something that we need to build. It's extremely important because if we just stick the number there, the sides will say, hmm.
+where this is coming from. They need to see production recovery, then they can dig into that number.
+
+Chris McCann  21:39
+Okay.
+Okay, no, that's fine. I can liaise with Peter and go through his app as well on what you have built there to get a better understanding of what I need to be pulling in to understand that.
+
+Guilherme De Marchi  21:43
+Okay.
+Do you know what is this app? This app is a, you see this accounts here actually, you have 5 accounts of production output. I was trying to get the...
+Can you, you don't see? Let me share quickly again, sorry.
+So you see this accounts, production order output, production order output. That group of accounts is that section that you have on the Monthly PNL production output. OK, this data here on Qlik that you're seeing here.
+
+Chris McCann  22:17
+Mhm.
+Diss.
+Yeah.
+Mhm.
+
+Guilherme De Marchi  22:33
+It is Fagalo 3H source of data extract. So you have on the P&L already. What you don't have is the ZF528N applied to that to break down what is meat packaging ingredients on the production side.
+
+Chris McCann  22:40
+Mhm.
+Okay.
+
+Guilherme De Marchi  22:53
+So, and this data is really heavy, okay?
+
+Chris McCann  22:59
+Mhm.
+
+Guilherme De Marchi  22:59
+Because it is by document, process order document is by day, so it's very heavy. I don't know. Probably is no flake will handle, but you don't need to bring all this data there. You just need to do.
+
+Chris McCann  23:12
+Mhm.
+
+Guilherme De Marchi  23:15
+Like Deborah do, so she she go into 3H here, right?
+
+Chris McCann  23:20
+Mhm.
+
+Guilherme De Marchi  23:21
+She will go here, flag a low 3H.
+She will put the ledger one LH.
+Right.
+Company code 125.
+GL accounts that list there.
+Is 31 here.
+And I'm talking about Deborah, but all the sites do, okay? The PUK sites, the poultry sites, they are slightly different, but the concept is the same.
+
+Chris McCann  23:48
+Mhm.
+
+Guilherme De Marchi  23:56
+Does she do this?
+then if you go into layout.
+Okay, layout. Probably going to see all the sides using here. You're going to have a red roof somewhere here.
+
+Chris McCann  24:03
+Mhm.
+
+Guilherme De Marchi  24:13
+Look, Ruskington do this.
+You see, Tonage, Redruth, then Redruth has another download from Scrapped. She had another download for reevaluation, right? Production volume and sales for another site. Look, MPL, Sap, Moy Park.
+
+Chris McCann  24:19
+Yeah.
+
+Guilherme De Marchi  24:35
+distribution cost, cost of sales, cat. So they keep doing specific layouts to help them to download the data more easily in a weekly basis. So this is all how the things works. Okay.
+
+Chris McCann  24:46
+Mhm.
+
+Guilherme De Marchi  24:52
+All right.
+
+Chris McCann  24:54
+Yeah.
+
+Guilherme De Marchi  24:55
+What else?
+
+Chris McCann  24:58
+What else?
+Um, let's see, so...
+
+Guilherme De Marchi  25:03
+I will continue, I will continue to cheque between today and tomorrow, OK? The ones I had a look, it is working, the PPV, it is getting cracked, I'm downloading Faglo 3H, checking the stock.
+
+Chris McCann  25:06
+Yeah.
+Yeah.
+
+Guilherme De Marchi  25:19
+What, what will, what will be?
+
+Chris McCann  25:21
+Is the traded goods PPV?
+Correct, but we don't actually have any GL accounts for that.
+So, I think it's an...
+
+Guilherme De Marchi  25:32
+Trading goods, Bqp, yeah, yeah, so...
+Other thing.
+Kim Kim build something in the past.
+Which is?
+Weekly mapping, this is apply more for the budget.
+Just get this here.
+And I think if we have a doubt, we can we can cheque with him and Simon as well, which is this.
+
+Jason Taylor  26:00
+You said Kim Kim built this in the past.
+
+Chris McCann  26:00
+Okay.
+
+Guilherme De Marchi  26:04
+Yeah, actually was Sandeep.
+Remember Sunday that used to work with us?
+
+Chris McCann  26:08
+Mhm.
+
+Jason Taylor  26:09
+Yeah, yeah.
+
+Chris McCann  26:10
+Mhm.
+
+Guilherme De Marchi  26:13
+Slot.
+Yes, so if we go here trading.
+But all the PPV.
+
+Chris McCann  26:33
+I wonder if he has this in Snowflake.
+
+Guilherme De Marchi  26:36
+Yeah.
+Look, this cannot.
+You can ask Simon. It has been viewed a long time ago. These names, some of this name is not being used as well. You see, for example, free cost, GL Cogs. Some are okay, some are not. Okay.
+
+Chris McCann  26:44
+Yeah.
+Mhm.
+
+Guilherme De Marchi  26:58
+But we can, we can use and test, but for example, inter-site transfer PPV.
+
+Chris McCann  27:00
+Mhm.
+
+Guilherme De Marchi  27:05
+Should be all the ones we've transferred in the name.
+
+Chris McCann  27:08
+Mmh.
+
+Guilherme De Marchi  27:10
+So I can give you like this, this I think will be okay.
+You didn't include anything here as well. Ah, traded good.
+Yeah, intersite Bqp you have.
+
+Chris McCann  27:24
+Yeah.
+
+Guilherme De Marchi  27:28
+I can, I can send you this on the chat.
+Alright, this is, this is, this can be used.
+And.
+Let's go back here and then trade that good Bqp.
+I don't have this section.
+
+Chris McCann  27:54
+Okay.
+
+Guilherme De Marchi  27:55
+Don't have any Bqp.
+Their side transfer.
+Yeah, maybe this one. You see?
+They created a new one.
+Is it transferred trading goods?
+
+Chris McCann  28:14
+Mhm.
+
+Guilherme De Marchi  28:14
+You see the night?
+You see the name of this one?
+
+Chris McCann  28:19
+Trading goods, yeah.
+
+Guilherme De Marchi  28:21
+Yeah, so we can cheque what's going into that.
+as well.
+
+Chris McCann  28:26
+Yeah.
+
+Guilherme De Marchi  28:27
+Quickly.
+If this allows me to cheque, I can cheque for you.
+
+Chris McCann  28:34
+Okay.
+
+Jason Taylor  28:40
+So whenever we go to start developing a prototype, where is the best location to put an app into? Are we looking at the dev analytics area?
+
+Chris McCann  28:58
+This is all in dev analytics.
+
+Jason Taylor  29:00
+Yeah, but we're going to keep it there. I'm just thinking of... I suppose it.
+
+Chris McCann  29:01
+Yeah.
+
+Guilherme De Marchi  29:05
+Yeah, don't show to it, just don't show to anyone for an hour. You're just, you know, testing and don't let people see, because...
+
+Chris McCann  29:09
+Yeah.
+
+Jason Taylor  29:10
+Okay.
+
+Chris McCann  29:11
+Yeah.
+
+Jason Taylor  29:13
+Okay.
+
+Guilherme De Marchi  29:16
+to avoid the headaches that we don't need it. Peter has too many headaches. Look, he's losing hair, getting old.
+He didn't say anything today; I don't know if he's there, but...
+
+Jason Taylor  29:28
+Diss.
+
+Peter Nwora  29:30
+Of course, I mean, I said I did.
+
+Guilherme De Marchi  29:32
+Ah, yeah, yeah, now you're there.
+
+Jason Taylor  29:33
+Yeah.
+
+Peter Nwora  29:36
+I did, I did, I did. Hello.
+Yeah.
+
+Guilherme De Marchi  29:42
+Maybe that account, for example, Chris, the sites used to add any manual, because we have also on the PUK side what we call recharge between the sites. Okay.
+
+Chris McCann  29:55
+Mhm.
+
+Guilherme De Marchi  29:58
+And, uh, and they post this into the month end.
+So for example, I'm going to give you one example. We don't have Europe.
+
+Chris McCann  30:02
+Mhm.
+
+Guilherme De Marchi  30:10
+meat, but to produce Audi products in Redruth, they required into the spec European meat. So we use definitely our red tractor ODB cost that is higher.
+
+Chris McCann  30:24
+Mhm.
+
+Guilherme De Marchi  30:26
+So what happened is Deborah in the end of the month, she calculates an impact of that and send the bill back to the Abbott to say, guys, I will not pay a bill.
+Because we have an option to say to the farmers, don't raise the pigs, I'm going to buy from Europe. And we don't want to do that. So that is a recharge. And they use this line trading goods into the monthly.
+
+Chris McCann  30:43
+Mhm.
+
+Peter Nwora  30:45
+No, I said to you.
+
+Guilherme De Marchi  30:51
+to recharge between, right? So it doesn't matter if you just map an account here. We should allow a manual entry into that.
+
+Peter Nwora  30:57
+Yeah, no, I just...
+
+Guilherme De Marchi  31:01
+as well.
+
+Peter Nwora  31:03
+I think there's something more.
+
+Guilherme De Marchi  31:05
+Is it possible?
+Like, for example, we're going to talk about the overheads, for example, we're going to build here.
+
+Peter Nwora  31:12
+That was.
+
+Guilherme De Marchi  31:13
+Run rate, OK?
+
+Peter Nwora  31:14
+LMS.
+
+Chris McCann  31:15
+Mhm.
+
+Guilherme De Marchi  31:16
+But this run rate will be a suggestion.
+
+Chris McCann  31:18
+Mhm.
+
+Guilherme De Marchi  31:18
+If the site wants to tweak the numbers, because they will, they can, they should have somewhere they can add, change the value.
+
+Peter Nwora  31:20
+Just sat at the end, so the dog...
+
+Chris McCann  31:22
+Mhm.
+
+Guilherme De Marchi  31:28
+Kate.
+This should be available as well into this PPV line trading goods. We can map one account there, but should be a manual entry because if you look, for example, Redruth.
+
+Peter Nwora  31:44
+Can you do me a favour?
+
+Guilherme De Marchi  31:44
+I'm just looking now. Not Redruth. Everybody, there is no cost in this year into this account that is on the, yeah, that is just a few.
+
+Peter Nwora  31:48
+The.
+Then, just so yeah, just...
+
+Chris McCann  31:53
+Mhm.
+
+Guilherme De Marchi  31:53
+That account can we can map there because it's saying inventory transfer trading goods we can map but the sites do.
+
+Peter Nwora  31:57
+I think that was going to stop through that.
+
+Chris McCann  32:03
+FF.
+
+Guilherme De Marchi  32:03
+A journal entry in the end of the month in another account.
+So, we can ask them as well.
+
+Peter Nwora  32:10
+Kpi.
+
+Guilherme De Marchi  32:11
+Kate.
+
+Chris McCann  32:12
+Yeah.
+
+Peter Nwora  32:12
+Yeah, I mean, yeah, I mean, that's one thing I do.
+
+Chris McCann  32:14
+We would want to, we want to try and have it as, if they're recording against a different account, ideally we would want to just pick that account up, yeah.
+
+Guilherme De Marchi  32:14
+Confusing it.
+
+Peter Nwora  32:20
+Good, OK.
+
+Guilherme De Marchi  32:21
+Yeah.
+I can ask, I can ask the guys on the on the intersight charges.
+Actually, should not be here as well. We can put, we can put a new group of accounts, say, inter-site charges, because they are charging each other. I'm going to ask Iain, Debra, and Phil. Phil can give us the mapping and we can cheque.
+
+Chris McCann  32:35
+Yeah.
+Can I share my screen quickly and just maybe get a bit of a steer on?
+
+Guilherme De Marchi  32:47
+Yeah, of course.
+
+Chris McCann  32:52
+On this, so the...
+This is the maintenance app for the P&L, the Monthly P&L. So there's lots of different things that they have built out in here. This is mostly built off of the spreadsheet that you actually have captured in your documentation.
+
+Guilherme De Marchi  33:14
+Yeah.
+And.
+
+Chris McCann  33:16
+And the idea behind this is that they're taking all of the accounts. You might know, you probably know this yourself, but take all the accounts and then put them into account groups.
+
+Guilherme De Marchi  33:27
+Yeah.
+
+Chris McCann  33:27
+And then from the groups, then...
+The groups are split out into different PNL levels.
+That sort of flow, yeah.
+
+Guilherme De Marchi  33:39
+No, none of these one will have the weekly PNL level.
+
+Chris McCann  33:45
+They won't have the Weekly PNL. OK.
+
+Guilherme De Marchi  33:48
+This is for the monthly PNL. Because for example, tell me if you see any PPV.
+Groupie, you're not gonna find out.
+
+Chris McCann  33:56
+No.
+
+Guilherme De Marchi  33:58
+You're not going to find any any labour variance, any labour efficiency, because this is what the sites needs to calculate. Understand that it should be our target if we could have a system in place that calculates the labour variance for us. Imagine a Sap.
+
+Chris McCann  34:06
+Mm-hmm.
+
+Guilherme De Marchi  34:14
+What a normally, what a...
+Company normally have one operates with standard cost.
+They have the accounts payable, entry, cost, actual cost. Standard cost entry, another cost. The difference between both go into a production labour variance account in a weekly order, doesn't matter. Then it is a GLP.
+
+Chris McCann  34:38
+Mm.
+
+Guilherme De Marchi  34:43
+Hosty here, we don't have that, you know, we don't have that.
+
+Chris McCann  34:44
+Yes.
+Okay.
+
+Guilherme De Marchi  34:48
+So it doesn't matter. It will, it's something different, Chris. Yeah. It will be ideal world.
+
+Chris McCann  34:53
+So that, yeah, so something something like this would be an output once we have defined what all the what GL account is going to fall into each of the different.
+
+Guilherme De Marchi  35:07
+This will work. Yeah, this will work for sales.
+
+Chris McCann  35:07
+Group for Weekly.
+Mhm.
+
+Guilherme De Marchi  35:12
+Sales deduction.
+Cogs standard cost.
+and overheads, but will not work for that section that I was telling you at the beginning. The Monthly P&L is a very synthetic way. You have input materials, which is meat, which is meat ingredients, then you have your packaging, then you have your labour.
+
+Chris McCann  35:20
+Mhm.
+Mhm.
+
+Guilherme De Marchi  35:38
+and then you have your recovery. That 3 groups of the monthly PNL is what Kim is breaking down here. Material slice in yield, substitution is a
+
+Chris McCann  35:38
+Mm-hmm.
+
+Guilherme De Marchi  35:52
+more at a lower level analysis for that impact.
+
+Chris McCann  35:58
+Kate.
+
+Guilherme De Marchi  36:00
+This is why tricky.
+
+Chris McCann  36:00
+So I think this, yeah, so this, all of this overhead stuff would have been picked up from that Monthly PNL, that sort of mapping that's going on. So that's where that will have all come from. So you're telling me then when it comes to.
+
+Guilherme De Marchi  36:06
+Gregg.
+Production variances, yeah, that that will be sales standard as well.
+
+Chris McCann  36:18
+external sales, internal sales and sales adjustments, they should all come from the same mapping as the monthly.
+
+Guilherme De Marchi  36:27
+Yeah, I would say I would say yes, but you don't have on the sales adjustment. I presume you don't have a mapping for credit note adjustment, price correction over either adjustment and promotion. So it will fit for sales. Yeah, gross sales, standard cost.
+
+Chris McCann  36:28
+Seals, yeah.
+No.
+Okay.
+
+Guilherme De Marchi  36:46
+Yeah.
+
+Chris McCann  36:47
+Okay.
+Okay, no, that's good to know. I can go there and look for that.
+
+Guilherme De Marchi  36:52
+Yeah, if you could, if you could find something, but overhead, definitely you need to copy and paste exactly the same, the same logic.
+
+Chris McCann  36:56
+Yeah.
+Okay.
+
+Guilherme De Marchi  37:02
+Yeah.
+
+Chris McCann  37:03
+All right.
+
+Guilherme De Marchi  37:05
+And on the queue, can you just go to the queue?
+
+Chris McCann  37:08
+Go to the...
+
+Guilherme De Marchi  37:10
+Two 2 numbers, and you have a you have there on top.
+You have the queue, yeah.
+
+Chris McCann  37:17
+Sorry, kill thinkers, yes.
+
+Guilherme De Marchi  37:19
+Yeah, kill figure, go, yeah.
+But go, not not here on the PNL, go up there, you have a queue, yeah, that one.
+Yeah, so this one...
+We have poultry and pork.
+Right, that I'm seeing here. OK, going to park, for example, Westerleigh, or whatever. Spalding.
+
+Chris McCann  37:37
+Mhm.
+
+Guilherme De Marchi  37:44
+When Luke sent to you the, I don't know, the SQL from this, you had their red tractor, ODB, free range, organic. Are you planning to include here? Because this is really important.
+
+Chris McCann  37:51
+Mhm.
+Yes, we are. We have an item open here on that.
+No, it's in here. It's actually sitting, so the Providence.
+Yeah, so, yeah, so I think there's a couple, there might be a couple of questions. I think Emma is going to get over to you just to clarify some stuff, but yes, that's sitting ready to go in.
+
+Guilherme De Marchi  38:17
+Yeah, okay.
+
+Emma Cutler  38:17
+Yeah.
+
+Guilherme De Marchi  38:27
+Okay, okay, and then...
+Yeah, and for poultry as well.
+I think both of you.
+
+Chris McCann  38:34
+Providence for poultry, so you want bird type breed that type of thing.
+
+Guilherme De Marchi  38:42
+I don't remember. No, no, no, no, no, no.
+
+Chris McCann  38:42
+Like your Rosses and your Rosses and your free ranges and stuff.
+
+Guilherme De Marchi  38:47
+Yeah, what Peter normally reports is, because now we are getting more specialised on poultry, so we have...
+Get what she said he sent to me.
+Parts.
+
+Jason Taylor  39:04
+Peter, what do you normally do? You making this harder for us?
+
+Guilherme De Marchi  39:04
+What?
+Kemp.
+Yeah.
+
+Emma Cutler  39:12
+Yeah.
+
+Guilherme De Marchi  39:14
+I'm making hard. This is what the guys do.
+
+Chris McCann  39:18
+Yeah.
+
+Guilherme De Marchi  39:21
+Look, no rush. You need to get this properly because if you don't open here by provenance, the guys would, oh, it's not enough. I need to download. So Peter, Peter's report like this. So.
+
+Chris McCann  39:25
+Mhm.
+Yes, OK.
+
+Guilherme De Marchi  39:36
+BCCHOICFFR free range. I'm not sure familiar, but.
+
+Chris McCann  39:43
+Yeah.
+
+Guilherme De Marchi  39:44
+is outdoor free range, free range, BCC. So you can have a chat with him how he would like to look into that.
+
+Chris McCann  39:54
+Who do I talk to? Our Peter or another Peter?
+
+Guilherme De Marchi  39:54
+But it doesn't make Peter.
+No, not our pizza.
+
+Chris McCann  40:00
+Yeah.
+
+Guilherme De Marchi  40:02
+You can, you can, you can ask Peter, Peter O'Hagan.
+
+Chris McCann  40:06
+Peter Reagan, OK.
+
+Guilherme De Marchi  40:10
+Ask him what he wants to show, because...
+
+Chris McCann  40:10
+No, it's fine.
+
+Guilherme De Marchi  40:16
+But this is not top priority, okay?
+
+Chris McCann  40:18
+Yeah, yeah, of course, yeah.
+
+Guilherme De Marchi  40:20
+Is gonna be.
+
+Chris McCann  40:22
+Yeah, so we would have, you'd want to break down by condemnation, you'd also want to break down by providence across both. And I did.
+
+Emma Cutler  40:22
+But.
+
+Guilherme De Marchi  40:28
+Like type, bird, bird type, or I don't know, don't know what you call.
+
+Chris McCann  40:30
+Or type, yeah.
+Yeah, and we want, we want a Providence under.
+
+Guilherme De Marchi  40:34
+Because we pack organic as organic, we pack free range as free range, and so on, so it's important.
+
+Chris McCann  40:39
+Yeah.
+Okay.
+Yeah, no, we can we can do that. Emma, you pick that up and run with it. Is that alright?
+
+Emma Cutler  40:48
+Yeah, I've just sent in a screenshot into the chat key for the question. So it couldn't find red, well, RT red tractor, it couldn't find that in the data. So it is, it's mapping that to the type standard, if that sounds right. Okay.
+
+Guilherme De Marchi  41:04
+Yeah, it is a standard, it is a standard, yeah, but right, standard.
+
+Emma Cutler  41:07
+And then, yeah, if you want to review the other ones in the little table there and confirm, and then I can deploy the changes.
+
+Guilherme De Marchi  41:16
+Yeah, ODB is ODB, free range is free range.
+Yeah, that correct, I think, et cetera.
+Not sure about the link, etc. should be because the link the link is a blended red tractor and ODB, so it should be. Let me let me talk to Josh quickly and I can get a confirmation for you.
+
+Emma Cutler  41:39
+Of what that should be? OK, no problem.
+
+Guilherme De Marchi  41:40
+Okay.
+
+Chris McCann  41:41
+Yeah, but I know Emma Hasan sitting ready to go, so.
+
+Emma Cutler  41:44
+Yeah, I actually think, Chris, it wasn't letting me, it wasn't letting me merge the changes, but we can review that if I, I'll try it again and if I run into bother, I'll let you know.
+
+Chris McCann  41:45
+Get that in.
+Yeah.
+Not a bother. Not a bother at all.
+
+Guilherme De Marchi  41:58
+Oh, so I will, let's do a catch up and just to summarise what we need to do. So I'm going to wait for the new link to answers, to get the answers.
+
+Chris McCann  42:04
+Mm.
+Mhm.
+
+Guilherme De Marchi  42:11
+Can I talk to Josh to confirm if Etcitra is the link?
+Right.
+
+Chris McCann  42:19
+Mm.
+
+Guilherme De Marchi  42:20
+That's for me and I keep looking into all the everything so far because it's taking me time to go each one and test. I'm going to test. I will ask some help from Paulo and Deborah. Not now. When I feel that something is not going well, I'm going to ask them.
+
+Chris McCann  42:27
+Of course.
+Mhm.
+
+Guilherme De Marchi  42:39
+because I need to involve Deborah and Phil as well to here. And then on the other side, your side, then is production volume.
+
+Chris McCann  42:40
+Mhm.
+Mhm.
+Yeah.
+
+Guilherme De Marchi  42:53
+Production recovery.
+Right.
+
+Chris McCann  42:57
+Yes.
+
+Guilherme De Marchi  42:58
+Base it on the ZFI-28 and top level. That word is really important, okay? If you don't do top level.
+It's gonna be something crazy. And then, not for this week. We have too many things to do for now.
+But that production tonnage that is used to calculate the recovery, this is one thing, okay? The other thing is...
+Stock movements. I know that you you're bringing Sap goods movement here. OK, which is opening stock, closing stock, so that that that way of doing that Carrickmacross is doing is something that we we would like to explore as well to get available to every site, because
+
+Chris McCann  43:37
+Mhm.
+
+Guilherme De Marchi  43:52
+The site finance, if they have a problem on stock, they have a problem on their results. Okay? Stock management is everything, right? You can confirm your sales, you can confirm your production.
+
+Chris McCann  44:03
+Mm-hmm.
+
+Guilherme De Marchi  44:08
+OK, and then you can confirm your result. OK, so that remember that I was showing Carrickmacross, they have opening stock.
+
+Chris McCann  44:09
+Mhm.
+
+Guilherme De Marchi  44:19
+Goods received, close in stock, buy material. This is all coming from the goods Movement report that you already have there. We just need to find out a way we're going to show this friendly or allowing them to cheque what's going on on site.
+
+Chris McCann  44:28
+Mhm.
+OK.
+
+Guilherme De Marchi  44:36
+Okay.
+
+Chris McCann  44:38
+Sounds good.
+
+Guilherme De Marchi  44:39
+Sounds good. We are making a good progress. I'm very happy. I had some feedbacks. I had some sent some snip shots for Eduardo as well about that layout. That sales data piece is really good.
+It will allow us to cheque the net revenue and the gross altogether.
+It's really good, guys. Really, I'm impressed with the speed.
+
+Chris McCann  45:09
+That's good.
+
+Guilherme De Marchi  45:10
+That's good.
+
+Chris McCann  45:10
+Glad to hear it. Glad to hear it. Right, that's fine, Gui. I think we can leave it there. We've got a number of different points. I'll pick up with Emma after on her piece for getting the PR sorted and getting that providence in for pork, not pork. For pig, not pig.
+Those are the same things for poultry and get the provenance in for.
+
+Emma Cutler  45:32
+Mmh.
+Yes.
+
+Chris McCann  45:40
+Work as well.
+
+Guilherme De Marchi  45:42
+Yeah, okay. That is a couple of things we're gonna, we're gonna, I'm gonna start it to add into the project, right? Because this is all based on what we spoke about, we just, we we don't need to just build the PNL, we need to get support backup.
+
+Chris McCann  45:43
+CA.
+Mhm.
+Mhm.
+
+Guilherme De Marchi  46:01
+For them to manage the results, so having this opening stock, closing stock, the report, good. Having the production recovery, they can drill down to understand what they are recovering, right? Having the what we call good.
+
+Chris McCann  46:14
+Mhm.
+
+Guilherme De Marchi  46:20
+Ship, not invoice, which is a good Despatch, not invoice, which is a straightforward report that is already there somewhere, is already on Qlik. I think it is. We need to bring, we need to bring this very, you know, summary management management on top of the weekly PNL, and the guys can understand everything that's going on. If someone asks something about sales, they get the answers.
+
+Chris McCann  46:26
+Mhm.
+Mhm.
+
+Guilherme De Marchi  46:45
+If someone asks them about the stock production, they have the, you know, if someone asks, if someone asks about consumables, they have, if someone asks about PPV, they have the detail. They don't need just, oh, let me download the data and do an analysis, then spend hours doing analysis in.
+
+Chris McCann  46:50
+It's right there.
+
+Jason Taylor  46:52
+That's it.
+
+Chris McCann  46:52
+Yeah.
+
+Guilherme De Marchi  47:05
+Get the answer in the next Monday, so they will have their, you know, that's that's the key for the weekly, right?
+
+Jason Taylor  47:08
+That's what we're trying to do, that key more and more across the apps. We're trying to look at opportunities to, and we've done it in one or two already, and we're planning on doing it in another, but just getting that generate insights type feature built into the app where you can philtre to a certain view and the pictures in front of you, but
+Maybe reading that picture might, you know, one person would read it one way versus one person read it another. So if we get AI generated insights on different views, it'll see if people having to draw the conclusions from what they're able to see. So we'll look at doing that. It might be a wee bit further down the line, but it's definitely where
+
+Guilherme De Marchi  47:46
+Yeah.
+
+Jason Taylor  47:51
+Our head is at from the get-go.
+
+Guilherme De Marchi  47:54
+Cool. I'm more than happy guys to support because finance is everything. You don't spend one money without affecting one GL account.
+
+Chris McCann  48:04
+This is very true, very true.
+
+Guilherme De Marchi  48:07
+Okay, cool. All right, really good.
+
+Jason Taylor  48:07
+Of.
+
+Chris McCann  48:08
+That's great. Thanks a lot, Kate, for the time.
+
+Guilherme De Marchi  48:10
+Thank you, thank you, Chris. Thank you, Chin. Bye, bye, bye.
+
+Jason Taylor  48:10
+Take care. Have a good one. Bye, bye, bye.
+
+Emma Cutler  48:11
+Thank you, bye.
+
+Chris McCann  48:12
+Bye-bye.
