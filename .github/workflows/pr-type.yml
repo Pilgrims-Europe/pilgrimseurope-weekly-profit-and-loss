@@ -1,0 +1,37 @@
+# Checks that each pull request title starts with a type word, for example "Fix: plan rows in the GL lines".
+# It then puts the matching "type: ..." label on the pull request. See "Pull requests" in AGENTS.md.
+# pull_request_target runs the workflow from main, so pull requests from forks can get a label too.
+# It does not check out or run code from the pull request.
+name: Pull request type
+
+on:
+  pull_request_target:
+    types: [opened, edited, reopened, synchronize]
+
+permissions:
+  issues: write
+  pull-requests: write
+
+jobs:
+  type:
+    runs-on: ubuntu-latest
+    steps:
+      - env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          PR: ${{ github.event.pull_request.number }}
+          TITLE: ${{ github.event.pull_request.title }}
+        run: |
+          TYPE=$(printf '%s' "$TITLE" | sed -nE 's/^(Add|Fix|Change|Research|Docs|Tooling): .+/\1/p')
+          if [ -z "$TYPE" ]; then
+            echo "::error::Start the title with a type word and a colon: Add, Fix, Change, Research, Docs or Tooling. Example: \"Fix: plan rows in the GL lines\"."
+            exit 1
+          fi
+          WANT="type: $(printf '%s' "$TYPE" | tr '[:upper:]' '[:lower:]')"
+          gh api "repos/$GH_REPO/issues/$PR/labels" --jq '.[].name' | grep '^type: ' | while read -r HAVE; do
+            if [ "$HAVE" != "$WANT" ]; then
+              gh api -X DELETE "repos/$GH_REPO/issues/$PR/labels/$(printf '%s' "$HAVE" | sed 's/ /%20/g')" > /dev/null
+            fi
+          done
+          gh api -X POST "repos/$GH_REPO/issues/$PR/labels" -f "labels[]=$WANT" > /dev/null
+          echo "Label: $WANT"

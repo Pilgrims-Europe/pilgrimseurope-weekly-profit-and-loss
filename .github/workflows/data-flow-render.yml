@@ -43,7 +43,7 @@ jobs:
           git push --force origin "$BRANCH"
           if [ -z "$(gh pr list --head "$BRANCH" --state open --json number --jq '.[].number')" ]; then
             gh pr create --head "$BRANCH" --base main \
-              --title "Render the data flow diagram" \
+              --title "Docs: render the data flow diagram" --label "type: docs" \
               --body "This pull request updates the data flow diagram in the README. The daily render found pending lines in \`docs/data-flow/CHANGELOG.md\`.
 
           Check the new \`docs/data-flow/flow.svg\`, then merge. If the next daily run finds more pending lines before you merge, it updates this pull request."
