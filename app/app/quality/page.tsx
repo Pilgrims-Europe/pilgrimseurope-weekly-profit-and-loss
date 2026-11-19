@@ -2,7 +2,7 @@ import { EmptyState } from '@/components/empty-state';
 import { KpiCard } from '@/components/kpi-card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { REPO_URL } from '@/lib/constants';
-import { getFreshness, getUnmapped } from '@/lib/wpl';
+import { getFreshness, getProductionTonnageCheck, getUnmapped } from '@/lib/wpl';
 import { formatUnit } from '@/lib/wpl-format';
 import type React from 'react';
 
@@ -27,7 +27,9 @@ const KNOWN = [
 export default async function QualityPage() {
   let content: React.ReactNode;
   try {
-    const [fresh, unmapped] = await Promise.all([getFreshness(), getUnmapped()]);
+    const [fresh, unmapped, tonnage] = await Promise.all([getFreshness(), getUnmapped(), getProductionTonnageCheck()]);
+    const tonnageSites = [...new Set(tonnage.map((t) => t.SITE))];
+    const t1 = (v: number | null) => (v === null ? 'Unknown' : v.toLocaleString('en-GB', { minimumFractionDigits: 1, maximumFractionDigits: 1 }));
     const byGroup = new Map<string, { value: number; accounts: number }>();
     for (const u of unmapped) {
       const g = String(u.GROUP_NAME ?? 'Not in the P&L account structure');
@@ -83,6 +85,60 @@ export default async function QualityPage() {
               ))}
             </TableBody>
           </Table>
+        </section>
+
+        <section className="overflow-hidden rounded-xl border bg-card shadow-sm">
+          <div className="px-5 pt-5 pb-3">
+            <h2 className="text-base font-semibold">Production tonnage check (last 8 complete weeks)</h2>
+            <p className="text-sm text-muted-foreground">
+              Difference = Production Tonnage less (Sales Tonnage + Sales Tonnage (Inedible) + Internal Sales Tonnage (STO) + finished goods
+              stock movement). Tonnes. The tolerance is Unknown, so the table has no RAG.{' '}
+              <a href={`${REPO_URL}/issues/55`} target="_blank" rel="noreferrer" className="font-semibold text-pe-brand hover:underline">
+                #55
+              </a>
+            </p>
+          </div>
+          {tonnageSites.length === 0 ? (
+            <EmptyState title="No weeks to check" className="m-5" />
+          ) : (
+            tonnageSites.map((site) => (
+              <div key={site} className="border-t">
+                <h3 className="px-5 pt-3 text-sm font-semibold">{site}</h3>
+                <Table striped>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Week</TableHead>
+                      <TableHead numeric>Production</TableHead>
+                      <TableHead numeric>Sales</TableHead>
+                      <TableHead numeric>Sales (Inedible)</TableHead>
+                      <TableHead numeric>Internal (STO)</TableHead>
+                      <TableHead numeric>FG stock movement</TableHead>
+                      <TableHead numeric>Difference</TableHead>
+                      <TableHead numeric>Difference %</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {tonnage
+                      .filter((t) => t.SITE === site)
+                      .map((t) => (
+                        <TableRow key={t.WEEK_START}>
+                          <TableCell>
+                            Wk {t.FISCAL_WEEK} ({t.WEEK_START})
+                          </TableCell>
+                          <TableCell numeric>{t1(t.PRODUCTION_T)}</TableCell>
+                          <TableCell numeric>{t1(t.SALES_T)}</TableCell>
+                          <TableCell numeric>{t1(t.SALES_INEDIBLE_T)}</TableCell>
+                          <TableCell numeric>{t1(t.INTERNAL_SALES_T)}</TableCell>
+                          <TableCell numeric>{t1(t.FG_STOCK_T)}</TableCell>
+                          <TableCell numeric>{t1(t.DIFFERENCE_T)}</TableCell>
+                          <TableCell numeric>{t.DIFFERENCE_PCT === null ? 'Unknown' : `${(t.DIFFERENCE_PCT * 100).toFixed(1)}%`}</TableCell>
+                        </TableRow>
+                      ))}
+                  </TableBody>
+                </Table>
+              </div>
+            ))
+          )}
         </section>
 
         <section className="overflow-hidden rounded-xl border bg-card shadow-sm">

@@ -136,6 +136,7 @@ const CASES: Record<string, () => Promise<unknown>> = {
   getPorkKill: () => wpl.getPorkKill('Ballymena', '2026-11-02'),
   getFreshness: () => wpl.getFreshness(),
   getUnmapped: () => wpl.getUnmapped(),
+  getProductionTonnageCheck: () => wpl.getProductionTonnageCheck(),
 };
 
 async function capture(fn: () => Promise<unknown>) {
@@ -196,6 +197,9 @@ describe('wpl.ts SQL contract', () => {
       ['BOOKINGS', 'CASUALTY', 'DIP', 'DOA', 'KILLED_QTY', 'KILL_DATE', 'PIGS_DELIVERED', 'PIGS_KILLED', 'TC_FACTORY_RESP', 'TC_PRODUCER_RESP'].sort(),
     );
     expect(await columns('getUnmapped')).toEqual(['ACCOUNTNAME', 'GLACCOUNT', 'GROUP_NAME', 'LINE_ITEMS', 'SITE', 'VALUE']);
+    expect(await columns('getProductionTonnageCheck')).toEqual(
+      ['DIFFERENCE_PCT', 'DIFFERENCE_T', 'FG_STOCK_T', 'FISCAL_WEEK', 'INTERNAL_SALES_T', 'PRODUCTION_T', 'SALES_INEDIBLE_T', 'SALES_T', 'SITE', 'WEEK_START'],
+    );
   });
 
   it('gives a value for each Sales margin leaf line from the SQL aliases', async () => {

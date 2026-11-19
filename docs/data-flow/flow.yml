@@ -221,6 +221,14 @@ nodes:
     sql: sql/10_wpl_yield_week.sql
     description: Arolink yield for the pilot plants by week. A yield loss is a cost.
     inputs: [yield, wpl_site, wpl_week]
+  - id: wpl_dq_production_tonnage
+    label: WPL_DQ_PRODUCTION_TONNAGE
+    layer: combine
+    status: planned
+    object: DEV_ANALYTICS.FINANCE_PL_WEEKLY.WPL_DQ_PRODUCTION_TONNAGE
+    sql: sql/13_wpl_dq.sql
+    description: Production tonnage check for the pilot sites. Production less sales, internal sales and finished goods stock movement.
+    inputs: [wpl_weekly_pl, sap_gm, material_master, wpl_site, wpl_week]
   - id: wpl_dq_unmapped
     label: WPL_DQ_UNMAPPED
     layer: rules
@@ -318,6 +326,14 @@ nodes:
     sql: sql/14_wpl_refresh.sql
     description: Table copy of WPL_DQ_FRESHNESS, for the Quality page.
     inputs: [wpl_dq_freshness]
+  - id: wpl_t_dq_production_tonnage
+    label: WPL_T_DQ_PRODUCTION_TONNAGE
+    layer: refresh
+    status: planned
+    object: DEV_ANALYTICS.FINANCE_PL_WEEKLY.WPL_T_DQ_PRODUCTION_TONNAGE
+    sql: sql/14_wpl_refresh.sql
+    description: Table copy of WPL_DQ_PRODUCTION_TONNAGE, for the Quality page.
+    inputs: [wpl_dq_production_tonnage]
   - id: wpl_t_dq_unmapped
     label: WPL_T_DQ_UNMAPPED
     layer: refresh
@@ -333,7 +349,7 @@ nodes:
     object: DEV_ANALYTICS.FINANCE_PL_WEEKLY.WEEKLY_PL
     sql: app/lib/wpl.ts
     description: Snowflake app (application service). Reads the refreshed tables and the site and line views.
-    inputs: [wpl_t_weekly_pl, wpl_t_gl_week, wpl_t_kill_poultry, wpl_t_kill_poultry_code, wpl_t_kill_pork, wpl_t_dq_freshness, wpl_t_dq_unmapped, wpl_t_sales_detail, wpl_site, wpl_line, wpl_week]
+    inputs: [wpl_t_weekly_pl, wpl_t_gl_week, wpl_t_kill_poultry, wpl_t_kill_poultry_code, wpl_t_kill_pork, wpl_t_dq_freshness, wpl_t_dq_unmapped, wpl_t_dq_production_tonnage, wpl_t_sales_detail, wpl_site, wpl_line, wpl_week]
   - id: qlik
     label: Qlik
     layer: consumers
