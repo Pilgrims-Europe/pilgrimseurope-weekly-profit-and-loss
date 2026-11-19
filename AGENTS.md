@@ -46,7 +46,9 @@ More than one agent session works on this repo at the same time. Start each sess
 
 - Test SQL in a copy schema: `scripts/build-dev-schema.ps1 [-Schema <name>]`. It runs the tie-out checks at the end. For a local app on the copy, set `WPL_SCHEMA=DEV_ANALYTICS.<name>`.
 - Tie-out checks: `scripts/check-tie-out.ps1 [-Schema <name>]` (`sql/checks/tie_out.sql`). A check passes when it returns no rows.
-- App checks: in `app/`, `npm run typecheck` and `npm test`. CI runs both on pull requests (`.github/workflows/app-check.yml`).
+- App contract check: `scripts/check-tie-out.ps1 -Check app_contract [-Schema <name>]` (`sql/checks/app_contract.sql`). It checks that the tables have each column that `app/lib/wpl.ts` reads. `build-dev-schema.ps1` and `deploy-live.ps1` run it after the tie-out checks.
+- If you change a column or a table that `app/lib/wpl.ts` reads, change `sql/checks/app_contract.sql` in the same pull request. `app/__tests__/lib/wpl-contract.test.ts` fails if the two do not agree.
+- App checks: in `app/`, `npm run typecheck` and `npm run test:coverage`. CI runs both on pull requests (`.github/workflows/app-check.yml`). The coverage thresholds are in `app/vitest.config.ts`.
 - Smoke test a running app: `scripts/smoke.ps1 -Base http://localhost:<port>`.
 - Deploy to live, after the merge: `scripts/deploy-live.ps1` from a clean `main`.
 

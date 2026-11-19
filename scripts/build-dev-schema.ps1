@@ -16,3 +16,4 @@ $parts += "CALL DEV_ANALYTICS.$Schema.WPL_REFRESH();"
 [IO.File]::WriteAllText($out, ($parts -join "`n"))
 snow sql -f $out --enable-templating NONE
 powershell -NoProfile -File (Join-Path $PSScriptRoot 'check-tie-out.ps1') -Schema $Schema
+powershell -NoProfile -File (Join-Path $PSScriptRoot 'check-tie-out.ps1') -Schema $Schema -Check app_contract

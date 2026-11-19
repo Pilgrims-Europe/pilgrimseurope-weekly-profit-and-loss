@@ -1,5 +1,5 @@
 # Checks pull requests that change the Weekly P&L app.
-# Fails if the TypeScript does not compile or a unit test fails.
+# Fails if the TypeScript does not compile, a unit test fails, or coverage falls below the thresholds in app/vitest.config.ts.
 name: App check
 
 on:
@@ -32,5 +32,5 @@ jobs:
       - name: Typecheck
         run: npm run typecheck
 
-      - name: Unit tests
-        run: npm test
+      - name: Unit tests and coverage thresholds
+        run: npm run test:coverage

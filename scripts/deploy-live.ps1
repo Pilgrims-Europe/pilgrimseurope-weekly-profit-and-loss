@@ -1,4 +1,4 @@
-# Deploy the weekly P&L to live: SQL views, table refresh, tie-out checks, then the app.
+# Deploy the weekly P&L to live: SQL views, table refresh, tie-out and app contract checks, then the app.
 # Runs only from an up-to-date, clean main, so live always matches main.
 # Usage: powershell -File scripts\deploy-live.ps1 [-SkipApp]
 param([switch]$SkipApp)
@@ -25,9 +25,11 @@ $parts += 'CALL DEV_ANALYTICS.FINANCE_PL_WEEKLY.WPL_REFRESH();'
 snow sql -f $file --enable-templating NONE | Select-String -Pattern 'rror|rebuilt at'
 if ($LASTEXITCODE -ne 0) { Write-Output 'Stop: the SQL failed. The app is not deployed.'; exit 1 }
 
-# 3. Tie-out checks. Stop before the app deploy if a check fails.
+# 3. Tie-out and app contract checks. Stop before the app deploy if a check fails.
 powershell -NoProfile -File (Join-Path $PSScriptRoot 'check-tie-out.ps1')
 if ($LASTEXITCODE -ne 0) { Write-Output 'Stop: tie-out failed. The SQL is live; the app is not deployed.'; exit 1 }
+powershell -NoProfile -File (Join-Path $PSScriptRoot 'check-tie-out.ps1') -Check app_contract
+if ($LASTEXITCODE -ne 0) { Write-Output 'Stop: a column the app reads is missing. The SQL is live; the app is not deployed.'; exit 1 }
 if ($SkipApp) { exit 0 }
 
 # 4. App deploy. A stale app/output bundle makes the deploy fail with "File exists".
