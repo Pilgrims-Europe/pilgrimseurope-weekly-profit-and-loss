@@ -40,7 +40,7 @@ WITH delivered AS (
     WHERE r.SPECIESTYPE = 1
       AND r.BIRDTYPE = 3
       AND NOT r.VOIDFLAG
-      AND r.EVENTDATE >= '2025-12-29'
+      AND r.EVENTDATE >= '2024-12-30'
     GROUP BY ALL
 ),
 condemned AS (

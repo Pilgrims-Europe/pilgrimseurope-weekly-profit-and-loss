@@ -172,7 +172,7 @@ For Aswani Nune (SAP BW Developer, Information Technology):
 1. Is the BW query `C_ACTUALPLANGL` at ACDOCA line grain, or does BW sum some lines?
 2. Can BW add the line item number (DOCLN), posting key, assignment and reference to the query?
 3. What are `VALUATIONTYPE`, `VALUATIONQUANTITY`, `REFERENCEDOCUMENTNUM` and `AMOUNTINFREEDEFINEDCURRENCY2`?
-4. Why is the year in `FISCALYEARWEEK` one more than `FISCALYEAR`?
+4. Why is the year in `FISCALYEARWEEK` one more than `FISCALYEAR`? Partly answered 2026-11-18: on 100% of GL lines, `FISCALYEARWEEK` is the calendar week of the posting date in `DIM_CALENDARMASTER`, with a year label one year ahead (202746 is fiscal week 2026-46). The reason for the label is Unknown.
 5. What is in `PROD_RAW.SAP.C_ACTUALPLANGL_Additional` (23.8 million rows, same columns)?
 6. Do back-postings to weeks older than W6 reach Snowflake?
 

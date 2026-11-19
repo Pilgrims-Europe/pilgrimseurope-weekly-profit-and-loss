@@ -1,6 +1,7 @@
 -- The weekly P&L: one row for each site, week and template line, with value, RAG, status and rule.
 -- Pilot sites get every line. Kill sites get their kill line only.
 -- Leaf lines: value from WPL_LINE_VALUE (0 when the week has no data). Red lines have no value.
+-- Weeks before the line's DATA_FROM (COPA starts 2025-04-21) get status 'No data' and no value.
 -- Subtotals: sum of their leaf components. MISSING_COMPONENTS counts components with no value (Red or empty).
 -- Ratios: numerator / (denominator x scale). EBIT % and Percentage Ext C/S are shown as a fraction.
 CREATE OR REPLACE VIEW DEV_ANALYTICS.FINANCE_PL_WEEKLY.WPL_WEEKLY_PL
@@ -20,6 +21,7 @@ leaf AS (
             WHEN g.RAG = 'Red'                                           THEN 'Not built'
             WHEN g.SITE_SCOPE IN ('POULTRY_KILL', 'PORK_KILL')
              AND g.SITE_KIND <> g.SITE_SCOPE                             THEN 'Not a kill site'
+            WHEN g.WEEK_START < g.DATA_FROM                              THEN 'No data'
             WHEN g.LINE_ID IN (420, 710)                                 THEN 'Empty'
             ELSE 'Built'
         END AS STATUS,
@@ -63,7 +65,7 @@ step1 AS (
 )
 SELECT
     a.SITE, a.SITE_KIND, a.SITE_ORDER, a.WEEK_START, a.WEEK_END, a.FISCAL_YEAR, a.FISCAL_WEEK, a.FISCAL_YEAR_WEEK,
-    a.LINE_ID, a.LINE_GROUP, a.LINE_NAME, a.SOURCE_TYPE, a.SOURCE_SYSTEM, a.RAG, a.REASON, a.RULE, a.UNIT, a.TICKET,
+    a.LINE_ID, a.LINE_GROUP, a.LINE_NAME, a.SOURCE_TYPE, a.SOURCE_SYSTEM, a.RAG, a.REASON, a.RULE, a.UNIT, a.TICKET, a.LAYOUT,
     a.STATUS,
     CASE
         WHEN a.RATIO_NUM IS NOT NULL THEN DIV0NULL(n.VALUE, d.VALUE * a.RATIO_SCALE)

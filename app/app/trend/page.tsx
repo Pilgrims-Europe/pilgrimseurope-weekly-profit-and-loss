@@ -3,7 +3,7 @@ import { FilterBar } from '@/components/filter-bar';
 import { RagBadge } from '@/components/rag-badge';
 import { TrendChart } from '@/components/trend-chart';
 import { getLines, getTrend, resolveFilters } from '@/lib/wpl';
-import { formatUnit, toNumber, weekLabel } from '@/lib/wpl-format';
+import { formatUnit, isRunRate, toNumber, weekLabel } from '@/lib/wpl-format';
 import type React from 'react';
 
 export const dynamic = 'force-dynamic';
@@ -46,7 +46,7 @@ export default async function TrendPage({
       },
     ];
     const trend = await getTrend(site.SITE, week.WEEK_START, Number(line.LINE_ID));
-    const overhead = line.LINE_GROUP === 'Overheads' && line.SOURCE_TYPE !== 'Subtotal';
+    const overhead = isRunRate(line);
     const data = trend.map((t) => ({
       label: `W${t.FISCAL_WEEK}`,
       value: toNumber(t.VALUE),

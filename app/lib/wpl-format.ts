@@ -5,7 +5,7 @@
 
 export type Rag = 'Green' | 'Amber' | 'Red';
 
-export type LineStatus = 'Built' | 'Not built' | 'Empty' | 'Subtotal' | 'Not a kill site';
+export type LineStatus = 'Built' | 'Not built' | 'Empty' | 'Subtotal' | 'Not a kill site' | 'No data';
 
 export function toNumber(value: unknown): number | null {
   if (value === null || value === undefined || value === '') return null;
@@ -18,8 +18,9 @@ const gbp3 = new Intl.NumberFormat('en-GB', { style: 'currency', currency: 'GBP'
 const int = new Intl.NumberFormat('en-GB', { maximumFractionDigits: 0 });
 const one = new Intl.NumberFormat('en-GB', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
 const pct = new Intl.NumberFormat('en-GB', { style: 'percent', minimumFractionDigits: 1, maximumFractionDigits: 1 });
+const two = new Intl.NumberFormat('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
-/** Format a value in its line unit: GBP, t, head, %, GBP/kg or FTE. Missing values show "—". */
+/** Format a value in its line unit: GBP, t, head, kg, %, GBP/kg or FTE. Missing values show "—". */
 export function formatUnit(value: unknown, unit: string | null | undefined): string {
   const n = toNumber(value);
   if (n === null) return '—';
@@ -32,9 +33,31 @@ export function formatUnit(value: unknown, unit: string | null | undefined): str
       return pct.format(n);
     case 't':
       return `${one.format(n)} t`;
+    case 'kg':
+      return `${int.format(n)} kg`;
     case 'FTE':
       return one.format(n);
     case 'head':
+    default:
+      return int.format(n);
+  }
+}
+
+/**
+ * Short form for the week columns of the pivot tables, as in Gui's sheet: no £ sign or unit name.
+ * GBP and kg as whole numbers, GBP/kg with 2 decimals, % with 1 decimal. Missing values show "—".
+ */
+export function formatPivot(value: unknown, unit: string | null | undefined): string {
+  const n = toNumber(value);
+  if (n === null) return '—';
+  switch (unit) {
+    case 'GBP/kg':
+      return two.format(n);
+    case '%':
+      return pct.format(n);
+    case 't':
+    case 'FTE':
+      return one.format(n);
     default:
       return int.format(n);
   }
@@ -66,6 +89,11 @@ export function weekLabel(fiscalWeek: unknown, weekStart: string): string {
   const fmt = (d: Date, year: boolean) =>
     d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', ...(year ? { year: 'numeric' } : {}), timeZone: 'UTC' });
   return `Week ${fiscalWeek ?? '?'} (${fmt(start, false)} to ${fmt(end, true)})`;
+}
+
+/** True for lines that show a 13-week run rate (overheads, not Consumables). WPL_LINE_VALUE uses the same test. */
+export function isRunRate(line: { RULE?: string | null } | null | undefined): boolean {
+  return !!line?.RULE?.startsWith('Run rate');
 }
 
 /** Ticket text such as "#20" to a GitHub issue URL. */

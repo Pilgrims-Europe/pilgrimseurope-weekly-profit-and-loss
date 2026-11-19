@@ -1,10 +1,11 @@
 -- One value for each site, week and built line (leaf lines only, no subtotals).
--- Sign: income positive, cost negative. Tonnage in tonnes, kill in head.
--- Overheads are a run rate: the average weekly GL value of the 13 weeks before the week.
+-- Sign: income positive, cost negative. Tonnage in tonnes, kill in head, Total KG in kg.
+-- Sales margin lines (2010 to 2210) use external sales (intercompany out). Total KG is edible kg, the same as Sales Tonnage (#52).
+-- Overheads are a run rate: the average weekly GL value of the 13 weeks before the week. Consumables is the week's GL actual (ticket #22).
 -- In the first weeks of FY2026 fewer than 13 weeks are in the data, so the average uses the weeks that exist.
 -- ACTUAL_VALUE holds the week's own GL value for overhead lines (for comparison in the app).
 CREATE OR REPLACE VIEW DEV_ANALYTICS.FINANCE_PL_WEEKLY.WPL_LINE_VALUE
-COMMENT = 'Weekly P&L app: value of each built leaf line by site and week, from the WPL_* source views. Overheads = 13-week run rate; ACTUAL_VALUE = the week GL actual.'
+COMMENT = 'Weekly P&L app: value of each built leaf line by site and week, from the WPL_* source views. Overheads (not Consumables) = 13-week run rate; ACTUAL_VALUE = the week GL actual.'
 AS
 WITH sales AS (
     SELECT SITE, WEEK_START,
@@ -15,7 +16,16 @@ WITH sales AS (
         SUM(IFF(NOT IS_INTERCO, STD_PACKAGING, 0))         AS EXT_PACKAGING,
         SUM(IFF(NOT IS_INTERCO, STD_LABOUR, 0))            AS EXT_LABOUR,
         SUM(IFF(NOT IS_INTERCO, STD_FREIGHT, 0))           AS EXT_FREIGHT,
-        SUM(IFF(IS_INTERCO, STD_FREIGHT, 0))               AS INT_FREIGHT
+        SUM(IFF(IS_INTERCO, STD_FREIGHT, 0))               AS INT_FREIGHT,
+        SUM(IFF(NOT IS_INTERCO, EDIBLE_KG, 0))             AS SM_KG,
+        SUM(IFF(NOT IS_INTERCO, GSV, 0))                   AS SM_GSV,
+        SUM(IFF(NOT IS_INTERCO, OSC, 0))                   AS SM_OSC,
+        SUM(IFF(NOT IS_INTERCO, STD_MEAT, 0))              AS SM_MEAT,
+        SUM(IFF(NOT IS_INTERCO, STD_LABOUR, 0))            AS SM_LABOUR,
+        SUM(IFF(NOT IS_INTERCO, STD_INGREDIENTS, 0))       AS SM_INGREDIENTS,
+        SUM(IFF(NOT IS_INTERCO, STD_PACKAGING, 0))         AS SM_PACKAGING,
+        SUM(IFF(NOT IS_INTERCO, STD_COS, 0))               AS SM_COS,
+        SUM(IFF(NOT IS_INTERCO, STD_FREIGHT, 0))           AS SM_FREIGHT
     FROM DEV_ANALYTICS.FINANCE_PL_WEEKLY.WPL_SALES_WEEK
     GROUP BY ALL
 ),
@@ -38,6 +48,7 @@ pilot_week AS (
 base AS (
     SELECT p.SITE, p.WEEK_START,
         sa.EXT_T, sa.INEDIBLE_T, sa.EXT_NSV, sa.EXT_MATERIAL, sa.EXT_PACKAGING, sa.EXT_LABOUR, sa.EXT_FREIGHT, sa.INT_FREIGHT,
+        sa.SM_KG, sa.SM_GSV, sa.SM_OSC, sa.SM_MEAT, sa.SM_LABOUR, sa.SM_INGREDIENTS, sa.SM_PACKAGING, sa.SM_COS, sa.SM_FREIGHT,
         m.STO_T, m.STO_NSV, m.STO_STD_MATERIAL, m.STO_STD_PACKAGING, m.STO_STD_LABOUR, m.PRODUCTION_T,
         COALESCE(g440.VALUE, 0) AS GL_PACKAGING,
         COALESCE(g810.VALUE, 0) AS GL_FREIGHT,
@@ -71,24 +82,35 @@ wide AS (
         COALESCE(SLICING_YIELD, 0)::FLOAT        AS "430",
         (GL_PACKAGING - (COALESCE(EXT_PACKAGING, 0) + COALESCE(STO_STD_PACKAGING, 0)))::FLOAT AS "440",
         (GL_FREIGHT - COALESCE(EXT_FREIGHT, 0))::FLOAT      AS "810",
-        (GL_DISTRIBUTION - COALESCE(INT_FREIGHT, 0))::FLOAT AS "820"
+        (GL_DISTRIBUTION - COALESCE(INT_FREIGHT, 0))::FLOAT AS "820",
+        COALESCE(SM_KG, 0)::FLOAT               AS "2010",
+        COALESCE(SM_GSV, 0)::FLOAT              AS "2020",
+        COALESCE(SM_OSC, 0)::FLOAT              AS "2040",
+        COALESCE(SM_MEAT, 0)::FLOAT             AS "2110",
+        COALESCE(SM_LABOUR, 0)::FLOAT           AS "2120",
+        COALESCE(SM_INGREDIENTS, 0)::FLOAT      AS "2130",
+        COALESCE(SM_PACKAGING, 0)::FLOAT        AS "2140",
+        -- Other: gold cost of sales less the four silver components, so STD Cost of Goods ties to COPA (#51).
+        (COALESCE(SM_COS, 0) - COALESCE(SM_MEAT, 0) - COALESCE(SM_LABOUR, 0) - COALESCE(SM_INGREDIENTS, 0) - COALESCE(SM_PACKAGING, 0))::FLOAT AS "2150",
+        COALESCE(SM_FREIGHT, 0)::FLOAT          AS "2210"
     FROM base
 ),
 calc AS (
     SELECT SITE, WEEK_START, LINE_KEY::NUMBER AS LINE_ID, VALUE
     FROM wide
-    UNPIVOT (VALUE FOR LINE_KEY IN ("40", "50", "60", "110", "120", "130", "140", "160", "210", "220", "230", "240", "250", "270", "430", "440", "810", "820"))
+    UNPIVOT (VALUE FOR LINE_KEY IN ("40", "50", "60", "110", "120", "130", "140", "160", "210", "220", "230", "240", "250", "270", "430", "440", "810", "820",
+                                    "2010", "2020", "2040", "2110", "2120", "2130", "2140", "2150", "2210"))
 ),
 gl_direct AS (
     SELECT SITE, WEEK_START, LINE_ID, VALUE
     FROM gl
-    WHERE LINE_ID IN (410, 510, 520, 530, 550, 610, 620, 630, 640, 720)
+    WHERE LINE_ID IN (410, 510, 520, 530, 550, 610, 620, 630, 640, 645, 720, 1000)
 ),
 overhead_week AS (
     -- Every pilot site, week and overhead line, with 0 when the week has no postings.
     SELECT p.SITE, p.WEEK_START, l.LINE_ID, COALESCE(g.VALUE, 0) AS VALUE
     FROM pilot_week p
-    CROSS JOIN (SELECT LINE_ID FROM DEV_ANALYTICS.FINANCE_PL_WEEKLY.WPL_LINE WHERE LINE_GROUP = 'Overheads' AND SOURCE_TYPE <> 'Subtotal') l
+    CROSS JOIN (SELECT LINE_ID FROM DEV_ANALYTICS.FINANCE_PL_WEEKLY.WPL_LINE WHERE RULE ILIKE 'Run rate%') l
     LEFT JOIN gl g ON g.SITE = p.SITE AND g.WEEK_START = p.WEEK_START AND g.LINE_ID = l.LINE_ID
 ),
 overhead AS (

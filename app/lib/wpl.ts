@@ -5,6 +5,8 @@
  * Every user-supplied value goes in as a bind parameter. Server code only.
  */
 import { snowflake } from '@/lib/snowflake';
+import type { LeafValue, SalesFilter, SalesFilterParam } from '@/lib/wpl-filter';
+import { isRunRate } from '@/lib/wpl-format';
 
 const SCHEMA =
   process.env.NODE_ENV === 'development' && /^[A-Z0-9_]+\.[A-Z0-9_]+$/.test(process.env.WPL_SCHEMA ?? '')
@@ -27,7 +29,15 @@ export interface Week {
   WEEK_START: string;
   FISCAL_WEEK: string;
   FISCAL_YEAR: string;
+  /** Fiscal year and month, for example "2026011". */
+  FISCAL_YEAR_PERIOD: string;
+  FISCAL_MONTH_NAME: string;
+  /** "Q1" to "Q4". */
+  FISCAL_QUARTER: string;
 }
+
+/** The two line layouts in WPL_LINE. */
+export type Layout = 'Anaplan template' | 'Sales margin';
 
 export interface PlLine {
   SITE: string;
@@ -60,8 +70,11 @@ export async function getSites(): Promise<Site[]> {
 
 export async function getWeeks(): Promise<Week[]> {
   return rows<Week>(
-    `SELECT DISTINCT TO_VARCHAR(WEEK_START, 'YYYY-MM-DD') AS WEEK_START, FISCAL_WEEK, FISCAL_YEAR
-     FROM ${SCHEMA}.WPL_T_WEEKLY_PL ORDER BY WEEK_START DESC`,
+    `SELECT TO_VARCHAR(w.WEEK_START, 'YYYY-MM-DD') AS WEEK_START, w.FISCAL_WEEK, w.FISCAL_YEAR, w.FISCAL_YEAR_PERIOD,
+            w.FISCAL_MONTH_NAME, w.FISCAL_QUARTER
+     FROM ${SCHEMA}.WPL_WEEK w
+     WHERE w.WEEK_START IN (SELECT DISTINCT WEEK_START FROM ${SCHEMA}.WPL_T_WEEKLY_PL)
+     ORDER BY w.WEEK_START DESC`,
   );
 }
 
@@ -78,7 +91,7 @@ export async function resolveFilters(params: { site?: string; week?: string }, k
  * The template lines for each site and one week, with last week's value for comparison.
  * With no site, all sites (pilot and kill sites). Roll them up with `rollUp` in lib/wpl-rollup.ts.
  */
-export async function getPl(weekStart: string, site?: string): Promise<PlLine[]> {
+export async function getPl(weekStart: string, site?: string, layout: Layout = 'Anaplan template'): Promise<PlLine[]> {
   return rows<PlLine>(
     `SELECT c.SITE, c.SITE_KIND, c.LINE_ID, c.LINE_GROUP, c.LINE_NAME, c.SOURCE_TYPE, c.SOURCE_SYSTEM, c.RAG, c.REASON, c.RULE,
             c.UNIT, c.TICKET, c.STATUS, c.VALUE, c.ACTUAL_VALUE, p.VALUE AS PREV_VALUE, c.MISSING_COMPONENTS, c.COMPONENTS,
@@ -87,10 +100,123 @@ export async function getPl(weekStart: string, site?: string): Promise<PlLine[]>
      JOIN ${SCHEMA}.WPL_LINE l ON l.LINE_ID = c.LINE_ID
      LEFT JOIN ${SCHEMA}.WPL_T_WEEKLY_PL p
        ON p.SITE = c.SITE AND p.LINE_ID = c.LINE_ID AND p.WEEK_START = DATEADD(week, -1, c.WEEK_START)
-     WHERE c.WEEK_START = ? AND (? = '' OR c.SITE = ?)
+     WHERE c.WEEK_START = ? AND (? = '' OR c.SITE = ?) AND l.LAYOUT = ?
      ORDER BY c.LINE_ID, c.SITE_ORDER`,
-    [weekStart, site ?? '', site ?? ''],
+    [weekStart, site ?? '', site ?? '', layout],
   );
+}
+
+export interface PlWeekLine extends PlLine {
+  WEEK_START: string;
+}
+
+/**
+ * The lines of one layout for each site and each week from `fromWeek` to `toWeek` (both included).
+ * With no site, all sites. Pivot them with `pivot` in lib/wpl-pivot.ts.
+ * The values and the line text come in two queries: a year of weeks has about 9,000 rows, and the
+ * rule and reason text on each row made one query take 6 to 8 seconds.
+ */
+export async function getPlRange(fromWeek: string, toWeek: string, layout: Layout, site?: string): Promise<PlWeekLine[]> {
+  type Value = Pick<PlWeekLine, 'WEEK_START' | 'SITE' | 'SITE_KIND' | 'LINE_ID' | 'STATUS' | 'VALUE' | 'MISSING_COMPONENTS'>;
+  type Meta = Omit<PlLine, 'SITE' | 'SITE_KIND' | 'STATUS' | 'VALUE' | 'ACTUAL_VALUE' | 'PREV_VALUE' | 'MISSING_COMPONENTS'>;
+  const [values, meta] = await Promise.all([
+    rows<Value>(
+      `SELECT TO_VARCHAR(c.WEEK_START, 'YYYY-MM-DD') AS WEEK_START, c.SITE, c.SITE_KIND, c.LINE_ID, c.STATUS, c.VALUE,
+              c.MISSING_COMPONENTS
+       FROM ${SCHEMA}.WPL_T_WEEKLY_PL c
+       WHERE c.WEEK_START BETWEEN ?::DATE AND ?::DATE AND (? = '' OR c.SITE = ?) AND c.LAYOUT = ?
+       ORDER BY c.WEEK_START, c.LINE_ID, c.SITE_ORDER`,
+      [fromWeek, toWeek, site ?? '', site ?? '', layout],
+    ),
+    rows<Meta>(
+      `SELECT LINE_ID, LINE_GROUP, LINE_NAME, SOURCE_TYPE, SOURCE_SYSTEM, RAG, REASON, RULE, UNIT, TICKET, COMPONENTS,
+              RATIO_NUM, RATIO_DEN, RATIO_SCALE
+       FROM ${SCHEMA}.WPL_LINE WHERE LAYOUT = ?`,
+      [layout],
+    ),
+  ]);
+  const byId = new Map(meta.map((m) => [String(m.LINE_ID), m]));
+  return values.flatMap((v) => {
+    const m = byId.get(String(v.LINE_ID));
+    return m ? [{ ...m, ...v, LINE_ID: String(v.LINE_ID), ACTUAL_VALUE: null, PREV_VALUE: null }] : [];
+  });
+}
+
+/** Column of WPL_T_SALES_DETAIL for each Sales margin filter. Fixed names, never from user input. */
+const FILTER_COLUMN: Record<SalesFilterParam, string> = {
+  cust: 'SOLD_TO',
+  cat: 'CATEGORY',
+  bu: 'BUSINESS_UNIT',
+  mat: 'MATERIAL_CODE',
+};
+
+/** WHERE text and binds for the Sales margin filters. Values go in as bind parameters. */
+function filterSql(f: SalesFilter): { sql: string; binds: string[] } {
+  const parts: string[] = [];
+  const binds: string[] = [];
+  for (const [param, column] of Object.entries(FILTER_COLUMN) as [SalesFilterParam, string][]) {
+    const values = f[param];
+    if (!values.length) continue;
+    parts.push(`${column} IN (${values.map(() => '?').join(', ')})`);
+    binds.push(...values);
+  }
+  return { sql: parts.map((p) => ` AND ${p}`).join(''), binds };
+}
+
+/**
+ * Sales margin leaf values from the COPA detail, for one site or all pilot sites, with the filters.
+ * External sales only. The same rules as WPL_LINE_VALUE (lines 2010 to 2210).
+ */
+export async function getSalesLeafValues(fromWeek: string, toWeek: string, filter: SalesFilter, site?: string): Promise<LeafValue[]> {
+  const f = filterSql(filter);
+  const sums = await rows<Record<string, string | null>>(
+    `SELECT SITE, TO_VARCHAR(WEEK_START, 'YYYY-MM-DD') AS WEEK_START,
+            SUM(EDIBLE_KG) AS "2010", SUM(GSV) AS "2020", SUM(OSC) AS "2040",
+            SUM(STD_MEAT) AS "2110", SUM(STD_LABOUR) AS "2120", SUM(STD_INGREDIENTS) AS "2130", SUM(STD_PACKAGING) AS "2140",
+            SUM(COALESCE(STD_COS, 0) - COALESCE(STD_MEAT, 0) - COALESCE(STD_LABOUR, 0) - COALESCE(STD_INGREDIENTS, 0)
+                - COALESCE(STD_PACKAGING, 0)) AS "2150",
+            SUM(STD_FREIGHT) AS "2210"
+     FROM ${SCHEMA}.WPL_T_SALES_DETAIL
+     WHERE NOT IS_INTERCO AND WEEK_START BETWEEN ?::DATE AND ?::DATE AND (? = '' OR SITE = ?)${f.sql}
+     GROUP BY ALL`,
+    [fromWeek, toWeek, site ?? '', site ?? '', ...f.binds],
+  );
+  const ids = ['2010', '2020', '2040', '2110', '2120', '2130', '2140', '2150', '2210'];
+  return sums.flatMap((s) => ids.map((id) => ({ SITE: s.SITE ?? '', WEEK_START: s.WEEK_START ?? '', LINE_ID: id, VALUE: s[id] })));
+}
+
+export interface FilterValue {
+  VALUE: string;
+  LABEL: string;
+}
+
+/**
+ * The values for each Sales margin filter: customers, categories, business units and materials with external
+ * sales at the site (or all pilot sites) in the weeks, largest N.S.V. first.
+ */
+export async function getSalesFilterOptions(
+  fromWeek: string,
+  toWeek: string,
+  site?: string,
+): Promise<Record<SalesFilterParam, FilterValue[]>> {
+  const r = await rows<{ DIM: SalesFilterParam; VALUE: string; LABEL: string }>(
+    `WITH d AS (
+       SELECT * FROM ${SCHEMA}.WPL_T_SALES_DETAIL
+       WHERE NOT IS_INTERCO AND WEEK_START BETWEEN ?::DATE AND ?::DATE AND (? = '' OR SITE = ?)
+     )
+     SELECT DIM, VALUE, LABEL FROM (
+       SELECT 'cust' AS DIM, SOLD_TO AS VALUE, MAX(CUSTOMER_NAME) || ' (' || LTRIM(SOLD_TO, '0') || ')' AS LABEL, SUM(NSV) AS N FROM d GROUP BY SOLD_TO
+       UNION ALL SELECT 'cat', CATEGORY, CATEGORY, SUM(NSV) FROM d GROUP BY CATEGORY
+       UNION ALL SELECT 'bu', BUSINESS_UNIT, BUSINESS_UNIT, SUM(NSV) FROM d GROUP BY BUSINESS_UNIT
+       UNION ALL SELECT 'mat', MATERIAL_CODE, MATERIAL_CODE || ' - ' || MAX(MATERIAL_DESC), SUM(NSV) FROM d GROUP BY MATERIAL_CODE
+     )
+     WHERE VALUE IS NOT NULL
+     ORDER BY DIM, N DESC NULLS LAST`,
+    [fromWeek, toWeek, site ?? '', site ?? ''],
+  );
+  const out: Record<SalesFilterParam, FilterValue[]> = { cust: [], cat: [], bu: [], mat: [] };
+  for (const x of r) out[x.DIM]?.push({ VALUE: x.VALUE, LABEL: x.LABEL });
+  return out;
 }
 
 export interface DetailItem {
@@ -160,8 +286,8 @@ export async function getLineDetail(site: string, weekStart: string, lineId: num
 
   const [accounts, [line]] = await Promise.all([
     getLineAccounts(site, weekStart, lineId),
-    rows<{ VALUE: string | null; LINE_GROUP: string; SOURCE_TYPE: string }>(
-      `SELECT VALUE, LINE_GROUP, SOURCE_TYPE FROM ${SCHEMA}.WPL_T_WEEKLY_PL WHERE SITE = ? AND WEEK_START = ? AND LINE_ID = ?`,
+    rows<{ VALUE: string | null; LINE_GROUP: string; SOURCE_TYPE: string; RULE: string | null }>(
+      `SELECT VALUE, LINE_GROUP, SOURCE_TYPE, RULE FROM ${SCHEMA}.WPL_T_WEEKLY_PL WHERE SITE = ? AND WEEK_START = ? AND LINE_ID = ?`,
       [site, weekStart, lineId],
     ),
   ]);
@@ -172,7 +298,7 @@ export async function getLineDetail(site: string, weekStart: string, lineId: num
     UNIT: 'GBP',
   }));
   const glTotal = items.reduce((s, i) => s + (i.VALUE ?? 0), 0);
-  if (line?.LINE_GROUP === 'Overheads') {
+  if (isRunRate(line)) {
     return {
       items,
       note: items.length
@@ -197,7 +323,7 @@ export async function getRagCounts(): Promise<Record<string, number>> {
 
 export async function getLines() {
   return rows(
-    `SELECT LINE_ID, LINE_GROUP, LINE_NAME, SOURCE_TYPE, SOURCE_SYSTEM, RAG, REASON, RULE, UNIT, TICKET, COMPONENTS
+    `SELECT LINE_ID, LINE_GROUP, LINE_NAME, SOURCE_TYPE, SOURCE_SYSTEM, RAG, REASON, RULE, UNIT, TICKET, COMPONENTS, LAYOUT
      FROM ${SCHEMA}.WPL_LINE ORDER BY LINE_ID`,
   );
 }
