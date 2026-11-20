@@ -9,6 +9,7 @@ This project moves the weekly P&L into Snowflake. Today, site finance teams spen
 ## Contents
 
 - [The goal](#the-goal)
+- [The Weekly P&L app](#the-weekly-pl-app)
 - [How the data flows](#how-the-data-flows)
 - [Who does what](#who-does-what)
 - [How we work](#how-we-work)
@@ -28,7 +29,7 @@ The goal is a **v1 spec** for the weekly P&L. The spec gives:
 3. The site entry app, for the lines that are manual.
 4. The feed from Snowflake into Anaplan.
 
-We build **kill** first, as the proof of concept. Kill data is already in Snowflake, so it is the quickest win.
+We built **kill** first, as the proof of concept. Now the [Weekly P&L app](#the-weekly-pl-app) also shows the P&L lines for the pilot sites, Redruth and Bromborough.
 
 How we deliver:
 
@@ -37,6 +38,18 @@ How we deliver:
 - **Share how you work.** Build with others on the call, so the team learns together.
 
 Words like *weekly P&L*, *kill* and *run rate* have exact meanings. See [`GLOSSARY.md`](GLOSSARY.md).
+
+---
+
+## The Weekly P&L app
+
+The app shows the Anaplan weekly template for one week, line by line, with the source, RAG and rule of each line. It also shows kill by kill site and day.
+
+- App: `DEV_ANALYTICS.FINANCE_PL_WEEKLY.WEEKLY_PL` in Snowflake.
+- Pages, RAG, data refresh and how to get access: see [`app/README.md`](app/README.md).
+- The SQL that builds each line is in [`sql/`](sql/). Each line has its rule in the app, on the **Lines and rules** page.
+
+To set up your computer, run the checks or run the app locally, see [`docs/dev-setup.md`](docs/dev-setup.md).
 
 ---
 
@@ -61,16 +74,18 @@ Do not change the diagram files. A GitHub Action renders them once a day and ope
 
 Each piece of work is a GitHub **issue** (also called a **ticket**). All tickets belong to the [map (#1)](https://github.com/Pilgrims-Europe/pilgrimseurope-weekly-profit-and-loss/issues/1).
 
-| Person | Tickets |
-| --- | --- |
-| **Chris** (drives the map) | [Which stock movement and BOM data is in Snowflake? (#5)](https://github.com/Pilgrims-Europe/pilgrimseurope-weekly-profit-and-loss/issues/5)<br/>[How can Snowflake data load into Anaplan? (#7)](https://github.com/Pilgrims-Europe/pilgrimseurope-weekly-profit-and-loss/issues/7)<br/>[Tag each Anaplan line by source and RAG (#11)](https://github.com/Pilgrims-Europe/pilgrimseurope-weekly-profit-and-loss/issues/11) |
-| **Emma** | [Which kill data is in Snowflake? (#2)](https://github.com/Pilgrims-Europe/pilgrimseurope-weekly-profit-and-loss/issues/2)<br/>[Build and check the weekly kill table (#10)](https://github.com/Pilgrims-Europe/pilgrimseurope-weekly-profit-and-loss/issues/10) |
-| **Peter** | [Which GL line item data is in Snowflake? (#4)](https://github.com/Pilgrims-Europe/pilgrimseurope-weekly-profit-and-loss/issues/4)<br/>[Which sales and standard margin data is in Snowflake? (#6)](https://github.com/Pilgrims-Europe/pilgrimseurope-weekly-profit-and-loss/issues/6) |
-| **Jason** | [What is the kill definition for pork? (#3)](https://github.com/Pilgrims-Europe/pilgrimseurope-weekly-profit-and-loss/issues/3)<br/>[Get Gui's files for the team (#8)](https://github.com/Pilgrims-Europe/pilgrimseurope-weekly-profit-and-loss/issues/8)<br/>[What should the site entry screen look like? (#9)](https://github.com/Pilgrims-Europe/pilgrimseurope-weekly-profit-and-loss/issues/9) |
+The links show the open tickets of each person, so they are always current.
 
-To see only your tickets, open [Issues](https://github.com/Pilgrims-Europe/pilgrimseurope-weekly-profit-and-loss/issues) and click **Assignee**, then your name.
+| Person | Area | Open tickets |
+| --- | --- | --- |
+| **Chris** | Drives the map. Reviews pull requests. | [Chris's tickets](https://github.com/Pilgrims-Europe/pilgrimseurope-weekly-profit-and-loss/issues?q=is%3Aissue+is%3Aopen+assignee%3APEUcmccann) |
+| **Emma** | Kill data. | [Emma's tickets](https://github.com/Pilgrims-Europe/pilgrimseurope-weekly-profit-and-loss/issues?q=is%3Aissue+is%3Aopen+assignee%3AEmmaCut1) |
+| **Peter** | GL line items, sales and Qlik. | [Peter's tickets](https://github.com/Pilgrims-Europe/pilgrimseurope-weekly-profit-and-loss/issues?q=is%3Aissue+is%3Aopen+assignee%3Apnwora7) |
+| **Jason** | Meetings with Gui. Site entry app design. | [Jason's tickets](https://github.com/Pilgrims-Europe/pilgrimseurope-weekly-profit-and-loss/issues?q=is%3Aissue+is%3Aopen+assignee%3AJason-Taylor90) |
 
-**Blocked tickets.** Some tickets must wait for others. GitHub shows a **Blocked by** box on the ticket. For example, *Build and check the weekly kill table* waits for the kill data and the pork kill definition. Start the tickets that are not blocked first.
+Some tickets have no owner yet. Chris gives them an owner. See [tickets with no owner](https://github.com/Pilgrims-Europe/pilgrimseurope-weekly-profit-and-loss/issues?q=is%3Aissue+is%3Aopen+no%3Aassignee).
+
+**Blocked tickets.** Some tickets must wait for others. GitHub shows a **Blocked by** box on the ticket. For example, [#75](https://github.com/Pilgrims-Europe/pilgrimseurope-weekly-profit-and-loss/issues/75) (production recovery) waits for [#74](https://github.com/Pilgrims-Europe/pilgrimseurope-weekly-profit-and-loss/issues/74) (top-level standard cost). Start the tickets that are not blocked first.
 
 **Ticket types.** The label on each ticket tells you the type of work:
 
@@ -80,6 +95,10 @@ To see only your tickets, open [Issues](https://github.com/Pilgrims-Europe/pilgr
 | `wayfinder:grilling` | Get a decision from a person, usually Gui. |
 | `wayfinder:prototype` | Make a rough version to get feedback. |
 | `wayfinder:task` | Do the work, for example build a table. |
+| `bug` | A number in the app looks wrong. Check it. |
+| `enhancement` | Make the app do more. |
+
+Other labels, for example `needs-triage` and `ready-for-agent`, show the state of the ticket. See [`docs/agents/triage-labels.md`](docs/agents/triage-labels.md).
 
 ---
 
@@ -107,7 +126,7 @@ Git keeps every version of our files, and it lets four people work at the same t
 
 ### One-time setup
 
-Do this once on your laptop. Open a terminal in Cortex Code (**Terminal > New Terminal**).
+Do this once on your laptop. For the full setup (Snowflake, the app and the checks), see [`docs/dev-setup.md`](docs/dev-setup.md). Open a terminal in Cortex Code (**Terminal > New Terminal**).
 
 ```powershell
 git config --global user.name "Your Name"
@@ -151,7 +170,7 @@ You can commit many times. Each commit is a save point.
 git push -u origin emma/2-kill-data
 ```
 
-**6. Ask for a review (pull request).** Git shows a link after the push. Open it, then click **Create pull request**. In the description, write `Closes #2` (use your ticket number). Chris reviews it and merges it into `main`.
+**6. Ask for a review (pull request).** Git shows a link after the push. Open it, then click **Create pull request**. In the description, write `Closes #2` (use your ticket number). Fill in the sections of the template. Chris reviews it and merges it into `main`. The repo uses squash merge, so the title of the pull request becomes one commit on `main`.
 
 **Pull request title.** Start the title with one type word and a colon. Then the reader knows what the pull request does before they open it.
 
@@ -183,24 +202,28 @@ A check on the pull request fails if the type word is missing. To fix it, edit t
 
 ```
 /
-├── README.md        ← you are here
-├── GLOSSARY.md      ← exact meaning of project words
-├── AGENTS.md        ← rules for the AI agents
-├── docs/dev-setup.md ← set up your computer and Cortex Code Desktop
-├── .vscode/         ← shared Run and Debug configurations and recommended extensions
-├── docs/agents/     ← how agents use GitHub issues
-├── docs/data-flow/  ← data flow diagram: flow.yml (source), CHANGELOG.md, flow.svg, index.html
-├── scripts/         ← render_flow.py makes the data flow diagram
-└── .github/         ← pull request template and GitHub Actions
+├── README.md            ← you are here
+├── GLOSSARY.md          ← exact meaning of project words
+├── AGENTS.md            ← rules for the AI agents
+├── app/                 ← the Weekly P&L app (Next.js), see app/README.md
+├── sql/                 ← Snowflake SQL for the app, run in number order
+│   └── checks/          ← tie-out and app contract checks
+├── scripts/             ← build a test schema, run checks, deploy, render the data flow
+├── research/            ← notes and findings from research tickets
+├── reports/             ← HTML reports, for example status reports
+├── questionnaires/      ← HTML forms with questions for Gui
+├── docs/
+│   ├── dev-setup.md     ← set up your computer and Cortex Code Desktop
+│   ├── data-flow/       ← data flow diagram: flow.yml (source), CHANGELOG.md, flow.svg, index.html
+│   ├── agents/          ← how agents use GitHub issues
+│   ├── handoffs/        ← notes to hand work from one session to the next
+│   └── meetings/, meeting-transcripts/ ← meeting transcripts
+├── .cortex/skills/      ← report house style and templates
+├── .vscode/             ← shared Run and Debug configurations and recommended extensions
+└── .github/             ← pull request template and GitHub Actions
 ```
 
-When you add work, use these folders. Make the folder if it does not exist.
-
-| Folder | What goes in it |
-| --- | --- |
-| `sql/` | Snowflake SQL: tables, views, checks |
-| `apps/` | Streamlit apps, for example the site entry app |
-| `research/` | Notes and findings from research tickets |
+When you add work, put it in the folder above that fits. Reports and questionnaires use the house style in `.cortex/skills/pilgrims-reporting/`.
 
 **Do not commit** passwords, keys or site data files (Excel, CSV). Gui's files go in SharePoint (see [#8](https://github.com/Pilgrims-Europe/pilgrimseurope-weekly-profit-and-loss/issues/8)).
 
@@ -214,6 +237,7 @@ The AI agents in Cortex Code read [`AGENTS.md`](AGENTS.md). Before an agent writ
 - Write short, plain sentences (ASD-STE100 Simplified Technical English).
 - Use the words in [`GLOSSARY.md`](GLOSSARY.md).
 - Never add facts that it does not know. It writes "Unknown" or asks.
+- Work in its own worktree, not in your main checkout.
 
 If an agent reply is not clear, type `/wait-what` in the chat. The agent then explains it again in plain words.
 
@@ -229,6 +253,7 @@ If an agent reply is not clear, type `/wait-what` in the chat. The agent then ex
 | Jason Taylor | Runs the meetings with Gui. Site entry app design. |
 | Emma Cutler | Kill data and the kill proof of concept. |
 | Peter Nwora | GL line items, sales and Qlik. |
-| Aswani | BW questions. |
+| Aswani Nune | SAP BW Developer, IT. BW and SAP cost questions. |
 | Tracy Conall | SAP questions. |
-| Abhishek, Simon | Anaplan. |
+| Abhishek Mazumdar | FP&A Analyst, Finance Systems. Anaplan. |
+| Simon Thompson | Head of Finance Systems. Anaplan. |
