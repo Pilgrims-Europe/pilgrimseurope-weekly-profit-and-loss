@@ -24,6 +24,35 @@ JOIN DEV_ANALYTICS.FINANCE_PL_WEEKLY.WPL_WEEK w ON t.EVENTDATE::DATE BETWEEN w.W
 WHERE NOT COALESCE(t.VOIDFLAG, FALSE)
 GROUP BY ALL;
 
+-- Kill (poultry) by provenance (detail for the app). Gui asked for the split on 2026-11-18.
+-- Provenance is PRODUCTNO on the Mtech load: SWP, BCC, ORG, FRD, CFRD, FRS, STP38.
+-- PRODUCT_NAME comes from PROTEINPRODUCTS.DESCRIPTION. One row for each code, so no dedupe is needed.
+-- Delivered and DOA are both on the load row, so kill splits exactly. The split ties to WPL_KILL_POULTRY.
+-- Condemnations are not here. PMTSCONDEMNTRANS has no product, so they cannot be split by provenance.
+-- That does not change kill, because condemnations are not taken off kill.
+CREATE OR REPLACE VIEW DEV_ANALYTICS.FINANCE_PL_WEEKLY.WPL_KILL_POULTRY_TYPE
+COMMENT = 'Weekly P&L app: Kill (poultry) by kill site, kill date and provenance (Mtech PRODUCTNO) = PLANTHDCOUNT - DOA. Broiler loads, void loads out. Condemnations are not split by provenance.'
+AS
+SELECT
+    s.SITE,
+    r.EVENTDATE::DATE                                       AS KILL_DATE,
+    w.WEEK_START,
+    COALESCE(NULLIF(TRIM(r.PRODUCTNO), ''), 'NOT SET')      AS PRODUCT_CODE,
+    p.DESCRIPTION                                           AS PRODUCT_NAME,
+    COUNT(*)                                                AS LOADS,
+    SUM(r.PLANTHDCOUNT)                                     AS BIRDS_DELIVERED,
+    SUM(r.DOA)                                              AS DOA,
+    SUM(r.PLANTHDCOUNT) - SUM(r.DOA)                        AS BIRDS_KILLED
+FROM PROD_RAW.MTECH.MVPMTSPROCRECVTRANSHOUSEDETAIL r
+JOIN DEV_ANALYTICS.FINANCE_PL_WEEKLY.WPL_SITE s ON s.MTECH_PLANT = r.PLANTNO
+JOIN DEV_ANALYTICS.FINANCE_PL_WEEKLY.WPL_WEEK w ON r.EVENTDATE::DATE BETWEEN w.WEEK_START AND w.WEEK_END
+LEFT JOIN PROD_RAW.MTECH.PROTEINPRODUCTS p ON p.PRODUCTNO = r.PRODUCTNO
+WHERE r.SPECIESTYPE = 1
+  AND r.BIRDTYPE = 3
+  AND NOT r.VOIDFLAG
+  AND r.EVENTDATE >= '2024-12-30'
+GROUP BY ALL;
+
 -- Kill by site and kill date.
 CREATE OR REPLACE VIEW DEV_ANALYTICS.FINANCE_PL_WEEKLY.WPL_KILL_POULTRY
 COMMENT = 'Weekly P&L app: Kill (poultry) by kill site and kill date = PLANTHDCOUNT - DOA. CONDEMNED (all codes) is detail only, not taken off. Broiler loads, void loads out.'

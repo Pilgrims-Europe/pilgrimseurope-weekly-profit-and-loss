@@ -47,6 +47,100 @@ Since 2025-01-01, Spalding has 2,333,923 pigs delivered and a `Killed Qty` of 2,
 
 `PROD_RAW.HELLENIC` also has `PIG_*` and `SHP_*` tables, for example `PIG_ANIMAL`. These are copies from 2026-09-07 and do not update. Use the `STG_PIG_*__live` tables.
 
+### Poultry kill by provenance
+
+Gui asked for the pork split by provenance on 2026-11-18. Emma checked poultry at the same time. Poultry has provenance too, with names in Mtech. Research date: 2026-11-18.
+
+`PRODUCTNO` on the load row holds the provenance. Delivered and DOA are on the same row, so kill splits exactly. No second join is needed.
+
+| Item | Value |
+| --- | --- |
+| Provenance field | `PRODUCTNO` on `PROD_RAW.MTECH.MVPMTSPROCRECVTRANSHOUSEDETAIL` |
+| Names | `DESCRIPTION` on `PROD_RAW.MTECH.PROTEINPRODUCTS`. One row for each code. |
+| View | `WPL_KILL_POULTRY_TYPE` in `sql/06_wpl_kill_poultry.sql` |
+| How checked | Summed the split and compared with `WPL_KILL_POULTRY` for all sites and weeks. Both give 472,128,487 delivered, 335,098 DOA and 471,793,389 kill. |
+
+`SPECIESTYPE`, `BIRDTYPE` and `FARMTYPE` are not provenance. Each holds one value at all four sites.
+
+The nine codes used from 2024-12-30 to 2026-11-18:
+
+| Code | Name | Sites | Birds delivered | Last kill |
+| --- | --- | --- | --- | --- |
+| SWP | Broiler Bird SWP | 4 | 337,801,798 | 2026-11-15 |
+| BCC | Better Chicken Commitment | 2 | 62,573,213 | 2026-11-15 |
+| HWF30 | BIRD HIGHER WELFARE 30 EUR | 2 | 46,243,343 | 2025-09-04 |
+| STP38 | STANDARD PLUS 38 EUR | 3 | 13,297,952 | 2026-08-04 |
+| FRD | FREEDOM FOOD FREE RNG DAY OLD-DEATH EUR | 2 | 6,399,405 | 2026-11-13 |
+| ORG | BIRD ORGANIC FINISHING EUR | 1 | 3,558,587 | 2026-11-13 |
+| CFRD | CORN FED FREE RANGE DAY OLD-DEATH EUR | 1 | 1,901,582 | 2026-11-12 |
+| ROI | Republic of Ireland Birds | 1 | 317,436 | 2025-12-12 |
+| FRS | FREEDOM FOOD FREE RNG FINSHING EUR | 1 | 35,171 | 2026-11-06 |
+
+Two codes stopped. `HWF30` ends on 2025-09-04, and `BCC` starts on 2025-01-14. So `BCC` probably replaced `HWF30`. This is not confirmed.
+
+`ROI` is an origin, not a welfare scheme. So `PRODUCTNO` holds both kinds of provenance.
+
+Seven codes are in use in the last year. Ballymena uses six. Anwick uses one. Every load has a code. None is unset.
+
+`BREEDNO` agrees with the code. The slower growing breeds go with the higher welfare schemes.
+
+| Breed code | Name | Used with |
+| --- | --- | --- |
+| RS308 | Ross 308 | SWP, BCC |
+| CB500 | Cobb 500 | SWP |
+| RedBro | RedBro | BCC, SWP |
+| HB | Hubbard | FRD, ORG, CFRD, FRS |
+
+Breed is not one for one with the code, so the view groups by code only.
+
+Condemnations are not in the view. `PMTSCONDEMNTRANS` has no product, so they cannot be split by provenance. This does not change kill, because condemnations are not taken off kill.
+
+### Pork kill by provenance
+
+Gui asked for the pork kill split by provenance on 2026-11-18: "RT, ODB, Free Range, GOS, Organic. etc". This section holds the answer. Research date: 2026-11-18.
+
+The split works on the kill figure itself. `"Killed Qty"` on the booking splits by provenance directly, because the booking carries `"idSuperCategory"`. The TC'd pig deduction splits too, because the lot also carries `"idSuperCategory"`. So the split does not need the transaction-row query below. This answers open question 7.
+
+| Item | Value |
+| --- | --- |
+| Provenance field | `"idSuperCategory"` on `"STG_PIG_BOOKING DETAIL__live"` and on `"STG_PIG_LOT__live"` |
+| Names | `"Description"` on `"STG_PIG_SUPER CATEGORIES__live"` |
+| View | `WPL_KILL_PORK_TYPE` in `sql/07_wpl_kill_pork.sql` |
+| How checked | Summed the split and compared with `WPL_KILL_PORK` for both sites, weeks 45 and 46. The totals match exactly. |
+
+Three fields are not provenance:
+
+- `"Pig Scheme"` is a contract and price code, for example `5825 BQP`.
+- `"Category"` is `G` on every booking.
+- `"idPigType"` is a coarser field with 4 values.
+
+Hellenic has no Red Tractor field. `"Farm Assured"`, `"Quality Assured"`, `"MandS Assured"` and `"VAN Assured"` are all unused: null or false on every booking. So Gui's label RT cannot be read from the data. It must be agreed.
+
+The reference table holds 30 pig super categories. Only 7 are used, from 2025-12-29 to 2026-11-18.
+
+| Provenance | Spalding | Westerleigh | Killed Qty |
+| --- | --- | --- | --- |
+| Standard | Yes | Yes | 715,734 |
+| ODB/RA | Yes | Yes | 485,724 |
+| ODB/RA C | Yes | Yes | 413,092 |
+| Link | Yes | No | 228,768 |
+| F/R Hamps | Yes | No | 184,112 |
+| Organic | Yes | No | 9,098 |
+| R/B GOS | Yes | No | 3,388 |
+
+Every booking has a provenance. No booking is unset. The view groups by provenance and does not use a fixed list, so a new category shows on its own.
+
+Emma confirmed on 2026-11-18 that RT means Red Tractor. This gives a proposed mapping to Gui's labels. It is reached by elimination, not from a field, so Gui must confirm it.
+
+| Gui's label | Provenance in the data |
+| --- | --- |
+| RT | `Standard` |
+| ODB | `ODB/RA` and `ODB/RA C` |
+| Free Range | `F/R Hamps` |
+| GOS | `R/B GOS` |
+| Organic | `Organic` |
+| etc | `Link` |
+
 ### Pig kill by pig type
 
 This section is for the P&L line "No. Pigs / lambs / birds" (report category Planning, central owner Kim). Today, the site owners (Chris Kitchen, Ian Chapman) get this from the Hellenic "Ledger Balances and PPV" PDF report on Monday morning. They copy the numbers into the Excel workbook by hand. A query on Snowflake gives the same breakdown with no PDF step. Research date: 2026-11-16.
@@ -178,7 +272,7 @@ Anwick matches exactly when loads are dated by plant weigh-in time, not kill dat
     - In 2026, most TC'd pigs with `"Factory"` = TRUE still have `"Payment Value"` > 0. This agrees with the factory paying for its own fault.
     - In 2026, 259 TC'd pigs have `"Payment Value"` > 0 but no factory parts row. Most are in March and June. The reason is not known.
   - To confirm the rule, compare with a "Pig Purchase Analysis" report for a day with factory TC'd pigs: Westerleigh 2026-09-16 (11 in Snowflake) or Spalding 2026-10-27 (4).
-- Hellenic pig type query: the result is not yet compared with the "Ledger Balances and PPV" PDF report.
+- Hellenic pig type query: the result is not yet compared with the "Ledger Balances and PPV" PDF report. The provenance split of kill does not use this query, so this does not block the split.
 - Hellenic pig type query: Westerleigh had only Standard and ODB pigs in the kill week 14–20 Jun 2026. It is not known if this is normal.
 - Ballymena is in Mtech. It is not a pilot site.
 - `PROD_RAW.AGROSOFT` has slaughter tables. This note did not check them.
@@ -191,7 +285,7 @@ Anwick matches exactly when loads are dated by plant weigh-in time, not kill dat
 4. What is kill for pork? Answered 2026-11-16 (Gui): `"Killed Qty"` on the booking. A TC'd pig is not in kill: kill = pigs over scale − TC'd pigs. Open: is `"Killed Qty"` the same as pigs over scale, or pigs over scale − TC'd? Check when `"Killed Qty"` is final for 2026-11-13.
 5. How often does the Mtech feed load into Snowflake? Owner: Unknown.
 6. Does the pig type query agree with the "Ledger Balances and PPV" PDF report for one week? Ask Chris Kitchen or Ian Chapman.
-7. Is the pig type query the right approach for "No. Pigs / lambs / birds"? Gui gave direction on 2026-11-16: use `"Killed Qty"` on the booking. The pig type query counts transaction rows, so it must change.
+7. Is the pig type query the right approach for "No. Pigs / lambs / birds"? Answered 2026-11-18: no, and it is not needed. The booking and the lot both carry `"idSuperCategory"`, so `"Killed Qty"` splits by provenance. See "Pork kill by provenance". Open: Gui must confirm the mapping from his labels (RT, ODB, Free Range, GOS, Organic) to the 7 categories in the data.
 8. When is `"Killed Qty"` final after the kill day? Owner: Unknown.
 9. Which field marks a TC'd pig as producer responsible or factory responsible? Probable answer: `"STG_PIG_CONDEMNED PARTS__live"."Factory"` (see Gaps). Open: confirm with the report for Westerleigh 2026-09-16 or Spalding 2026-10-27.
 10. Anwick: is the date basis kill date or plant weigh-in time? Check with another week of Anwick figures.

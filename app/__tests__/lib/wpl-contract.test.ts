@@ -133,7 +133,9 @@ const CASES: Record<string, () => Promise<unknown>> = {
   getTrend: () => wpl.getTrend('Redruth', '2026-11-02', 2020),
   getPoultryKill: () => wpl.getPoultryKill('Dungannon', '2026-11-02'),
   getPoultryCodes: () => wpl.getPoultryCodes('Dungannon', '2026-11-02'),
+  getPoultryTypes: () => wpl.getPoultryTypes('Dungannon', '2026-11-02'),
   getPorkKill: () => wpl.getPorkKill('Ballymena', '2026-11-02'),
+  getPorkTypes: () => wpl.getPorkTypes('Ballymena', '2026-11-02'),
   getFreshness: () => wpl.getFreshness(),
   getUnmapped: () => wpl.getUnmapped(),
   getProductionTonnageCheck: () => wpl.getProductionTonnageCheck(),
@@ -195,6 +197,10 @@ describe('wpl.ts SQL contract', () => {
     expect(await columns('getPoultryCodes')).toEqual(['CALCULATIONCATEGORY', 'CODE', 'CODE_NAME', 'HEAD']);
     expect(await columns('getPorkKill')).toEqual(
       ['BOOKINGS', 'CASUALTY', 'DIP', 'DOA', 'KILLED_QTY', 'KILL_DATE', 'PIGS_DELIVERED', 'PIGS_KILLED', 'TC_FACTORY_RESP', 'TC_PRODUCER_RESP'].sort(),
+    );
+    expect(await columns('getPoultryTypes')).toEqual(['BIRDS_DELIVERED', 'BIRDS_KILLED', 'DOA', 'LOADS', 'PRODUCT_CODE', 'PRODUCT_NAME']);
+    expect(await columns('getPorkTypes')).toEqual(
+      ['BOOKINGS', 'KILLED_QTY', 'PIGS_DELIVERED', 'PIGS_KILLED', 'SUPER_CATEGORY', 'TC_FACTORY_RESP', 'TC_PRODUCER_RESP'],
     );
     expect(await columns('getUnmapped')).toEqual(['ACCOUNTNAME', 'GLACCOUNT', 'GROUP_NAME', 'LINE_ITEMS', 'SITE', 'VALUE']);
     expect(await columns('getProductionTonnageCheck')).toEqual(
