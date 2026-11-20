@@ -146,8 +146,11 @@ N.S.V. of external sales, plus STO at standard cost, plus sales adjustments.
 ## Cost and contribution
 
 **Standard cost**:
-The released cost of one kg of a material at a plant. It is split into cost components: meat, ingredients, packaging, labour and other.
+The released cost of one kg of a material at a plant. It is split into cost components: meat, ingredients, packaging, labour and other. Labour is direct labour plus indirect labour. The standard cost includes the cost of all BOM levels below the material.
 _Avoid_: Standard price
+
+**Top-level standard cost**:
+The part of the standard cost that is added at the last production stage of a material. It does not include the standard cost of the materials from earlier stages. SAP shows it in report ZFI28N.
 
 **STD Cost of Goods**:
 The standard cost of the goods sold: meat, labour, ingredients, packaging and other. It does not include freight.
@@ -174,7 +177,10 @@ _Avoid_: Contribution, margin
 The difference between the actual cost and the standard cost of a week. The groups are production variances, PPV, STK, OCI and freight and distribution variances.
 
 **Production variance**:
-A variance from how production used material, packaging and labour, against standard. It includes yield and labour efficiency. The method is Unknown.
+A variance from how production used material, packaging and labour, against standard. It includes yield and labour efficiency. Production variance = consumption less production recovery, for each cost component. Consumption includes only the materials that the plant does not make.
+
+**Production recovery**:
+The standard cost of the production output of a week: output volume x top-level standard cost, for each cost component. It includes the output of all production stages.
 
 **Yield**:
 The difference between actual output and the output that standard expects from the input, at a price.
