@@ -137,6 +137,8 @@ Unknown: the source tables of ZPP56.
 
 No BOM table is in a PROD or DEV schema. A search for STPO, STKO, MAST and BOM names found none.
 
+Update 2026-11-20: a production BOM is now in Snowflake: `PROD_STAGING.SAP.BILLOFMATERIALS`. It is a multi-level explosion with validity dates. See `research/top-level-standard-cost.md`, "Update 2026-11-20". The text below is about the sandbox copy.
+
 The only BOM copy is `SNOWFLAKE_LEARNING_DB.CHRISMC_WORKING_WITH_SEMI_STRUCTURED_DATA.BOM_V1` (view `LATEST_BOM` on top). It is a one-off load on 2026-06-11. It has 752,390 rows.
 
 Fields: `Plant - Key`, `Material - Key`, `Material - Text`, `Alternative BOM - Key`, `Component (BOM) - Key`, `QUANTITY`, `QUANTITY_UNIT`, `BASE_QUANTITY`, `Base Quantity(1) Unit`, `BOM_NUMBER`, `APPLICATION_ID`.

@@ -9,9 +9,59 @@ Ticket: #74. Gui needs top-level standard cost by cost component for the product
 3. The costing changes once a fiscal period (4 or 5 weeks), not once a week. Each material has at most 1 released cost estimate in each fiscal period in 2026.
 4. All 35 plants use cost component structure P1. UK company code 125 uses costing variant Z125 (and ZPKG for packaging). All other company codes use PPC1.
 
-A possible workaround: top level = the material's split less the split of its BOM components. This needs a BOM in a production schema. Today the only BOM is a sandbox copy from 2026-06-11 (see `research/stock-bom.md`).
+A possible workaround: top level = the material's split less the split of its BOM components. On 2026-11-19 the only BOM was a sandbox copy. Since 2026-11-20 a production BOM is in Snowflake, and the workaround gives good results. See "Update 2026-11-20: production BOM".
 
-Confidence: high for what is in Snowflake. Medium for the meaning of the "lower level" indicator, because no SAP documentation was found. Low for the workaround, because the BOM copy has no dates.
+Confidence: high for what is in Snowflake. Medium for the meaning of the "lower level" indicator, because no SAP documentation was found. Medium for the workaround. It agrees with the data, but no person has compared it with ZFI28N.
+
+## Update 2026-11-20: production BOM
+
+A production BOM is now in Snowflake.
+
+| Layer | Object | Notes |
+| --- | --- | --- |
+| Raw | `PROD_RAW.SAP.BILLOFMATERIALS_01` to `_11` | Talend (user `TALEND_SECURE`) created and loaded them on 2026-11-20. Unknown: the load schedule. |
+| Silver | `PROD_STAGING.SAP.BILLOFMATERIALS` | Dynamic table, union of the 11 raw tables, target lag 1 day. |
+| Raw | `PROD_RAW.SAP.BOM` | Empty. Do not use. |
+
+The table comment says the source is SAP BW/4HANA `C_BOMITEMVALIDMATERIALSEXPLOSION` (96 plants).
+
+Grain: one row for each top material, BOM usage, alternative and exploded component line. `MATERIAL` is the top material. `HIERARCHY_LEVEL` is the level below it. `PARENT_MATERIAL` is the direct parent (blank at level 1). `BILLOFMATERIALITEMQUANTITY` is for `BILLOFMATERIALQUANTITY` of the parent.
+
+Facts:
+
+- 31 plants have rows, not 96. 2550 Wholesale has no rows. 2517 Westerleigh has 110 rows, with no BOM valid from after 2022.
+- `BOMVALIDITYENDDATE` is 99991231 on all rows. So each row is a BOM that is valid now. Old versions are not in the table.
+- All rows have BOM status 01.
+- `BOMCOMPONENTSCRAPINPERCENT` is not in the dynamic table.
+- A material can have more than one BOM usage valid on the same date, with different components. Example: PF69 70003235 has usage 1 (component 100171937) and usage 3 (component 100171622). The 2026-11-19 example agrees with usage 1.
+- At Redruth and 2527 the stage inputs have material type FERT. At other plants they have type HALB.
+
+Unknown: which BOM usage SAP costing uses at each plant. In SAP, usage 1 is production and usage 3 is universal. This is general SAP knowledge, not checked.
+
+### The workaround test, again
+
+Same test as in Question 1, with the new BOM. Estimates and BOMs valid on 2026-11-05. Level-1 components only, parent and component in KG. Meat = components 001 + 002.
+
+| Plant | BOM usage | Parents | Parent meat = component meat (1%) | Parents with a component that has labour | Component labour kept in parent labour | Derived top-level total below zero |
+| --- | --- | --- | --- | --- | --- | --- |
+| 2504 Redruth | 1 | 1,690 | 1,681 | 1,433 | 1,432 | 2 |
+| 2506 Bromborough | 1 | 528 | 392 | 146 | Not tested | Not tested |
+| 2527 | 1 | 1,240 | 1,172 | 776 | 771 | 10 |
+| FR90 Dungannon Fresh | 3 | 2,692 | 2,533 | 1,384 | 1,384 | 16 |
+| PF50 | 3 | 1,256 | 1,104 | 814 | 794 | 31 |
+| PF61 Windmill Lane | 3 | 608 | 195 | 52 | Not tested | Not tested |
+| PF69 Shillelagh | 3 | 2,144 | 1,392 | 1,566 | 1,558 | 14 |
+
+The labour and below-zero columns use HALB and FERT components only.
+
+Results:
+
+1. The 2026-11-19 gap at Redruth is closed. The sandbox BOM showed no Redruth component with labour. The new BOM shows 1,433.
+2. The component labour stays in the parent labour column. It does not move into meat. This agrees with the 2026-11-19 finding.
+3. The derived top level is below zero for less than 3% of parents at each plant tested.
+4. At PF61 and PF69 many parents do not agree on meat. Unknown: why. A possible cause is the wrong BOM usage, or components in other units than KG.
+
+Median labour for each kg, derived top level against component: Redruth 0.0328 against 0.1136, PF69 (usage 3) 0.0445 against 0.0844. So at Redruth most labour in the finished good comes from the earlier stages.
 
 ## Question 1: is ZFI28N, or the data behind it, in Snowflake?
 
@@ -87,7 +137,7 @@ Example, PF69, parent 70003235 "MATTESSONS CORNED BEEF 90GX12". Component 100171
 
 In this example, the component labour stays in the parent labour column. It does not move into meat. This is different from the description in #74. Unknown: if ZFI28N bottom level shows the same. A person must compare one ZFI28N output with the table.
 
-At Redruth, 1,282 of 1,372 semi-finished materials (prefix 38) have labour in their own estimate. But no Redruth BOM component in `BOM_V1` has labour. So the sandbox BOM does not show how Redruth semi-finished goods feed finished goods. Unknown: why.
+At Redruth, 1,282 of 1,372 semi-finished materials (prefix 38) have labour in their own estimate. But no Redruth BOM component in `BOM_V1` has labour. So the sandbox BOM does not show how Redruth semi-finished goods feed finished goods. Unknown: why. The new production BOM shows it (see "Update 2026-11-20").
 
 COPA has no level field. At Redruth since 2026-01-01, `COSTING_VARIANT`, `COST_COMPONENT_STRUCTURE`, `COSTING_VERSION` and `COSTING_STATUS` are blank on all 370,839 rows of `C_PROFITABILITYANAL_COSTING_PEU_SAP_STG`. `CC_COSTIND01` to `CC_COSTIND04` are zero.
 
@@ -169,7 +219,9 @@ Aswani Nune, SAP BW Developer, Information Technology.
 2. If not, can BW extract the cost estimate itemization (CKIS), or the "top level" view that ZFI28N shows?
 3. What does ZFI28N read in SAP? Is it a BW query or an ABAP report on KEKO, KEPH and CKIS?
 4. Does the extract keep only the last released estimate in each fiscal period?
-5. Can the BOM (`BOM_V1`, today a one-off sandbox load) move to `PROD_RAW.SAP` with a daily load?
+5. Can the BOM (`BOM_V1`, today a one-off sandbox load) move to `PROD_RAW.SAP` with a daily load? Answered 2026-11-20: yes, see "Update 2026-11-20".
+6. The BOM source `C_BOMITEMVALIDMATERIALSEXPLOSION` gives 31 plants, not 96. 2550 Wholesale has no rows. Is this correct?
+7. Which BOM usage does product costing use at each plant?
 
 Answers: Unknown.
 
@@ -179,7 +231,8 @@ Answers: Unknown.
 2. In ZFI28N top level, where does the cost of the semi-finished input show: in meat, or in a separate line?
 3. Do production variances need the top-level split for finished goods only, or also for semi-finished goods?
 4. What is cost component 009 (`LABOUR_INDIRECT`) at Bodmin (2505)? Is it part of labour?
-5. Is the derived top level (material less BOM components) good enough for v1, if a production BOM is loaded?
+5. Is the derived top level (material less BOM components) good enough for v1? A production BOM is now loaded. Gui must decide.
+6. Why do many PF61 and PF69 parents not agree with their components on meat?
 
 ## Sources
 
@@ -195,6 +248,37 @@ All checks are read-only queries in Snowflake account JBSUSA-PILGRIMS_EUROPE_PRO
 8. `SNOWFLAKE.ACCOUNT_USAGE.QUERY_HISTORY`, last 7 days: load method.
 9. `cortex search object`: searches above.
 10. Repo files: `research/stock-bom.md`, `research/fgoods-oci.md`, `GLOSSARY.md`.
+11. `PROD_STAGING.SAP.BILLOFMATERIALS` (2026-11-20): grain, plants, usages, validity dates, workaround test.
+
+Workaround test with the production BOM (2026-11-20):
+
+```sql
+WITH ce AS (
+  SELECT PLANT, LTRIM(PRODUCT, '0') P,
+         SUM(COALESCE(COST001, 0) + COALESCE(COST002, 0)) / MAX(LOTSIZEFORPRODUCTCOSTING) MEAT,
+         SUM(COALESCE(COST005, 0)) / MAX(LOTSIZEFORPRODUCTCOSTING) LAB,
+         SUM(C_TOTALCOST) / MAX(LOTSIZEFORPRODUCTCOSTING) TOT
+  FROM PROD_RAW.SAP."jbs_bw4_hana.edw.fmco.comisc/C_PRODUCTCOSTRELEASEDCE"
+  WHERE COSTINGSTATUS = 'FR' AND COSTINGVARIANT IN ('Z125', 'PPC1')
+    AND '20261105' BETWEEN COSTESTIMATEVALIDITYSTARTDATE AND COSTESTIMATEVALIDITYENDDATE
+  GROUP BY 1, 2),
+b AS (
+  SELECT PLANT, BILLOFMATERIALVARIANTUSAGE U, LTRIM(MATERIAL, '0') PAR, LTRIM(BILLOFMATERIALCOMPONENT, '0') COMP,
+         SUM(BILLOFMATERIALITEMQUANTITY / NULLIF(BILLOFMATERIALQUANTITY, 0)) Q
+  FROM PROD_STAGING.SAP.BILLOFMATERIALS
+  WHERE HIERARCHY_LEVEL = 1 AND BOMVALIDITYSTARTDATE <= '20261105' AND BOMVALIDITYENDDATE >= '20261105'
+    AND BILLOFMATERIALITEMUNIT = 'KG' AND BILLOFMATERIALUNIT = 'KG'
+    AND BILLOFMATERIALCOMPONENTTYPE IN ('HALB', 'FERT')
+  GROUP BY ALL),
+s AS (
+  SELECT b.PLANT, b.U, b.PAR, SUM(b.Q * c.LAB) CLAB, SUM(b.Q * c.TOT) CTOT
+  FROM b JOIN ce c ON c.PLANT = b.PLANT AND c.P = b.COMP GROUP BY ALL)
+SELECT s.PLANT, s.U, COUNT(*) PARENTS, COUNT_IF(s.CLAB > 0) COMP_LAB,
+       COUNT_IF(s.CLAB > 0 AND p.LAB >= s.CLAB - 0.0001) LAB_KEPT,
+       COUNT_IF(p.TOT - s.CTOT < -0.0001) TOP_TOT_NEG
+FROM s JOIN ce p ON p.PLANT = s.PLANT AND p.P = s.PAR
+GROUP BY ALL ORDER BY 1, 2;
+```
 
 Level indicator by plant:
 
