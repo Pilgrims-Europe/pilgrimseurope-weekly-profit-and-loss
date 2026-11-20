@@ -12,7 +12,7 @@ WITH booking AS (
     SELECT *
     FROM PROD_RAW.HELLENIC."STG_PIG_BOOKING DETAIL__live"
     WHERE "Species" = 'PIGS'
-      AND "Est Kill Date" >= '2025-12-29'
+      AND "Est Kill Date" >= '2024-12-30'
       AND UPPER("hdr__operation") <> 'D'
     QUALIFY ROW_NUMBER() OVER (PARTITION BY "idBookingDetail" ORDER BY "hdr__timestamp" DESC) = 1
 ),
@@ -20,7 +20,7 @@ lot AS (
     SELECT "idLOT", "Participant Code", "Kill Date"::DATE AS KILL_DATE, "idSuperCategory"
     FROM PROD_RAW.HELLENIC."STG_PIG_LOT__live"
     WHERE "Species" = 'PIGS'
-      AND "Kill Date" >= '2025-12-29'
+      AND "Kill Date" >= '2024-12-30'
       AND UPPER("hdr__operation") <> 'D'
     QUALIFY ROW_NUMBER() OVER (PARTITION BY "idLOT" ORDER BY "hdr__timestamp" DESC) = 1
 ),
