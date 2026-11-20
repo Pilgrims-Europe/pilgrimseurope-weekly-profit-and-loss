@@ -173,7 +173,7 @@ Yes. The weekly P&L can join `S4ACC_STG` and `ACCOUNTGROUPS_STG` in the same way
 Evidence:
 
 - Both views exist in `PROD_STAGING.FINANCE_PL`. `ENGINEER_ROLE` owns them. `ENGINEER_ROLE` also owns `WPL_GL_ACCOUNT_MAP`. Source: `SHOW GRANTS ON VIEW`, `SHOW VIEWS`.
-- The join key is `S4ACC_STG.ECCACCT = LTRIM(GLACCOUNT, '0')`. Each S4 account has one group.
+- The join key is `S4ACC_STG.ECCACCT = LTRIM(NORMALIZE_GL_ACCOUNT(GLACCOUNT), '0')`, as in `BW_ACTUALS_STG`. Each S4 account has one group.
 - The group from the views agrees with `PL_APP_FACT_BASE` for all 392 company 125 accounts that have both.
 
 What changes if the weekly P&L reads the views:
