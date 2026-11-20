@@ -146,11 +146,17 @@ N.S.V. of external sales, plus STO at standard cost, plus sales adjustments.
 ## Cost and contribution
 
 **Standard cost**:
-The released cost of one kg of a material at a plant. It is split into cost components: meat, ingredients, packaging, labour and other. Labour is direct labour plus indirect labour. The standard cost includes the cost of all BOM levels below the material.
+The released cost of one kg of a material at a plant. It is split into cost components: meat, ingredients, packaging, labour and other. Labour is direct labour plus indirect labour. Gui has not confirmed that indirect labour is part of labour. The standard cost includes the cost of all BOM levels below the material.
 _Avoid_: Standard price
 
 **Top-level standard cost**:
-The part of the standard cost that is added at the last production stage of a material. It does not include the standard cost of the materials from earlier stages. SAP shows it in report ZFI28N.
+The part of the standard cost that is added at the last production stage of a material. It does not include the standard cost of the materials from earlier stages. When SAP does not give it, it is derived: the standard cost of the material less the standard cost of its level-1 BOM components.
+
+**BOM**:
+Bill of materials. The list of components and quantities that a plant uses to make one material. A level-1 component goes directly into the material. A component can have its own BOM.
+
+**Production stage**:
+One step of production that makes one material from its level-1 BOM components. A finished good can need many production stages. Each stage makes a semi-finished good or the finished good.
 
 **STD Cost of Goods**:
 The standard cost of the goods sold: meat, labour, ingredients, packaging and other. It does not include freight.
@@ -177,10 +183,16 @@ _Avoid_: Contribution, margin
 The difference between the actual cost and the standard cost of a week. The groups are production variances, PPV, STK, OCI and freight and distribution variances.
 
 **Production variance**:
-A variance from how production used material, packaging and labour, against standard. It includes yield and labour efficiency. Production variance = consumption less production recovery, for each cost component. Consumption includes only the materials that the plant does not make.
+A variance from how production used material, packaging and labour, against standard. It includes yield and labour efficiency. Production variance = consumption less production recovery, for each cost component. Gui gave this method on 2026-11-18.
+
+**Consumption**:
+The value of the materials that production uses in a week, at the value that the goods movement posts. It includes only the materials that the plant does not make. A plant makes a material if the material has its own valid BOM at that plant.
+
+**Production quantity**:
+The quantity of each material that a plant produces in a week, at all production stages. Production tonnage is different: it counts finished goods only.
 
 **Production recovery**:
-The standard cost of the production output of a week: output volume x top-level standard cost, for each cost component. It includes the output of all production stages.
+The standard cost of the production of a week: production quantity x top-level standard cost, for each cost component. It includes all production stages.
 
 **Yield**:
 The difference between actual output and the output that standard expects from the input, at a price.
