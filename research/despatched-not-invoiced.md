@@ -6,19 +6,20 @@ In this note, "despatched, not invoiced" means: goods with a posted goods issue 
 
 ## Short answer
 
-1. No Qlik Cloud app or sheet for despatched, not invoiced was found. The closest apps are GRNI (the purchase side) and PE Service Level (deliveries, but no billing status). Unknown: if the report is in on-premises Qlik. I could not look there.
-2. The data is in Snowflake, but only in DEV. `DEV_RAW.SAP."jbs_bw4_hana.edw.sd/C_DELIVERYDOCUMENTITEMS_MAIN"` has one row for each delivery item, with goods issue date, goods movement status, billing status and net weight. It loads 3 to 4 times each day. No SAP delivery or billing item table is in `PROD_RAW`.
-3. The status in that table is the status now. It is not the status at the end of a week. Some old rows keep billing status `A` (not billed), but SAP has billed them. So a weekly report needs the billing date from a different table.
-4. For fiscal week 202646 (2026-11-09 to 2026-11-15), every billable delivery item at both pilot plants is billed. On 2026-11-20, the open items are in week 202647 only, plus 7 old rows that are stale.
-5. For question 3: there is no Qlik report to link to today. The app can show the report only after the delivery data moves to a PROD schema, or after the team accepts a DEV source. This is a decision for Gui and Chris.
+1. No Qlik app or sheet for despatched, not invoiced was found, in Qlik Cloud or in on-premises Qlik Sense. The closest apps are GRNI (the purchase side) and Service Level (deliveries, but no billing status).
+2. On-premises Qlik has the data, but no report uses it. The QVD files `DELIVERYDOCUMENTITEMS_FYP_<year period>.qvd` and `DELIVERYDOCUMENTITEMS_OPEN.qvd` have the delivery billing status. The ETL app "Transform S4 Service Level Mapping" copies them each day. No other app script that reloaded in 2026 names the billing status field.
+3. The data is in Snowflake, but only in DEV. `DEV_RAW.SAP."jbs_bw4_hana.edw.sd/C_DELIVERYDOCUMENTITEMS_MAIN"` has one row for each delivery item, with goods issue date, goods movement status, billing status and net weight. It loads 3 to 4 times each day. No SAP delivery or billing item table is in `PROD_RAW`.
+4. The status in that table is the status now. It is not the status at the end of a week. Some old rows keep billing status `A` (not billed), but SAP has billed them. So a weekly report needs the billing date from a different table.
+5. For fiscal week 202646 (2026-11-09 to 2026-11-15), every billable delivery item at both pilot plants is billed. On 2026-11-20, the open items are in week 202647 only, plus 7 old rows that are stale.
+6. For question 3: there is no Qlik report to link to today. The app can show the report only after the delivery data moves to a PROD schema, or after the team accepts a DEV source. This is a decision for Gui and Chris.
 
-Confidence: high that no Qlik Cloud app has this report, and for what is in Snowflake. Medium for the meaning of the SAP status codes, because I used general SAP knowledge and no SAP documentation in the repo. Low for on-premises Qlik, because I did not look there.
+Confidence: high that no Qlik Cloud app has this report, and for what is in Snowflake. High for the names of on-premises apps and sheets, and for the scripts of apps that reloaded in 2026. Medium for the meaning of the SAP status codes, because I used general SAP knowledge and no SAP documentation in the repo. I did not open on-premises QVD files or Qlik Sense apps that reloaded before 2026.
 
 ## Question 1: which Qlik app or sheet has the report?
 
-None was found in Qlik Cloud.
+None was found in Qlik Cloud or in on-premises Qlik Sense.
 
-### What was searched
+### What was searched in Qlik Cloud
 
 Qlik Cloud tenant `pilgrimseurope.eu.qlikcloud.com`, read-only tools, 2026-11-20.
 
@@ -36,7 +37,30 @@ Qlik Cloud tenant `pilgrimseurope.eu.qlikcloud.com`, read-only tools, 2026-11-20
 
 Related report: GRNI (goods received, not invoiced) is the purchase-side report. It is in the apps GRNI (`981bcfdf-28ff-4adc-9529-fcdab19e42b2`, Finance - Prod) and Working Capital, sheet "GRNI - Detail". It is not the report that Gui asked for.
 
-Unknown: if the report is in on-premises Qlik, or is a SAP transaction (for example the billing due list, VF04). I did not have access to on-premises Qlik.
+Unknown: if the report is a SAP transaction (for example the billing due list, VF04), an Excel file or a QlikView document.
+
+### What was searched in on-premises Qlik Sense
+
+Central node `cen-qliksense.moypark.local`, read-only calls to the Repository API (QRS) and the Engine API (`GetScript`, no data opened), 2026-11-20.
+
+| Search | Result |
+| --- | --- |
+| Names and descriptions of all 886 apps, for despatch, dispatch, invoice, unbilled, not billed, DNI, billing, delivery, shipped, accrual, goods issue | 13 apps. Most are Intrastat despatch apps in the Archive stream. Live: "Planned Despatch" (stream 3PL_Logistics) and "Hellenic Weekly Delivery Report" (stream Agri). No app for despatched, not invoiced. |
+| Names of all 7,206 sheets, same words plus open delivery, uninvoiced, to be invoiced, pending billing, accrual, in transit | Billing document sheets in sales apps (COM Reporting, Pilgrims Europe Sales Reporting - S4, Cost of Sales Reporting S4), "In Transit" sheets in procurement apps, "Picking Accrual" in COM Reporting (Archive), "Deliveries billing test" in an Intrastat app (Archive). No sheet for despatched, not invoiced. |
+| Load scripts of 9 candidate apps, for billing status, LIKP, LIPS, VBUK, VBUP, VBFA, goods issue, accrual | No candidate app loads a delivery billing status. Picking Accrual (COM Reporting) has no delivery or billing status field in its script. |
+| Load scripts of all 506 apps that reloaded in 2026, for `DELIVERYRELATEDBILLINGSTATUS`, `BILLINGSTATUS`, `DELIVERYDOCUMENTITEMS`, `FKSTA`, `GBSTK`, VBUK, VBUP, VBFA, LIKP, LIPS, not invoiced, unbilled, not billed | 62 apps. "not Invoiced" is in the S4 Procurement apps only (purchase side). `BILLINGSTATUS` in the COM and COPA transform apps is part of other field names, not `DELIVERYRELATEDBILLINGSTATUS`. `DELIVERYRELATEDBILLINGSTATUS` is only in "Transform S4 Service Level Mapping" and two copies of it. |
+
+The on-premises source:
+
+| Item | Value |
+| --- | --- |
+| ETL app | "Transform S4 Service Level Mapping" (`127ef63b-61f2-4c28-9564-2195faf1b9e2`), stream Qlik Admin ETL. Last reload 2026-11-20. |
+| Input QVDs | `003.QVD\Transactional\SD - Sales and Delivery\DELIVERY DOCUMENT ITEMS\DELIVERYDOCUMENTITEMS_FYP_<year period>.qvd` and `DELIVERYDOCUMENTITEMS_OPEN.qvd` |
+| Output QVDs | `SAP S4\Service Level\Delivery S4\ServiceLevelDeliveryS4_Raw_<year period>.qvd` and `...\OPEN\ServiceLevelDeliveryS4_Raw_OPEN.qvd` |
+| Fields kept | `DELIVERYRELATEDBILLINGSTATUS`, `ITEMISBILLINGRELEVANT`, `INTERCOMPANYBILLINGSTATUS`, `OVERALLINTCOBILLINGSTATUS`, goods movement status |
+| Users of the field | None found. No script of an app that reloaded in 2026 names `DELIVERYRELATEDBILLINGSTATUS`, except the ETL app and its copies. Unknown: which apps load the output QVDs. |
+
+Unknown: which app or job makes `DELIVERYDOCUMENTITEMS_OPEN.qvd`, and which rows it holds. No app script that reloaded in 2026 stores this file. It can be a QlikView job or a Talend job. I did not open the QVD.
 
 ## Question 2: which data does it use? Is it in Snowflake?
 
@@ -145,7 +169,8 @@ This is a decision for Gui and Chris. The facts:
 | --- | --- |
 | A Qlik Cloud report for despatched, not invoiced exists | Not found. There is nothing to link to today. |
 | A Qlik report filters by site and fiscal week | Unknown, because no report was found. |
-| An on-premises Qlik report exists | Unknown. |
+| An on-premises Qlik report exists | Not found. |
+| An on-premises QVD with delivery billing status exists | Yes, `DELIVERYDOCUMENTITEMS_FYP_*.qvd` and `DELIVERYDOCUMENTITEMS_OPEN.qvd`. No report uses the billing status. |
 | Delivery items with goods issue and billing status are in Snowflake | Yes, in `DEV_RAW.SAP` only. Daily load, 3 to 4 times. |
 | The data can filter by plant and fiscal week | Yes. `PLANT` and `ACTUALGOODSMOVEMENTDATE` join to `DIM_CALENDARMASTER`. |
 | The data gives kg | Yes, `ITEMNETWEIGHT`. |
@@ -155,18 +180,19 @@ This is a decision for Gui and Chris. The facts:
 
 ## Questions for people
 
-1. For Gui: which report did you mean? Is it in on-premises Qlik, in a SAP transaction (for example VF04), or in Excel? Can you send a screenshot or the path?
+1. For Gui: which report did you mean? Is it in QlikView, in a SAP transaction (for example VF04), or in Excel? Can you send a screenshot or the path?
 2. For Gui: must the report include STO deliveries (`NL`), or only sales to customers (`ZLF4`)?
 3. For Gui: does site finance need the list at the week end (for example, despatched in the week and not billed by Sunday), or the list today?
 4. For Gui: is kg enough, or does the report need a value? If it needs a value, which price: the sales order price or standard cost?
 5. For the owner of the SAP delivery load (Unknown): can it move from `DEV_RAW` to `PROD_RAW`? Why do some rows keep billing status `A` after SAP bills them? Which load is live: Talend or the Qlik data integration project?
 6. For the owner of the SAP billing condition load (Unknown): why did the load stop on 2026-10-15?
+7. For the owner of the on-premises Qlik ETL (Unknown): which job makes `DELIVERYDOCUMENTITEMS_OPEN.qvd`? Does it have the same stale billing status as the Snowflake table?
 
 Answers: Unknown.
 
 ## Sources
 
-All Snowflake checks are read-only queries in account JBSUSA-PILGRIMS_EUROPE_PROD on 2026-11-20. All Qlik checks are read-only calls to the Qlik Cloud tenant on 2026-11-20.
+All Snowflake checks are read-only queries in account JBSUSA-PILGRIMS_EUROPE_PROD on 2026-11-20. All Qlik checks are read-only calls to the Qlik Cloud tenant and to the on-premises Qlik Sense central node on 2026-11-20.
 
 1. `SNOWFLAKE.ACCOUNT_USAGE.TABLES` and `COLUMNS`: name searches, row counts, table comments.
 2. `DEV_RAW.INFORMATION_SCHEMA.COLUMNS`: fields of the delivery and billing tables.
@@ -177,7 +203,8 @@ All Snowflake checks are read-only queries in account JBSUSA-PILGRIMS_EUROPE_PRO
 7. `SNOWFLAKE.ACCOUNT_USAGE.QUERY_HISTORY`, last 7 days: load method.
 8. `cortex search object`: searches above.
 9. Qlik Cloud: `qlik_search`, `qlik_list_sheets` and `qlik_get_script` for the apps above, and `qlik_get_pipeline_project_details` for project `6a7d87454660619fdb1b907a`.
-10. Repo files: `docs/meeting-transcripts/181126_Meeting.txt`, `research/sales-margin.md`, `research/stock-bom.md`, `GLOSSARY.md`.
+10. On-premises Qlik Sense: QRS `/qrs/app/full` and `/qrs/app/object/full?filter=objectType eq 'sheet'`, and Engine API `OpenDoc` (`qNoData`) and `GetScript` for the apps above.
+11. Repo files: `docs/meeting-transcripts/181126_Meeting.txt`, `research/sales-margin.md`, `research/stock-bom.md`, `GLOSSARY.md`.
 
 Week 202646 by billing status:
 
