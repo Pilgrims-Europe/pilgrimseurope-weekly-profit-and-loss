@@ -8,7 +8,7 @@ Stock movements are in Snowflake. The table `PROD_RAW.SAP."jbs_bw4_hana.edw.scm.
 
 Stock balances are in Snowflake by fiscal period, not by week. `V_MATERIALPRICEMBEW` has the current stock. `V_MATERIALPRICEMBEWH` has stock at the end of past periods.
 
-The BOM is not in a production schema. The only BOM copy is a one-off load from 2026-06-11 in a personal sandbox.
+The BOM was not in a production schema on 2026-11-12. The only BOM copy was a one-off load from 2026-06-11 in a personal sandbox. Update 2026-11-20: a production BOM is now in `PROD_STAGING.SAP.BILLOFMATERIALS`. Its facts are in `research/top-level-standard-cost.md`, "Update 2026-11-20: production BOM".
 
 The tables behind ZL20, ZR63G, ZVAR and ZPP56 are Unknown.
 
@@ -135,9 +135,9 @@ No table in Snowflake has order variances (planned against actual by order). No 
 
 Unknown: the source tables of ZPP56.
 
-No BOM table is in a PROD or DEV schema. A search for STPO, STKO, MAST and BOM names found none.
+On 2026-11-12, no BOM table was in a PROD or DEV schema. A search for STPO, STKO, MAST and BOM names found none.
 
-Update 2026-11-20: a production BOM is now in Snowflake: `PROD_STAGING.SAP.BILLOFMATERIALS`. It is a multi-level explosion with validity dates. See `research/top-level-standard-cost.md`, "Update 2026-11-20". The text below is about the sandbox copy.
+Update 2026-11-20: a production BOM is now in `PROD_STAGING.SAP.BILLOFMATERIALS`. Its facts are in `research/top-level-standard-cost.md`, "Update 2026-11-20: production BOM". The text below is about the sandbox copy.
 
 The only BOM copy is `SNOWFLAKE_LEARNING_DB.CHRISMC_WORKING_WITH_SEMI_STRUCTURED_DATA.BOM_V1` (view `LATEST_BOM` on top). It is a one-off load on 2026-06-11. It has 752,390 rows.
 
@@ -157,7 +157,7 @@ It has no validity dates and no change dates. Unknown: the SAP source of this lo
 
 ## Gaps
 
-1. No BOM in a PROD schema. The sandbox copy is from 2026-06-11 and does not refresh.
+1. No BOM in a PROD schema on 2026-11-12. Closed 2026-11-20: see `PROD_STAGING.SAP.BILLOFMATERIALS` in `research/top-level-standard-cost.md`.
 2. No weekly stock balance. MBEW and MBEWH are by fiscal period. `C_STOCK_BY_PERIOD` is empty and only in DEV.
 3. Goods movements start on 2024-12-30. There is no earlier history.
 4. Fiscal period 2026002 has every row 2 times. Fiscal period 2026003 has every row 3 times. This is true for all plants. Remove duplicates on the document key before use.
@@ -171,7 +171,7 @@ It has no validity dates and no change dates. Unknown: the SAP source of this lo
 2. What do movement types Z61, Z62, Z71 and Z72 mean at Redruth and Bromborough?
 3. How do Redruth and Bromborough calculate production variances today, without orders?
 4. Is the Carrickmacross model plant PF68, WM41 or both?
-5. Who owns the BOM load to `BOM_V1`, and can it move to `PROD_RAW.SAP` with a daily refresh?
+5. Who owns the BOM load to `BOM_V1`, and can it move to `PROD_RAW.SAP` with a daily refresh? Answered 2026-11-20: a production BOM is now in `PROD_STAGING.SAP.BILLOFMATERIALS`. Unknown: the load schedule.
 6. Who owns `C_GOODSMOVEMENTDOCUMENTS_TASK`, and can they remove the duplicate rows in 2026002 and 2026003?
 7. Does site finance need stock at week end, or is period-end stock enough?
 
