@@ -186,12 +186,28 @@ nodes:
     sql: sql/06_wpl_kill_poultry.sql
     description: Poultry kill = birds delivered less DOA. Void loads out. Condemnations are shown, not taken off.
     inputs: [mtech, wpl_site, wpl_kill_poultry_code, wpl_week]
+  - id: wpl_kill_poultry_type
+    label: WPL_KILL_POULTRY_TYPE
+    layer: rules
+    status: planned
+    object: DEV_ANALYTICS.FINANCE_PL_WEEKLY.WPL_KILL_POULTRY_TYPE
+    sql: sql/06_wpl_kill_poultry.sql
+    description: Poultry kill by provenance (Mtech product code). Condemnations are not split by provenance.
+    inputs: [mtech, wpl_site, wpl_week]
   - id: wpl_kill_pork
     label: WPL_KILL_PORK
     layer: rules
     object: DEV_ANALYTICS.FINANCE_PL_WEEKLY.WPL_KILL_PORK
     sql: sql/07_wpl_kill_pork.sql
     description: Pork kill = Killed Qty less TC'd pigs, in head, by kill date.
+    inputs: [hellenic, wpl_site, wpl_week]
+  - id: wpl_kill_pork_type
+    label: WPL_KILL_PORK_TYPE
+    layer: rules
+    status: planned
+    object: DEV_ANALYTICS.FINANCE_PL_WEEKLY.WPL_KILL_PORK_TYPE
+    sql: sql/07_wpl_kill_pork.sql
+    description: Pork kill by provenance (Hellenic super category). Detail only, no daily floor at 0.
     inputs: [hellenic, wpl_site, wpl_week]
   - id: wpl_sales_detail
     label: WPL_SALES_DETAIL
@@ -312,6 +328,22 @@ nodes:
     sql: sql/14_wpl_refresh.sql
     description: Table copy of WPL_KILL_PORK.
     inputs: [wpl_kill_pork]
+  - id: wpl_t_kill_poultry_type
+    label: WPL_T_KILL_POULTRY_TYPE
+    layer: refresh
+    status: planned
+    object: DEV_ANALYTICS.FINANCE_PL_WEEKLY.WPL_T_KILL_POULTRY_TYPE
+    sql: sql/14_wpl_refresh.sql
+    description: Table copy of WPL_KILL_POULTRY_TYPE.
+    inputs: [wpl_kill_poultry_type]
+  - id: wpl_t_kill_pork_type
+    label: WPL_T_KILL_PORK_TYPE
+    layer: refresh
+    status: planned
+    object: DEV_ANALYTICS.FINANCE_PL_WEEKLY.WPL_T_KILL_PORK_TYPE
+    sql: sql/14_wpl_refresh.sql
+    description: Table copy of WPL_KILL_PORK_TYPE.
+    inputs: [wpl_kill_pork_type]
   - id: wpl_t_dq_data_to
     label: WPL_T_DQ_DATA_TO
     layer: refresh
@@ -349,7 +381,7 @@ nodes:
     object: DEV_ANALYTICS.FINANCE_PL_WEEKLY.WEEKLY_PL
     sql: app/lib/wpl.ts
     description: Snowflake app (application service). Reads the refreshed tables and the site and line views.
-    inputs: [wpl_t_weekly_pl, wpl_t_gl_week, wpl_t_kill_poultry, wpl_t_kill_poultry_code, wpl_t_kill_pork, wpl_t_dq_freshness, wpl_t_dq_unmapped, wpl_t_dq_production_tonnage, wpl_t_sales_detail, wpl_site, wpl_line, wpl_week]
+    inputs: [wpl_t_weekly_pl, wpl_t_gl_week, wpl_t_kill_poultry, wpl_t_kill_poultry_code, wpl_t_kill_poultry_type, wpl_t_kill_pork, wpl_t_kill_pork_type, wpl_t_dq_freshness, wpl_t_dq_unmapped, wpl_t_dq_production_tonnage, wpl_t_sales_detail, wpl_site, wpl_line, wpl_week]
   - id: qlik
     label: Qlik
     layer: consumers

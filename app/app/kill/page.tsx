@@ -3,7 +3,7 @@ import { FilterBar } from '@/components/filter-bar';
 import { KpiCard } from '@/components/kpi-card';
 import { RagBadge } from '@/components/rag-badge';
 import { Table, TableBody, TableCell, TableFooter, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { getPorkKill, getPoultryCodes, getPoultryKill, resolveFilters } from '@/lib/wpl';
+import { getPorkKill, getPorkTypes, getPoultryCodes, getPoultryKill, getPoultryTypes, resolveFilters } from '@/lib/wpl';
 import { formatUnit, weekLabel } from '@/lib/wpl-format';
 import type React from 'react';
 
@@ -50,9 +50,10 @@ export default async function KillPage({ searchParams }: { searchParams: Promise
     ];
 
     if (site.SITE_KIND === 'POULTRY_KILL') {
-      const [days, codes] = await Promise.all([
+      const [days, codes, types] = await Promise.all([
         getPoultryKill(site.SITE, week.WEEK_START),
         getPoultryCodes(site.SITE, week.WEEK_START),
+        getPoultryTypes(site.SITE, week.WEEK_START),
       ]);
       content = (
         <>
@@ -113,6 +114,52 @@ export default async function KillPage({ searchParams }: { searchParams: Promise
             )}
           </Card>
           <Card
+            title="Kill by provenance"
+            note="Provenance is the Mtech product code on the load. Condemnations are not here: Mtech holds them by site and code, with no product, so they cannot be split by provenance. That does not change kill, because condemnations are not taken off kill."
+          >
+            {types.length === 0 ? (
+              <EmptyState title="No kill by provenance this week" className="m-5" />
+            ) : (
+              <Table striped>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Provenance</TableHead>
+                    <TableHead numeric>Loads</TableHead>
+                    <TableHead numeric>Delivered</TableHead>
+                    <TableHead numeric>DOA</TableHead>
+                    <TableHead numeric>Kill</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {types.map((t) => (
+                    <TableRow key={String(t.PRODUCT_CODE)}>
+                      <TableCell>
+                        <span className="font-mono text-xs">{String(t.PRODUCT_CODE)}</span>
+                        {t.PRODUCT_NAME && (
+                          <span className="block text-xs text-muted-foreground">{String(t.PRODUCT_NAME)}</span>
+                        )}
+                      </TableCell>
+                      <TableCell numeric>{n(t.LOADS)}</TableCell>
+                      <TableCell numeric>{n(t.BIRDS_DELIVERED)}</TableCell>
+                      <TableCell numeric>{n(t.DOA)}</TableCell>
+                      <TableCell numeric className="font-semibold">{n(t.BIRDS_KILLED)}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+                <TableFooter>
+                  <TableRow>
+                    <TableCell>Week</TableCell>
+                    {['LOADS', 'BIRDS_DELIVERED', 'DOA', 'BIRDS_KILLED'].map((k) => (
+                      <TableCell key={k} numeric>
+                        {n(sum(types, k))}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                </TableFooter>
+              </Table>
+            )}
+          </Card>
+          <Card
             title="Condemnations by code"
             note="Condemnations are not taken off kill. The meaning of CALCULATIONCATEGORY 1 and 2 is Unknown. Some codes are part rejects, not whole birds."
           >
@@ -144,7 +191,10 @@ export default async function KillPage({ searchParams }: { searchParams: Promise
         </>
       );
     } else {
-      const days = await getPorkKill(site.SITE, week.WEEK_START);
+      const [days, types] = await Promise.all([
+        getPorkKill(site.SITE, week.WEEK_START),
+        getPorkTypes(site.SITE, week.WEEK_START),
+      ]);
       content = (
         <>
           <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
@@ -202,6 +252,47 @@ export default async function KillPage({ searchParams }: { searchParams: Promise
                     {['BOOKINGS', 'PIGS_DELIVERED', 'DOA', 'DIP', 'CASUALTY', 'KILLED_QTY', 'TC_PRODUCER_RESP', 'TC_FACTORY_RESP', 'PIGS_KILLED'].map((k) => (
                       <TableCell key={k} numeric>
                         {n(sum(days, k))}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                </TableFooter>
+              </Table>
+            )}
+          </Card>
+          <Card
+            title="Kill by provenance"
+            note="Provenance is the Hellenic super category. The labels are the Hellenic names, not Gui's grouping (RT, ODB, Free Range, GOS, Organic). Hellenic has no Red Tractor field, so the mapping needs Gui's answer. Detail only: this does not floor kill at 0 for a day. No day has ever needed the floor, so the split matches the kill above."
+          >
+            {types.length === 0 ? (
+              <EmptyState title="No kill by provenance this week" className="m-5" />
+            ) : (
+              <Table striped>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Provenance</TableHead>
+                    <TableHead numeric>Over scale</TableHead>
+                    <TableHead numeric>TC&apos;d producer</TableHead>
+                    <TableHead numeric>TC&apos;d factory</TableHead>
+                    <TableHead numeric>Kill</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {types.map((t) => (
+                    <TableRow key={String(t.SUPER_CATEGORY)}>
+                      <TableCell>{String(t.SUPER_CATEGORY)}</TableCell>
+                      <TableCell numeric>{n(t.KILLED_QTY)}</TableCell>
+                      <TableCell numeric>{n(t.TC_PRODUCER_RESP)}</TableCell>
+                      <TableCell numeric>{n(t.TC_FACTORY_RESP)}</TableCell>
+                      <TableCell numeric className="font-semibold">{n(t.PIGS_KILLED)}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+                <TableFooter>
+                  <TableRow>
+                    <TableCell>Week</TableCell>
+                    {['KILLED_QTY', 'TC_PRODUCER_RESP', 'TC_FACTORY_RESP', 'PIGS_KILLED'].map((k) => (
+                      <TableCell key={k} numeric>
+                        {n(sum(types, k))}
                       </TableCell>
                     ))}
                   </TableRow>

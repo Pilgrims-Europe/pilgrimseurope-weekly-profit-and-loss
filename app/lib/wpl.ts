@@ -367,11 +367,42 @@ export async function getPoultryCodes(site: string, weekStart: string) {
   );
 }
 
+/**
+ * Poultry kill by provenance (Mtech PRODUCTNO) for one site and week.
+ * Condemnations are not here: PMTSCONDEMNTRANS has no product, so they cannot be split.
+ * That does not change kill, because condemnations are not taken off kill.
+ */
+export async function getPoultryTypes(site: string, weekStart: string) {
+  return rows(
+    `SELECT PRODUCT_CODE, PRODUCT_NAME, SUM(LOADS) AS LOADS, SUM(BIRDS_DELIVERED) AS BIRDS_DELIVERED,
+            SUM(DOA) AS DOA, SUM(BIRDS_KILLED) AS BIRDS_KILLED
+     FROM ${SCHEMA}.WPL_T_KILL_POULTRY_TYPE WHERE SITE = ? AND WEEK_START = ?
+     GROUP BY ALL HAVING SUM(BIRDS_KILLED) <> 0 ORDER BY BIRDS_KILLED DESC`,
+    [site, weekStart],
+  );
+}
+
 export async function getPorkKill(site: string, weekStart: string) {
   return rows(
     `SELECT TO_VARCHAR(KILL_DATE, 'YYYY-MM-DD') AS KILL_DATE, BOOKINGS, PIGS_DELIVERED, DOA, DIP, CASUALTY,
             TC_PRODUCER_RESP, TC_FACTORY_RESP, KILLED_QTY, PIGS_KILLED
      FROM ${SCHEMA}.WPL_T_KILL_PORK WHERE SITE = ? AND WEEK_START = ? ORDER BY KILL_DATE`,
+    [site, weekStart],
+  );
+}
+
+/**
+ * Pork kill by provenance (the Hellenic super category) for one site and week.
+ * Detail only: WPL_KILL_PORK_TYPE does not floor kill at 0 for a day, so this can differ
+ * slightly from PIGS_KILLED on the kill line. WPL_T_KILL_PORK is the one source for kill.
+ */
+export async function getPorkTypes(site: string, weekStart: string) {
+  return rows(
+    `SELECT SUPER_CATEGORY, SUM(BOOKINGS) AS BOOKINGS, SUM(PIGS_DELIVERED) AS PIGS_DELIVERED,
+            SUM(KILLED_QTY) AS KILLED_QTY, SUM(TC_PRODUCER_RESP) AS TC_PRODUCER_RESP,
+            SUM(TC_FACTORY_RESP) AS TC_FACTORY_RESP, SUM(PIGS_KILLED) AS PIGS_KILLED
+     FROM ${SCHEMA}.WPL_T_KILL_PORK_TYPE WHERE SITE = ? AND WEEK_START = ?
+     GROUP BY ALL HAVING SUM(PIGS_KILLED) <> 0 ORDER BY PIGS_KILLED DESC`,
     [site, weekStart],
   );
 }
